@@ -51,3 +51,20 @@ export const Fonts = Platform.select({
     mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
   },
 });
+
+/**
+ * RethinkSans font family definitions
+ * Use these font names in your Text components: fontFamily: 'RethinkSans-Regular'
+ */
+export const RethinkSans = {
+  regular: 'RethinkSans-Regular',
+  medium: 'RethinkSans-Medium',
+  semiBold: 'RethinkSans-SemiBold',
+  bold: 'RethinkSans-Bold',
+  extraBold: 'RethinkSans-ExtraBold',
+  italic: 'RethinkSans-Italic',
+  mediumItalic: 'RethinkSans-MediumItalic',
+  semiBoldItalic: 'RethinkSans-SemiBoldItalic',
+  boldItalic: 'RethinkSans-BoldItalic',
+  extraBoldItalic: 'RethinkSans-ExtraBoldItalic',
+} as const;
