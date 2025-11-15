@@ -1,8 +1,34 @@
-# Welcome to your Expo app 👋
+# SiteMate AI
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+<div align="center">
+  <img src="assets/imgs/logo.png" alt="SiteMate AI Logo" width="200"/>
+</div>
 
-## Get started
+SiteMate AI is an easy-to-use app that checks your website's health. It finds problems, suggests quick fixes, and helps your website perform better - no tech skills needed.
+
+SiteMate AI is like a mechanic for your website. It checks for problems to keep your website running fast and your visitors happy. When issues are found, you can instantly request for verified professionals to fix them.
+
+<div align="center">
+  <img src="assets/imgs/onboarding.png" alt="SiteMate AI Onboarding" width="600"/>
+</div>
+
+## Features
+
+- 🔍 **Website Health Checks** - Automatically scans your website for issues
+- 🛠️ **Quick Fix Suggestions** - Get actionable recommendations to improve performance
+- 👨‍💼 **Professional Services** - Request verified professionals to fix issues instantly
+- 📱 **Cross-Platform** - Available on iOS, Android, and Web
+- 🎯 **No Tech Skills Required** - Simple and intuitive interface for everyone
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (v18 or higher)
+- npm or yarn
+- Expo CLI (optional, but recommended)
+
+### Installation
 
 1. Install dependencies
 
@@ -10,41 +36,61 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    npm install
    ```
 
-2. Start the app
+2. Start the development server
 
    ```bash
-   npx expo start
+   npm start
    ```
 
-In the output, you'll find options to open the app in a
+   Or use specific platform commands:
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+   ```bash
+   npm run ios      # iOS simulator
+   npm run android  # Android emulator
+   npm run web      # Web browser
+   ```
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Project Structure
 
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+site-audit-ai-fe/
+├── app/              # Main application code (file-based routing)
+├── assets/           # Images, fonts, and other static assets
+│   └── imgs/         # Logo and onboarding images
+├── components/       # Reusable React components
+├── constants/        # App constants and configuration
+└── hooks/            # Custom React hooks
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Development
 
-## Learn more
+This project uses:
+- **React Native** with **Expo** for cross-platform development
+- **TypeScript** for type safety
+- **Expo Router** for file-based navigation
+- **ESLint** for code linting
+- **Prettier** for code formatting
 
-To learn more about developing your project with Expo, look at the following resources:
+### Available Scripts
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+- `npm start` - Start the Expo development server
+- `npm run lint` - Run ESLint to check for linting errors
+- `npm run lint:fix` - Fix ESLint errors automatically
+- `npm run format` - Format code with Prettier
+- `npm run format:check` - Check code formatting without making changes
 
-## Join the community
+### Code Quality
 
-Join our community of developers creating universal apps.
+This project uses Husky and lint-staged to ensure code quality:
+- Pre-commit hooks automatically run ESLint on staged files
+- Code must pass linting checks before commits are allowed
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Learn More
+
+- [Expo Documentation](https://docs.expo.dev/)
+- [React Native Documentation](https://reactnative.dev/)
+- [Expo Router Documentation](https://docs.expo.dev/router/introduction/)
+
+## License
+
+Private project
