@@ -37,7 +37,6 @@ const styles = StyleSheet.create({
         padding: 5,
         paddingHorizontal: 10,
         borderWidth: 1,
-        borderColor: "#babec6",
         borderRadius: 12,
         marginTop: 12
     },
@@ -94,10 +93,11 @@ const styles = StyleSheet.create({
         fontSize: 16,
         marginLeft: 10,
     },
-    SignInContainer: {
+    SignUpContainer: {
         flexDirection: 'row',
         alignItems: "center",
-        justifyContent: 'center'
+        justifyContent: 'center',
+        marginTop: 30
     },
     existingAccountText: {
         marginTop: 40,
@@ -106,11 +106,28 @@ const styles = StyleSheet.create({
         fontFamily: "RethinkSans-Regular",
         fontSize: 18
     },
-    SignIN: {
-         marginTop: 40,
+    SignUp: {
+        marginTop: 40,
         color: "blue",
         fontFamily: "RethinkSans-SemiBold",
         fontSize: 18
+    },
+    incorrectPassword: {
+        color: "#ff5a3d",
+        fontFamily: "RethinkSans-Regular",
+        fontSize: 14,
+        marginTop: 8
+    },
+    forgotPasswordContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        marginTop: 25
+    },
+    forgotPasswordText: {
+        color: "blue",
+        fontFamily: "RethinkSans-Regular",
+        fontSize: 14.5,
     },
 })
 
