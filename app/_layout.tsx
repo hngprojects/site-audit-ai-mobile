@@ -33,12 +33,12 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (fontsLoaded || fontError) {
-      // Hide the splash screen once fonts are loaded or if there's an error
+      
       SplashScreen.hideAsync();
     }
   }, [fontsLoaded, fontError]);
 
-  // Don't render the app until fonts are loaded
+ 
   if (!fontsLoaded && !fontError) {
     return null;
   }
@@ -48,10 +48,11 @@ export default function RootLayout() {
       <Stack initialRouteName='index'>
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+        <Stack.Screen name="signUp" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
       </Stack>
-      <StatusBar style="auto" />
+      <StatusBar style="dark" />
     </ThemeProvider>
   );
 }

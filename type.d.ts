@@ -23,3 +23,9 @@ export type Country = {
   languages?: Record<string, string>;
 };
 
+export interface Slide {
+  id: string;
+  image: any;
+  title: string;
+  subtitle: string;
+}
