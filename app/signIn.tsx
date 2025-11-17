@@ -10,7 +10,7 @@ const SignIn = () => {
     useEffect(() => {
         navigation.setOptions({ headerShown: false });
 
-    })
+    }, [navigation])
     
   return (
     <View style = {{
