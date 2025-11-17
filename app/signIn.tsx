@@ -17,7 +17,7 @@ const SignIn = () => {
 
     useEffect(() => {
         navigation.setOptions({ headerShown: false });
-          setIncorrectPassword(false)
+          
     }, [navigation])
     
   return (
