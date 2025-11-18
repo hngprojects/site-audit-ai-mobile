@@ -1,5 +1,5 @@
 import { slides } from "@/constants/onboardingSlide";
-import styles from "@/Stylesheets/onboardingStylesheet";
+import styles from "@/stylesheets/onboardingStylesheet";
 import { Slide } from "@/type";
 import { useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
