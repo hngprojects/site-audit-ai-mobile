@@ -1,5 +1,5 @@
 import { getAllCountries } from '@/Service/httpsRequest';
-import styles from '@/Stylesheets/LanguageScreenStylesheet';
+import styles from '@/Stylesheets/languageScreenStylesheet';
 import { Country } from '@/type';
 import Feather from '@expo/vector-icons/Feather';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
@@ -131,7 +131,7 @@ const Index = () => {
           </View>
 
             <TouchableOpacity 
-              onPress={() => router.push('./onboarding')}
+              onPress={() => router.replace('./onboarding')}
               style={styles.continueButton}>
               <Text style={styles.btnText}>
                 Continue

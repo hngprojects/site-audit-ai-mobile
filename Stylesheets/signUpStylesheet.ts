@@ -8,13 +8,13 @@ const styles = StyleSheet.create({
     },
     logo: {
         alignItems: "center",
-        marginTop: 50,
-        marginLeft: 75,
+        marginTop: -60,
     },
     createAccountTitle: {
         color: "#000",
         fontFamily: "RethinkSans-Bold",
-        fontSize: 20
+        fontSize: 20,
+        marginTop: -55
     },
     textInputLabel: {
         color: "#000",
@@ -63,7 +63,8 @@ const styles = StyleSheet.create({
     continueWithSection: {
         flexDirection: "row",
         alignItems: 'center',
-        marginTop: 25
+        justifyContent: "center",
+        marginTop: 20
     },
     Line: {
         width: 85,
@@ -81,7 +82,20 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         borderWidth: 1,
         borderColor: "#babec6",
-        marginTop: 35,
+        marginTop: 20,
+        padding: 10, 
+        justifyContent: "center",
+        alignItems: 'center',
+        paddingVertical: 8,
+        flexDirection: 'row',
+    },
+    AppleSocialSIgninButton: {
+        width: '100%',
+        height: 50,
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: "#babec6",
+        marginTop: 15,
         padding: 10, 
         justifyContent: "center",
         alignItems: 'center',
@@ -97,7 +111,8 @@ const styles = StyleSheet.create({
     SignInContainer: {
         flexDirection: 'row',
         alignItems: "center",
-        justifyContent: 'center'
+        justifyContent: 'center',
+        marginTop: -20
     },
     existingAccountText: {
         marginTop: 40,
