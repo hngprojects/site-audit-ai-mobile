@@ -1,4 +1,4 @@
-import styles from '@/Stylesheets/signInStylesheet';
+import styles from '@/stylesheets/signInStylesheet';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -27,13 +27,15 @@ const SignIn = () => {
         ...styles.container
     }}>
       
-              <Image
-                  style={{
-                  height: 50,
-                  width: 50,
-                  ...styles.logo,
-                  }}
-              />
+            <Image
+                source={require('../assets/images/icon.png')}
+                style={{
+                    width: 140,
+                    resizeMode: "contain",
+                    alignSelf: "center",
+                    ...styles.logo,
+                }}
+            />
       
               <Text style={{...styles.createAccountTitle}}>
                   Sign in to your account
@@ -125,6 +127,20 @@ const SignIn = () => {
       
                   <Text style={styles.Google}>
                       Continue with Google
+                  </Text>
+              </TouchableOpacity>
+               <TouchableOpacity style={styles.AppleSocialSIgninButton}>
+      
+                  <Image 
+                  source={require('../assets/images/apple.png')}
+                  style={{
+                      height: 35,
+                      width: 35,
+                  }}
+                  />
+      
+                  <Text style={styles.Google}>
+                      Continue with Apple
                   </Text>
               </TouchableOpacity>
       
