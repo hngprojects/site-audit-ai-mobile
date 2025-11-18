@@ -1,4 +1,4 @@
-import { getAllCountries } from '@/Service/httpsRequest';
+import { getAllCountries } from '@/service/httpsRequest';
 import styles from '@/stylesheets/languageScreenStylesheet';
 import { Country } from '@/type';
 import Feather from '@expo/vector-icons/Feather';

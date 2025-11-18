@@ -1,98 +1,119 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import AuditResultCard from "@/components/auditResultCard";
+import EmptyState from "@/components/homeScreenEmptyState";
+import styles from "@/stylesheets/homeScreenStylesheet";
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import Octicons from "@expo/vector-icons/Octicons";
+import { useState } from "react";
+import { Image, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const inset = useSafeAreaInsets();
+ // const router = useRouter();
+  const [websiteUrl, setWebsiteUrl] = useState<string>('');
+  const [urlAvailable , setUrlAvailable ] = useState<boolean>(true);
+  
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+
+  const [audits] = useState([
+    { url: "http://www.figma.com", status: "Passed" },
+    { url: "http://www.figma.com", status: "Average" },
+    { url: "http://www.figma.com", status: "Average" },
+  ]);
+
+  const RunAudit = () => {
+    if(websiteUrl === "")
+      return setUrlAvailable( false)
+    
+  }
+
+  return (
+    <View
+      style={{
+        paddingTop: inset.top,
+        paddingBottom: inset.bottom,
+        ...styles.container,
+      }}
+    >
+     
+      <TouchableOpacity style={styles.notificationContainer}>
+        <Octicons name="bell" size={24} color="black" />
+      </TouchableOpacity>
+
+      
+        <View style={styles.headingSection}>
+          <Text style={styles.title}>Want to know how your website&apos;s doing?</Text>
+          <Text style={styles.sub}>
+            Enter your link to get a quick AI review.
+          </Text>
+        </View>
+
+       
+        <View style={[styles.inputPlaceholder, {borderColor: !urlAvailable ? "#d32f2f" : "#bbbcbc",}]}>
+          <MaterialCommunityIcons 
+            name="web" size={24} 
+            color="#A0A0A0" 
+            style={styles.webIcon}
+          />
+          <TextInput
+            placeholder="Enter your website URL"
+            placeholderTextColor={"#A0A0A0"}
+            style={styles.placeholderText}
+            onChangeText={x => setWebsiteUrl(x)}
+          />
+        </View>
+        {!urlAvailable && (
+          <Text style={styles.invalidLink}>Invalid link. Please try again</Text>
+        )}
+
+      
+        <View style={styles.tipBox}>
+          <View style={styles.buldIcon}>
+              <MaterialCommunityIcons name="lightbulb-on-10" size={24} color="black" />
+          </View>
+          <Text style={styles.tipText}>
+            Pro tip: Regular audits help you stay ahead of SEO changes and
+            maintain optimal website performance.
+          </Text>
+        </View>
+
+        
+        <Text style={styles.sectionTitle}>Recent audits</Text>
+
+      <ScrollView showsVerticalScrollIndicator={false}>
+       
+        {audits.length === 0 ? (
+          <EmptyState />
+        ) : (
+          audits.map((item, index) => (
+            <AuditResultCard
+              key={index}
+              url={item.url}
+              status={item.status as any}
+              score="70"
+              time="5"
+            />
+          ))
+        )}
+
+        <View style={{ height: 100 }} /> 
+      </ScrollView>
+
+   
+      <TouchableOpacity 
+        onPress={RunAudit}
+        style={styles.runButton}
+      >
+        <Image 
+          source={require("../../assets/images/Logo1.png")}
+          style={
+            styles.runButtonImage
+          }
+          resizeMode="contain"
+        />
+        <Text style={styles.runButtonText}>Run audit</Text>
+      </TouchableOpacity>
+    </View>
   );
 }
-
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-});

@@ -51,7 +51,7 @@ const Onboarding = () => {
     if (index < slides.length - 1) {
       flatListRef.current?.scrollToIndex({ index: index + 1 });
     } else {
-      router.replace("./signUp"); 
+      router.replace("./(tabs)/"); 
     }
   };
 
@@ -59,7 +59,7 @@ const Onboarding = () => {
     <View style={{...styles.container, paddingTop: inset.top, paddingBottom: inset.bottom - 15}}>
       
       <TouchableOpacity
-      onPress={() => router.replace("./signUp")} 
+      onPress={() => router.replace("./(tabs)/")} 
         style={styles.skipButton}
        >
         <Text style={styles.skipText}>Skip</Text>

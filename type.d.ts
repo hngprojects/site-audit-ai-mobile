@@ -29,3 +29,10 @@ export interface Slide {
   title: string;
   subtitle: string;
 }
+
+export type AuditResultCardProps = {
+  url: string;
+  status: "Passed" | "Average" | "Failed";
+  score: string;
+  time: string
+};
