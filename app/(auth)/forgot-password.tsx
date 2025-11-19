@@ -1,4 +1,4 @@
-import styles from '@/stylesheets/forgot-password-stylesheet';
+import styles from '@/Stylesheets/forgot-password-stylesheet';
 import { Feather } from '@expo/vector-icons';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';

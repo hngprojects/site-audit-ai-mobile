@@ -1,4 +1,4 @@
-import styles from '@/stylesheets/sign-in-stylesheet';
+import styles from '@/Stylesheets/sign-in-stylesheet';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
