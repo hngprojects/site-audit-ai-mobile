@@ -2,7 +2,7 @@ import styles from '@/stylesheets/signUpStylesheet';
 import Feather from '@expo/vector-icons/Feather';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Image, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Image, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 
@@ -12,8 +12,50 @@ const SignUp = () => {
 
     const [fullName, setFullName] = useState<string>('');
     const [email, setEmail] = useState<string>('');
-    const [Password, setPassword] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
     const [secureTextEntry, setSecureTextEntry] = useState<boolean>(true);
+    const [loading, setloading] = useState<boolean>(false);
+
+
+
+
+    const handleSignUp = () => {
+        setloading(true);
+        
+        if (!fullName) {
+            alert("Please enter your full name.");
+            setloading(false);
+            return;
+        }
+        
+        if (!email) {
+            alert("Please enter your email.");
+            setloading(false);
+            return;
+        }
+
+        if (!password) {
+            alert("Please enter your password ");
+            setloading(false);
+            return;
+        }
+        
+        try {
+             router.replace("./(tabs)/"); 
+            
+        } catch (error: any) {
+
+            console.error("Sign-up error:", error);
+
+            alert("An error occurred during sign-up. Please try again.");
+
+        } finally {
+            setloading(false);
+        }
+
+      }
+
+
 
   return (
     <View style= {{
@@ -72,7 +114,7 @@ const SignUp = () => {
                 placeholder="user@gmail.com"
                 style={styles.passwordTextInput}
                 placeholderTextColor="#dfdfdfff"
-                value={Password}
+                value={password}
                 onChangeText={x => setPassword(x)}
                 secureTextEntry={secureTextEntry}
             />
@@ -89,11 +131,22 @@ const SignUp = () => {
 
         </View>
 
-        <TouchableOpacity style={styles.signUpButton}>
-            <Text style={styles.signUpText}>
-                Sign Up
-            </Text>
-        </TouchableOpacity>
+        {loading ? (
+            <ActivityIndicator 
+                size="large" 
+                color="#ff5a3d" 
+                style={{marginTop: 20}} 
+            />
+        ) : (
+            <TouchableOpacity 
+                onPress={handleSignUp}
+                style={styles.signUpButton} 
+            >
+                <Text style={styles.signUpText}>
+                    Sign Up
+                </Text>
+            </TouchableOpacity>
+        )}
         
         <View style={styles.continueWithSection}>
             <View style={styles.Line}/>

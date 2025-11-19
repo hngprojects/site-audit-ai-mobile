@@ -131,7 +131,7 @@ const Index = () => {
           </View>
 
             <TouchableOpacity 
-              onPress={() => router.replace('./onboarding')}
+              onPress={() => router.replace("./signUp")}
               style={styles.continueButton}>
               <Text style={styles.btnText}>
                 Continue

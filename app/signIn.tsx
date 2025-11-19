@@ -2,7 +2,7 @@ import styles from '@/stylesheets/signInStylesheet';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Image, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Image, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const SignIn = () => {
@@ -14,6 +14,47 @@ const SignIn = () => {
       const [Password, setPassword] = useState<string>('');
       const [secureTextEntry, setSecureTextEntry] = useState<boolean>(true);
       const [IncorrectPassword, setIncorrectPassword] = useState<boolean>(false);
+      const [loading, setloading] = useState<boolean>(false);
+
+
+      const handleSignIn = () => {
+        setloading(true);
+        
+        if (!email) {
+            alert("Please enter your email.");
+            setloading(false);
+            return;
+        }
+
+
+        if (!Password) {
+            alert("Please enter your password ");
+            setloading(false);
+            return;
+        }
+        
+        
+        try {
+             router.replace("./(tabs)/"); 
+            
+        } catch (error: any) {
+
+            console.error("Sign-in error:", error);
+
+            if(error.code === 'AUTH_INVALID_CREDENTIALS'){
+                alert("The email or password you entered is incorrect. Please try again.");
+                setIncorrectPassword(true);
+                return;
+            }
+
+            alert("An error occurred during sign-in. Please try again.");
+
+        } finally {
+            setloading(false);
+        }
+
+      }
+
 
     useEffect(() => {
         navigation.setOptions({ headerShown: false });
@@ -59,7 +100,7 @@ const SignIn = () => {
                   Password
               </Text>
       
-              <View style={{
+            <View style={{
                 borderColor: IncorrectPassword ? "#ff5a3d" : "#babec6",
                 ...styles.passwordContainer
                 }}>
@@ -98,11 +139,23 @@ const SignIn = () => {
                 </Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.signUpButton}>
-                  <Text style={styles.signUpText}>
-                      Sign in
-                  </Text>
-              </TouchableOpacity>
+              {loading ? (
+                <ActivityIndicator 
+                    size="large" 
+                    color="#ff5a3d" 
+                    style={{marginTop: 20}} 
+                />
+              ) : (
+                
+                <TouchableOpacity 
+                    onPress={handleSignIn}
+                    style={styles.signUpButton}>
+                        <Text style={styles.signUpText}>
+                            Sign in
+                        </Text>
+                </TouchableOpacity>
+
+              )}
               
               <View style={styles.continueWithSection}>
                   <View style={styles.Line}/>
