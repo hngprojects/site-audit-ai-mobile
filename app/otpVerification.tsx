@@ -36,7 +36,7 @@ const OTPVerification = () => {
     onPress={Keyboard.dismiss}
     >
      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        behavior={"padding"}
         style={{
           ...styles.container,
           paddingTop: insets.top , 
