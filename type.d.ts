@@ -36,3 +36,8 @@ export type AuditResultCardProps = {
   score: string;
   time: string
 };
+
+export interface ResetPasswordEmailState {
+  passwordRecoveryEmail: string;
+  setPasswordRecoveryEmail: (email: string) => void;
+}

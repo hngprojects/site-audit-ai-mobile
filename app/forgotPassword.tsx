@@ -1,4 +1,5 @@
 import styles from '@/stylesheets/forgotPasswordStylesheet';
+import { useResetPasswordEmailStore } from '@/zustardStore/resetPasswordEmailStore';
 import { Feather } from '@expo/vector-icons';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
@@ -14,6 +15,8 @@ const ForgotPassword = () => {
     const [verificationEmail, setVerificationEmail] = useState<boolean>(false)
     const [loading, setLoading] = useState<boolean>(false);
 
+    const { setPasswordRecoveryEmail } = useResetPasswordEmailStore();
+
 
     
 
@@ -22,6 +25,7 @@ const ForgotPassword = () => {
 
         try {
             
+            setPasswordRecoveryEmail(email);
             setVerificationEmail(true);
         } catch (error: any) {
             console.error("Error sending reset code:", error);

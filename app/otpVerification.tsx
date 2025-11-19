@@ -1,4 +1,5 @@
 import styles from "@/stylesheets/otpVerificationStylesheet";
+import { useResetPasswordEmailStore } from "@/zustardStore/resetPasswordEmailStore";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
@@ -14,6 +15,8 @@ const OTPVerification = () => {
   const [invalidOtp, setInvalidOtp] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   
+
+  const emailWeSentYourCode = useResetPasswordEmailStore((state) => state.passwordRecoveryEmail);
 
   const confirmCode = () => {
     setLoading(true);
@@ -47,7 +50,7 @@ const OTPVerification = () => {
 
       <Text style={styles.subTitle}>
         We&apos;ve sent a 6-digit code to{" "}
-        <Text style={styles.email}>danielmartins@gmail.com</Text>. Enter it
+        <Text style={styles.email}>{emailWeSentYourCode}</Text>. Enter it
         below to confirm your email.
       </Text>
 
