@@ -1,4 +1,4 @@
-import styles from '@/stylesheets/signUpStylesheet';
+import styles from '@/stylesheets/sign-up-stylesheet';
 import Feather from '@expo/vector-icons/Feather';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
@@ -23,7 +23,7 @@ const SignUp = () => {
         }}
     >
         <Image
-            source={require('../assets/images/icon.png')}
+            source={require('../../assets/images/icon.png')}
             style={{
             width: 140,
             resizeMode: "contain",
@@ -109,7 +109,7 @@ const SignUp = () => {
          <TouchableOpacity style={styles.SocialSIgninButton}>
 
             <Image 
-            source={require('../assets/images/google.png')}
+            source={require('../../assets/images/google.png')}
             style={{
                 height: 25,
                 width: 25,
@@ -124,7 +124,7 @@ const SignUp = () => {
                <TouchableOpacity style={styles.AppleSocialSIgninButton}>
       
                   <Image 
-                  source={require('../assets/images/apple.png')}
+                  source={require('../../assets/images/apple.png')}
                   style={{
                       height: 35,
                       width: 35,
@@ -140,7 +140,7 @@ const SignUp = () => {
             <Text style = {styles.existingAccountText}>
                 Already have an account?
             </Text>
-            <TouchableOpacity onPress={() => router.push("./signIn")}>
+            <TouchableOpacity onPress={() => router.push('/(auth)/sign-in')}>
                 <Text style= {styles.SignIN}>Sign In</Text>
             </TouchableOpacity>
         </View>
@@ -149,3 +149,4 @@ const SignUp = () => {
 }
 
 export default SignUp
+

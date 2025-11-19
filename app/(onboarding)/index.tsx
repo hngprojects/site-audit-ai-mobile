@@ -1,17 +1,17 @@
 import { slides } from "@/constants/onboardingSlide";
-import styles from "@/stylesheets/onboardingStylesheet";
+import styles from "@/stylesheets/onboarding-stylesheet";
 import { Slide } from "@/type";
 import { useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
 import {
-  Animated,
-  Dimensions,
-  FlatList,
-  Image,
-  Text,
-  TouchableOpacity,
-  View,
-  ViewToken
+    Animated,
+    Dimensions,
+    FlatList,
+    Image,
+    Text,
+    TouchableOpacity,
+    View,
+    ViewToken
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -51,7 +51,7 @@ const Onboarding = () => {
     if (index < slides.length - 1) {
       flatListRef.current?.scrollToIndex({ index: index + 1 });
     } else {
-      router.replace("./signUp"); 
+      router.replace("/(auth)/sign-up"); 
     }
   };
 
@@ -59,7 +59,7 @@ const Onboarding = () => {
     <View style={{...styles.container, paddingTop: inset.top, paddingBottom: inset.bottom - 15}}>
       
       <TouchableOpacity
-      onPress={() => router.replace("./signUp")} 
+      onPress={() => router.replace("/(auth)/sign-up")} 
         style={styles.skipButton}
        >
         <Text style={styles.skipText}>Skip</Text>
