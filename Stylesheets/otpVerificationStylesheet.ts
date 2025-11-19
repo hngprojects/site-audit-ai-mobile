@@ -89,6 +89,11 @@ resendContainer: {
     borderRadius: 10,
     marginTop: 10,
   },
+  iosButtonView: {
+    flex: 1, 
+    justifyContent: "flex-end",
+    marginBottom: 45
+  },
   buttonView: {
     flex: 1, 
     justifyContent: "flex-end",

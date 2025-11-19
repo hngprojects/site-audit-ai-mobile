@@ -4,7 +4,7 @@ import { Feather } from '@expo/vector-icons';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { ActivityIndicator, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const ForgotPassword = () => {
@@ -22,6 +22,12 @@ const ForgotPassword = () => {
 
     const sendingResetCode = () => {
         setLoading(true);
+
+        if(email === '') {
+            alert("Please enter your email address.");
+            setLoading(false);
+            return;
+        }
 
         try {
             
@@ -59,7 +65,7 @@ const ForgotPassword = () => {
             
         </View>
         <Text style={{...styles.createAccountTitle}}>
-            Enter your email and we&apos;ll send you a mail to reset it
+            Enter your email and we&apos;ll send you a mail to reset your password.
         </Text>
       
       
@@ -112,7 +118,7 @@ const ForgotPassword = () => {
                 
                     <TouchableOpacity 
                         onPress={() => router.push('/otpVerification')}
-                        style={[styles.continueButton, {marginTop: 140 }]}
+                        style={[styles.continueButton, Platform.OS === 'ios' ? {marginTop: 220 } : {marginTop: 140 }]}
                     >
                             <Text style={styles.continueText}>
                                 Continue

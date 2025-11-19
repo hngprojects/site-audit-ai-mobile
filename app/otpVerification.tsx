@@ -3,7 +3,7 @@ import { useResetPasswordEmailStore } from "@/zustardStore/resetPasswordEmailSto
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Keyboard, KeyboardAvoidingView, Platform, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { OtpInput } from "react-native-otp-entry";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -32,8 +32,17 @@ const OTPVerification = () => {
   }
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top , paddingBottom: insets.bottom}]}>
-     
+    <TouchableWithoutFeedback
+    onPress={Keyboard.dismiss}
+    >
+     <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{
+          ...styles.container,
+          paddingTop: insets.top , 
+          paddingBottom: insets.bottom - 30
+        }}
+      >
         <View style= {styles.headerSection}>
             <TouchableOpacity 
             onPress={router.back}
@@ -92,7 +101,7 @@ const OTPVerification = () => {
           style={{marginTop: 420}} 
         />
       ) : (
-        <View style={styles.buttonView}>
+        <View style={Platform.OS === 'ios' ? {...styles.iosButtonView} : {...styles.buttonView}}>
           <TouchableOpacity
             disabled={!otpFilled}
             style={{...styles.continueBtnActive,
@@ -108,8 +117,8 @@ const OTPVerification = () => {
           </TouchableOpacity>
         </View>
       )}
-
-    </View>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 }
 

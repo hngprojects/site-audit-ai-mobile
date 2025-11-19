@@ -41,6 +41,11 @@ export default StyleSheet.create({
         top:225,
         left: 165
     },
+    iconios: {
+       position: "absolute",
+        top:225,
+        left: 190
+    },
   title: {
     fontSize: 22,
     fontWeight: "700",

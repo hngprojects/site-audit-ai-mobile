@@ -2,7 +2,7 @@ import styles from '@/stylesheets/signInStylesheet';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Image, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Image, Keyboard, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const SignIn = () => {
@@ -62,12 +62,17 @@ const SignIn = () => {
     }, [navigation])
     
   return (
-    <View style = {{
-        paddingTop: inset.top, 
-        paddingBottom: inset.bottom,
-        ...styles.container
-    }}>
-      
+    <TouchableWithoutFeedback
+    onPress={Keyboard.dismiss}
+    >
+        <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={{
+                ...styles.container,
+                paddingTop: inset.top , 
+                paddingBottom: inset.bottom
+            }}
+        >
             <Image
                 source={require('../assets/images/icon.png')}
                 style={{
@@ -205,7 +210,8 @@ const SignIn = () => {
                       <Text style= {styles.SignUp}>Sign Up</Text>
                   </TouchableOpacity>
               </View>
-    </View>
+        </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   )
 }
 
