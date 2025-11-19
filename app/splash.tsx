@@ -1,3 +1,4 @@
+import { getFromSecureStore } from '@/expoSecureStore';
 import { useRouter } from 'expo-router';
 import React, { useEffect } from 'react';
 import { Image, ImageBackground, View } from 'react-native';
@@ -6,10 +7,16 @@ const Splash = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
+    const timer = setTimeout(async () => {
+
+      const token = await getFromSecureStore("jwt");
+
+      if (token) {
+         router.replace("./(tabs)/"); 
+      }
+
       router.replace("./onboarding"); 
 
-       return () => clearTimeout(timer);
     }, 3000);
 
     return () => clearTimeout(timer); 

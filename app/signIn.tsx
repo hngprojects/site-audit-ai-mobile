@@ -1,3 +1,4 @@
+import { saveToSecureStore } from '@/expoSecureStore';
 import styles from '@/stylesheets/signInStylesheet';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation, useRouter } from 'expo-router';
@@ -17,7 +18,7 @@ const SignIn = () => {
       const [loading, setloading] = useState<boolean>(false);
 
 
-      const handleSignIn = () => {
+      const handleSignIn = async () => {
         setloading(true);
         
         if (!email) {
@@ -35,6 +36,8 @@ const SignIn = () => {
         
         
         try {
+            
+            await saveToSecureStore("jwt", "hereItIs")
              router.replace("./(tabs)/"); 
             
         } catch (error: any) {
