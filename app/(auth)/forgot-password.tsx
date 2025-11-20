@@ -1,17 +1,46 @@
-import styles from '@/stylesheets/forgotPasswordStylesheet';
+import styles from '@/stylesheets/forgot-password-stylesheet';
+import { useResetPasswordEmailStore } from '@/zustardStore/resetPasswordEmailStore';
 import { Feather } from '@expo/vector-icons';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const ForgotPassword = () => {
     const router = useRouter();
     const inset = useSafeAreaInsets();
 
-        const [email, setEmail] = useState<string>('');
-        const [verificationEmail, setVerificationEmail] = useState<boolean>(false)
+    const [email, setEmail] = useState<string>('');
+    const [verificationEmail, setVerificationEmail] = useState<boolean>(false)
+    const [loading, setLoading] = useState<boolean>(false);
+
+    const { setPasswordRecoveryEmail } = useResetPasswordEmailStore();
+
+
+    
+
+    const sendingResetCode = () => {
+        setLoading(true);
+
+        if(email === '') {
+            alert("Please enter your email address.");
+            setLoading(false);
+            return;
+        }
+
+        try {
+            
+            setPasswordRecoveryEmail(email);
+            setVerificationEmail(true);
+        } catch (error: any) {
+            console.error("Error sending reset code:", error);
+            alert("An error occurred while sending the reset code. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    }
+
   return (
     <View 
         style={{paddingTop: inset.top, 
@@ -36,7 +65,7 @@ const ForgotPassword = () => {
             
         </View>
         <Text style={{...styles.createAccountTitle}}>
-            Enter your email and we&apos;ll send you a mail to reset it
+            Enter your email and we&apos;ll send you a mail to reset your password.
         </Text>
       
       
@@ -53,25 +82,33 @@ const ForgotPassword = () => {
       
         />
 
-
-           <TouchableOpacity 
-           onPress={() => setVerificationEmail(true)}
-           style={styles.continueButton}>
-            <Text style={styles.continueText}>
-                Continue
-            </Text>
-        </TouchableOpacity>
+            {loading ? (
+                <ActivityIndicator 
+                    size="large" 
+                    color="#ff5a3d" 
+                    style={{marginTop: 20}} 
+                />
+            ) : (
+                <TouchableOpacity 
+                    onPress={sendingResetCode}
+                    style={styles.continueButton}>
+                        <Text style={styles.continueText}>
+                            Continue
+                        </Text>
+                </TouchableOpacity>
+            )}
         </>
         )}
 
         {verificationEmail && (
             <View style = {styles.VerificationContainer}>
+                <View style={styles.outerGlowCircle} />
                 <View style={styles.glowCircle} />
                  <Feather name="mail" size={40} color="#d32f2f" style={styles.Icon}/>
 
                  <Text style={{
                     ...styles.checkyourmail}}>
-                    Check Your Email
+                    Check your email
                  </Text>
                  <Text style={styles.subText}>
                     We&apos;ve sent a password code to your email 
@@ -79,8 +116,10 @@ const ForgotPassword = () => {
                  </Text>
 
                 
-                  <TouchableOpacity 
-                        style={[styles.continueButton, {marginTop: 140 }]}>
+                    <TouchableOpacity 
+                        onPress={() => router.push('/otpVerification')}
+                        style={[styles.continueButton, Platform.OS === 'ios' ? {marginTop: 220 } : {marginTop: 140 }]}
+                    >
                             <Text style={styles.continueText}>
                                 Continue
                             </Text>
@@ -95,4 +134,5 @@ const ForgotPassword = () => {
   )
 }
 
-export default ForgotPassword;
+export default ForgotPassword
+

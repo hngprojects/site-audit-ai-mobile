@@ -8,13 +8,13 @@ const styles = StyleSheet.create({
     },
     logo: {
         alignItems: "center",
-        marginTop: -45,
+        marginTop: -60,
     },
     createAccountTitle: {
         color: "#000",
         fontFamily: "RethinkSans-Bold",
         fontSize: 20,
-        marginTop: -45
+        marginTop: -55
     },
     textInputLabel: {
         color: "#000",
@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
         marginTop: 12
     },
     passwordTextInput: {
-        fontSize: 18,
+        fontSize: 20,
     },
     signUpButton: {
         width: '100%',
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: 'center',
         justifyContent: "center",
-        marginTop: 25
+        marginTop: 20
     },
     Line: {
         width: 85,
@@ -76,12 +76,12 @@ const styles = StyleSheet.create({
         marginHorizontal: 10
     },
     SocialSIgninButton: {
-        width: '100%',
+         width: '100%',
         height: 50,
         borderRadius: 10,
         borderWidth: 1,
         borderColor: "#babec6",
-        marginTop: 35,
+        marginTop: 20,
         padding: 10, 
         justifyContent: "center",
         alignItems: 'center',
@@ -107,41 +107,26 @@ const styles = StyleSheet.create({
         fontSize: 16,
         marginLeft: 10,
     },
-    SignUpContainer: {
+    SignInContainer: {
         flexDirection: 'row',
         alignItems: "center",
         justifyContent: 'center',
+        marginTop: -20
     },
     existingAccountText: {
-        marginTop: 30,
+        marginTop: 40,
         marginRight: 10,
         color: "#bbbcbc",
         fontFamily: "RethinkSans-Regular",
         fontSize: 18
     },
-    SignUp: {
-        marginTop: 30,
+    SignIN: {
+         marginTop: 40,
         color: "blue",
         fontFamily: "RethinkSans-SemiBold",
         fontSize: 18
     },
-    incorrectPassword: {
-        color: "#ff5a3d",
-        fontFamily: "RethinkSans-Regular",
-        fontSize: 14,
-        marginTop: 8
-    },
-    forgotPasswordContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'flex-end',
-        marginTop: 25
-    },
-    forgotPasswordText: {
-        color: "blue",
-        fontFamily: "RethinkSans-Regular",
-        fontSize: 14.5,
-    },
 })
 
 export default styles;
+
