@@ -41,7 +41,7 @@ const SignIn = () => {
         try {
             
             await saveToSecureStore("jwt", "hereItIs")
-             router.replace("./(tabs)/"); 
+             router.replace("../(tabs)/"); 
             
         } catch (error: any) {
 
