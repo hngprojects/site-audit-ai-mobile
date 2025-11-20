@@ -32,7 +32,7 @@ export default function HomeScreen() {
     <View
       style={{
         paddingTop: inset.top,
-        paddingBottom: inset.bottom - 40,
+        paddingBottom: inset.bottom,
         ...styles.container,
       }}
     >
@@ -43,9 +43,9 @@ export default function HomeScreen() {
 
       
         <View style={styles.headingSection}>
-          <Text style={styles.title}>Improve your website with a quick scan</Text>
+          <Text style={styles.title}>Want to know how your website&apos;s doing?</Text>
           <Text style={styles.sub}>
-            Quick AI review with clear action steps
+            Enter your link to get a quick AI review.
           </Text>
         </View>
 
@@ -68,20 +68,15 @@ export default function HomeScreen() {
         )}
 
       
-
-         <TouchableOpacity 
-        onPress={RunAudit}
-        style={styles.runButton}
-      >
-        <Image 
-          source={require("../../assets/images/Logo1.png")}
-          style={
-            styles.runButtonImage
-          }
-          resizeMode="contain"
-        />
-        <Text style={styles.runButtonText}>Start Scan</Text>
-      </TouchableOpacity>
+        <View style={styles.tipBox}>
+          <View style={styles.buldIcon}>
+              <MaterialCommunityIcons name="lightbulb-on-10" size={24} color="black" />
+          </View>
+          <Text style={styles.tipText}>
+            Pro tip: Regular audits help you stay ahead of SEO changes and
+            maintain optimal website performance.
+          </Text>
+        </View>
 
         
         <Text style={styles.sectionTitle}>Recent audits</Text>
@@ -89,18 +84,7 @@ export default function HomeScreen() {
       <ScrollView showsVerticalScrollIndicator={false}>
        
         {audits.length === 0 ? (
-          <>
           <EmptyState />
-
-          <View style={styles.tipBox}>
-            <View style={styles.buldIcon}>
-              <MaterialCommunityIcons name="lightbulb-on-10" size={24} color="black" />
-            </View>
-            <Text style={styles.tipText}>
-              Join 2000+ business owners who have improved their sales with Sitelytics
-            </Text>
-          </View>
-        </>
         ) : (
           audits.map((item, index) => (
             <AuditResultCard
@@ -117,7 +101,19 @@ export default function HomeScreen() {
       </ScrollView>
 
    
-     
+      <TouchableOpacity 
+        onPress={RunAudit}
+        style={styles.runButton}
+      >
+        <Image 
+          source={require("../../assets/images/Logo1.png")}
+          style={
+            styles.runButtonImage
+          }
+          resizeMode="contain"
+        />
+        <Text style={styles.runButtonText}>Run audit</Text>
+      </TouchableOpacity>
     </View>
   );
 }

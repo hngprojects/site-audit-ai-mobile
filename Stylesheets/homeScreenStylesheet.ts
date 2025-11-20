@@ -28,7 +28,7 @@ export default StyleSheet.create({
   sub: {
     color: "#555",
     fontSize: 14,
-    marginBottom: 38,
+    marginBottom: 18,
     marginTop: 5,
     fontFamily: "RethinkSans-Regular",
   },
@@ -64,10 +64,7 @@ export default StyleSheet.create({
     padding: 12,
     borderRadius: 12,
     marginBottom: 20,
-    marginTop: 10,
     flexDirection: "row",
-    borderWidth: 1,
-    borderColor: "#e29f0fff",
 
   },
   buldIcon: {
@@ -77,8 +74,7 @@ export default StyleSheet.create({
   tipText: {
     fontSize: 13,
     color: "#5C4500",
-    fontFamily: "RethinkSans-Regular",
-    flex: 1
+    fontFamily: "RethinkSans-Regular"
   },
 
   sectionTitle: {
@@ -90,10 +86,9 @@ export default StyleSheet.create({
   },
 
   runButton: {
-    width: "100%",
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 30,
+    position: "absolute",
+    bottom: 30,
+    right: 20,
     backgroundColor: "#F04438",
     paddingVertical: 14,
     paddingHorizontal: 24,
