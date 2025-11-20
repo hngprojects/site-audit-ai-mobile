@@ -7,7 +7,7 @@ import * as authActions from '@/actions/auth-actions';
 interface AuthStore extends AuthState {
   // Actions
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (fullName: string, email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   initialize: () => Promise<void>;
   clearError: () => void;
@@ -48,10 +48,10 @@ export const useAuthStore = create<AuthStore>()(
         }
       },
 
-      signUp: async (fullName: string, email: string, password: string) => {
+      signUp: async (email: string, password: string) => {
         set({ isLoading: true, error: null });
         try {
-          const response = await authActions.signUp(fullName, email, password);
+          const response = await authActions.signUp(email, password);
           set({
             user: response.user,
             token: response.token,

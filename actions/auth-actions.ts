@@ -15,11 +15,10 @@ export const signIn = async (
 };
 
 export const signUp = async (
-  fullName: string,
   email: string,
   password: string
 ): Promise<AuthResponse> => {
-  const credentials: SignUpCredentials = { fullName, email, password };
+  const credentials: SignUpCredentials = { email, password, fullName: '' };
   return await authService.signUp(credentials);
 };
 

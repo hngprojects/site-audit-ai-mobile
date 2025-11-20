@@ -1,9 +1,5 @@
 import type { AuthResponse, SignInCredentials, SignUpCredentials } from '@/type';
-
-/**
- * Authentication service
- * Makes HTTP requests to the backend API
- */
+import axios, { isAxiosError } from 'axios';
 
 const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL || '';
 
@@ -11,35 +7,86 @@ if (!BASE_URL) {
   console.warn('EXPO_PUBLIC_BASE_URL is not set. Please add it to your .env file.');
 }
 
+const apiClient = axios.create({
+  baseURL: BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+const formatErrorMessage = (errorData: any): string => {
+  if (errorData.data?.errors && Array.isArray(errorData.data.errors)) {
+    const flattenErrors = (arr: any[]): string[] => {
+      const result: string[] = [];
+      for (const item of arr) {
+        if (typeof item === 'string') {
+          result.push(item);
+        } else if (Array.isArray(item)) {
+          result.push(...flattenErrors(item));
+        } else if (item && typeof item === 'object') {
+          if (item.message) {
+            result.push(item.message);
+          } else if (item.error) {
+            result.push(item.error);
+          } else {
+            Object.values(item).forEach((val) => {
+              if (typeof val === 'string') {
+                result.push(val);
+              } else if (Array.isArray(val)) {
+                result.push(...flattenErrors(val));
+              }
+            });
+          }
+        }
+      }
+      return result;
+    };
+    
+    const errorMessages = flattenErrors(errorData.data.errors);
+    
+    if (errorMessages.length > 0) {
+      return errorMessages.join('. ');
+    }
+  }
+  
+  return errorData.message || errorData.error || 'An error occurred';
+};
+
 export const authService = {
-  /**
-   * Sign in with email and password
-   */
   async signIn(credentials: SignInCredentials): Promise<AuthResponse> {
     const { email, password } = credentials;
 
-    // Validate input
     if (!email || !password) {
       throw new Error('Email and password are required');
     }
 
     try {
-      const response = await fetch(`${BASE_URL}/api/v1/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Invalid email or password');
+      const response = await apiClient.post('/api/v1/auth/login', { email, password });
+      const responseData = response.data;
+      
+      const token = responseData.data?.access_token || responseData.data?.token || responseData.access_token || responseData.token;
+      const apiUser = responseData.data?.user || responseData.user;
+      
+      if (!apiUser || !token) {
+        throw new Error('Invalid response from server');
       }
-
-      const data: AuthResponse = await response.json();
-      return data;
+      
+      const user = {
+        id: apiUser.id,
+        email: apiUser.email,
+        fullName: apiUser.first_name && apiUser.last_name 
+          ? `${apiUser.first_name} ${apiUser.last_name}`.trim()
+          : apiUser.fullName || apiUser.username || '',
+        createdAt: apiUser.created_at || apiUser.createdAt || new Date().toISOString(),
+      };
+      
+      return { user, token };
     } catch (error) {
+      if (isAxiosError(error)) {
+        const errorData = error.response?.data || {};
+        const errorMessage = formatErrorMessage(errorData);
+        throw new Error(errorMessage);
+      }
       if (error instanceof Error) {
         throw error;
       }
@@ -47,45 +94,56 @@ export const authService = {
     }
   },
 
-  /**
-   * Sign up with email, password, and full name
-   */
   async signUp(credentials: SignUpCredentials): Promise<AuthResponse> {
-    const { email, password, fullName } = credentials;
+    const { email, password } = credentials;
 
-    // Validate input
     if (!email || !password) {
       throw new Error('Email and password are required');
     }
 
-    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       throw new Error('Invalid email format');
     }
 
-    // Validate password length
     if (password.length < 6) {
       throw new Error('Password must be at least 6 characters');
     }
 
     try {
-      const response = await fetch(`${BASE_URL}/api/v1/auth/signup`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password, username:email.split('@')[0] }),
+      const response = await apiClient.post('/api/v1/auth/signup', {
+        email,
+        password,
+        username: email.split('@')[0],
       });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Failed to sign up');
+      
+      const responseData = response.data;
+      console.log(responseData);
+      
+      const token = responseData.data?.access_token || responseData.data?.token || responseData.access_token || responseData.token;
+      const apiUser = responseData.data?.user || responseData.user;
+      
+      if (!apiUser || !token) {
+        throw new Error('Invalid response from server');
       }
-
-      const data: AuthResponse = await response.json();
-      return data;
+      
+      const user = {
+        id: apiUser.id,
+        email: apiUser.email,
+        fullName: apiUser.first_name && apiUser.last_name 
+          ? `${apiUser.first_name} ${apiUser.last_name}`.trim()
+          : apiUser.fullName || apiUser.username || '',
+        createdAt: apiUser.created_at || apiUser.createdAt || new Date().toISOString(),
+      };
+      
+      return { user, token };
     } catch (error) {
+      if (isAxiosError(error)) {
+        const errorData = error.response?.data || {};
+        console.log(errorData);
+        const errorMessage = formatErrorMessage(errorData);
+        throw new Error(errorMessage);
+      }
       if (error instanceof Error) {
         throw error;
       }
@@ -93,47 +151,52 @@ export const authService = {
     }
   },
 
-  /**
-   * Sign out (clears session)
-   */
   async signOut(token: string): Promise<void> {
     try {
-      await fetch(`${BASE_URL}/api/v1/auth/logout`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await apiClient.post(
+        '/api/v1/auth/logout',
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
     } catch (error) {
       // Even if the request fails, we still want to sign out locally
       console.error('Error signing out:', error);
     }
   },
 
-  /**
-   * Verify token (validate token with server)
-   */
   async verifyToken(token: string): Promise<AuthResponse['user'] | null> {
     if (!token) {
       return null;
     }
 
     try {
-      const response = await fetch(`${BASE_URL}/api/v1/auth/verify-email`, {
-        method: 'GET',
+      const response = await apiClient.get('/api/v1/auth/me', {
         headers: {
-          'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
       });
 
-      if (!response.ok) {
+      const responseData = response.data;
+      const apiUser = responseData.data?.user || responseData.data || responseData.user || responseData;
+      
+      if (!apiUser || !apiUser.id) {
         return null;
       }
-
-      const data = await response.json();
-      return data.user || null;
+      
+      const user = {
+        id: apiUser.id,
+        email: apiUser.email,
+        fullName: apiUser.first_name && apiUser.last_name 
+          ? `${apiUser.first_name} ${apiUser.last_name}`.trim()
+          : apiUser.fullName || apiUser.username || '',
+        createdAt: apiUser.created_at || apiUser.createdAt || new Date().toISOString(),
+      };
+      
+      return user;
     } catch (error) {
       console.error('Error verifying token:', error);
       return null;
