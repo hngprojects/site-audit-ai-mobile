@@ -1,4 +1,4 @@
-import styles from '../Stylesheets/forgotPasswordStylesheet';
+import styles from '@/Stylesheets/forgot-password-stylesheet';
 import { Feather } from '@expo/vector-icons';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
@@ -95,4 +95,5 @@ const ForgotPassword = () => {
   )
 }
 
-export default ForgotPassword;
+export default ForgotPassword
+

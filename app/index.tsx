@@ -10,9 +10,6 @@ import { ActivityIndicator, FlatList, Image, Keyboard, KeyboardAvoidingView, Tex
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 
-
-
-
 const Index = () => {
   const router = useRouter();
   const inset = useSafeAreaInsets();
@@ -130,8 +127,8 @@ const Index = () => {
             )}
           </View>
 
-            <TouchableOpacity 
-              onPress={() => router.replace('./onboarding')}
+            <TouchableOpacity
+              onPress={() => router.replace('/(onboarding)' as any)}
               style={styles.continueButton}>
               <Text style={styles.btnText}>
                 Continue
