@@ -1,4 +1,4 @@
-import { getAllCountries } from '@/Service/httpsRequest';
+import { getAllCountries } from '@/service/httpsRequest';
 import styles from '@/stylesheets/language-screen-stylesheet';
 import { Country } from '@/type';
 import Feather from '@expo/vector-icons/Feather';
@@ -131,7 +131,7 @@ const Index = () => {
           </View>
 
             <TouchableOpacity 
-              onPress={() => router.replace('/(onboarding)')}
+              onPress={() => router.replace("./signUp")}
               style={styles.continueButton}>
               <Text style={styles.btnText}>
                 Continue

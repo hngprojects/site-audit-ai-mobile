@@ -4,7 +4,7 @@ import styles from '@/stylesheets/sign-up-stylesheet';
 import Feather from '@expo/vector-icons/Feather';
 import { useRouter } from 'expo-router';
 import React, { lazy, Suspense, useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Image, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, Keyboard, KeyboardAvoidingView, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // Lazy load social login buttons
@@ -21,7 +21,6 @@ const SignUp = () => {
   const [secureTextEntry, setSecureTextEntry] = useState<boolean>(true);
   const [localError, setLocalError] = useState<string | null>(null);
 
-  // Navigate to tabs when authenticated
   useEffect(() => {
     if (isAuthenticated) {
       router.replace('/(tabs)');
@@ -84,132 +83,132 @@ const SignUp = () => {
   const hasError = !!displayError;
 
   return (
-    <View
-      style={{
-        paddingTop: inset.top,
-        paddingBottom: inset.bottom,
-        ...styles.container,
-      }}
-    >
-      <Image
-        source={require('../../assets/images/icon.png')}
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <KeyboardAvoidingView
+        behavior="padding"
         style={{
-          width: 140,
-          resizeMode: 'contain',
-          alignSelf: 'center',
-          ...styles.logo,
-        }}
-      />
-
-      <Text style={{ ...styles.createAccountTitle }}>Create your account</Text>
-
-      <Text style={{ ...styles.textInputLabel }}>Full Name</Text>
-
-      <TextInput
-        placeholder="Enter your full name"
-        style={styles.textInput}
-        placeholderTextColor="#dfdfdfff"
-        value={fullName}
-        onChangeText={(text) => {
-          setFullName(text);
-          setLocalError(null);
-          clearError();
-        }}
-        autoCapitalize="words"
-        editable={!isLoading}
-      />
-
-      <Text style={{ ...styles.textInputLabel }}>Email</Text>
-
-      <TextInput
-        placeholder="user@gmail.com"
-        style={styles.textInput}
-        placeholderTextColor="#dfdfdfff"
-        value={email}
-        onChangeText={(text) => {
-          setEmail(text);
-          setLocalError(null);
-          clearError();
-        }}
-        autoCapitalize="none"
-        keyboardType="email-address"
-        editable={!isLoading}
-      />
-
-      <Text style={{ ...styles.textInputLabel }}>Password</Text>
-
-      <View
-        style={{
-          borderColor: hasError ? '#ff5a3d' : '#babec6',
-          ...styles.passwordContainer,
+          ...styles.container,
+          paddingTop: inset.top,
+          paddingBottom: inset.bottom,
         }}
       >
+        <Image
+          source={require('../../assets/images/icon.png')}
+          style={{
+            width: 140,
+            resizeMode: 'contain',
+            alignSelf: 'center',
+            ...styles.logo,
+          }}
+        />
+
+        <Text style={{ ...styles.createAccountTitle }}>Create your account</Text>
+
+        <Text style={{ ...styles.textInputLabel }}>Full Name</Text>
+
         <TextInput
-          placeholder="Enter your password"
-          style={styles.passwordTextInput}
+          placeholder="Enter your full name"
+          style={styles.textInput}
           placeholderTextColor="#dfdfdfff"
-          value={password}
+          value={fullName}
           onChangeText={(text) => {
-            setPassword(text);
+            setFullName(text);
             setLocalError(null);
             clearError();
           }}
-          secureTextEntry={secureTextEntry}
+          autoCapitalize="words"
           editable={!isLoading}
         />
 
-        {secureTextEntry ? (
-          <TouchableOpacity onPress={() => setSecureTextEntry(!secureTextEntry)}>
-            <Feather name="eye-off" size={24} color="#9ba1ab" />
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity onPress={() => setSecureTextEntry(!secureTextEntry)}>
-            <Feather name="eye" size={24} color="#9ba1ab" />
-          </TouchableOpacity>
-        )}
-      </View>
+        <Text style={{ ...styles.textInputLabel }}>Email</Text>
 
-      {displayError && (
-        <Text style={[styles.incorrectPassword, { marginTop: 8 }]}>{displayError}</Text>
-      )}
+        <TextInput
+          placeholder="user@gmail.com"
+          style={styles.textInput}
+          placeholderTextColor="#dfdfdfff"
+          value={email}
+          onChangeText={(text) => {
+            setEmail(text);
+            setLocalError(null);
+            clearError();
+          }}
+          autoCapitalize="none"
+          keyboardType="email-address"
+          editable={!isLoading}
+        />
 
-      <LoadingButton
-        onPress={handleSignUp}
-        loading={isLoading}
-        disabled={isLoading}
-        text="Sign Up"
-        buttonStyle={styles.signUpButton}
-        textStyle={styles.signUpText}
-      />
+        <Text style={{ ...styles.textInputLabel }}>Password</Text>
 
-      <View style={styles.continueWithSection}>
-        <View style={styles.Line} />
-
-        <Text style={styles.continueText}>Or continue with</Text>
-
-        <View style={styles.Line} />
-      </View>
-
-      <Suspense
-        fallback={
-          <View style={styles.SocialSIgninButton}>
-            <ActivityIndicator size="small" color="#9ba1ab" />
-          </View>
-        }
-      >
-        <SocialLoginButtons />
-      </Suspense>
-
-      <View style={styles.SignInContainer}>
-        <Text style={styles.existingAccountText}>Already have an account?</Text>
-        <TouchableOpacity
-          onPress={() => router.push('/(auth)/sign-in')}
-          disabled={isLoading}
+        <View
+          style={{
+            borderColor: hasError ? '#ff5a3d' : '#babec6',
+            ...styles.passwordContainer,
+          }}
         >
-          <Text style={styles.SignIN}>Sign In</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+          <TextInput
+            placeholder="Enter your password"
+            style={styles.passwordTextInput}
+            placeholderTextColor="#dfdfdfff"
+            value={password}
+            onChangeText={(text) => {
+              setPassword(text);
+              setLocalError(null);
+              clearError();
+            }}
+            secureTextEntry={secureTextEntry}
+            editable={!isLoading}
+          />
+
+          {secureTextEntry ? (
+            <TouchableOpacity onPress={() => setSecureTextEntry(!secureTextEntry)}>
+              <Feather name="eye-off" size={24} color="#9ba1ab" />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity onPress={() => setSecureTextEntry(!secureTextEntry)}>
+              <Feather name="eye" size={24} color="#9ba1ab" />
+            </TouchableOpacity>
+          )}
+        </View>
+
+        {displayError && (
+          <Text style={[styles.incorrectPassword, { marginTop: 8 }]}>{displayError}</Text>
+        )}
+
+        <LoadingButton
+          onPress={handleSignUp}
+          loading={isLoading}
+          disabled={isLoading}
+          text="Sign Up"
+          buttonStyle={styles.signUpButton}
+          textStyle={styles.signUpText}
+        />
+
+        <View style={styles.continueWithSection}>
+          <View style={styles.Line} />
+
+          <Text style={styles.continueText}>Or continue with</Text>
+
+          <View style={styles.Line} />
+        </View>
+
+        <Suspense
+          fallback={
+            <View style={styles.SocialSIgninButton}>
+              <ActivityIndicator size="small" color="#9ba1ab" />
+            </View>
+          }
+        >
+          <SocialLoginButtons />
+        </Suspense>
+
+        <View style={styles.SignInContainer}>
+          <Text style={styles.existingAccountText}>Already have an account?</Text>
+          <TouchableOpacity onPress={() => router.push('/(auth)/sign-in')}>
+            <Text style={styles.SignIN}>Sign In</Text>
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 };
 

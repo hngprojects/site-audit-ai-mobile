@@ -60,3 +60,14 @@ export interface AuthResponse {
   user: User;
   token: string;
 }
+export type AuditResultCardProps = {
+  url: string;
+  status: "Passed" | "Average" | "Failed";
+  score: string;
+  time: string
+};
+
+export interface ResetPasswordEmailState {
+  passwordRecoveryEmail: string;
+  setPasswordRecoveryEmail: (email: string) => void;
+}
