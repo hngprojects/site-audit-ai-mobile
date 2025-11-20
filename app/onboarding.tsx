@@ -1,5 +1,5 @@
 import { slides } from "@/constants/onboardingSlide";
-import styles from "@/stylesheets/onboardingStylesheet";
+import styles from "../Stylesheets/onboardingstylesheet";
 import { Slide } from "@/type";
 import { useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
@@ -14,8 +14,6 @@ import {
   ViewToken
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
-
 
 const { width } = Dimensions.get("window");
 
