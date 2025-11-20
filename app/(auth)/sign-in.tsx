@@ -147,6 +147,16 @@ const SignIn = () => {
           buttonStyle={styles.signInButton}
           textStyle={styles.signInText}
         />
+        <View style={styles.tipBox}>
+          <Image
+            source={require('../../assets/images/light-bulb.png')}
+            style={styles.lightBulbIcon}
+            resizeMode="contain"
+          />
+          <Text style={styles.tipText}>
+            Join 2000+ business owners who&apos;ve improved their sales with Sitelytics.
+          </Text>
+        </View>
       </KeyboardAvoidingView>
 
       <View style={styles.signUpButtonContainer}>

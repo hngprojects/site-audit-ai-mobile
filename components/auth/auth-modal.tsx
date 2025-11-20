@@ -51,13 +51,13 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose }) => {
   };
 
   const handleSignUp = () => {
-    onClose();
     router.push('/(auth)/sign-up');
+    // Don't close modal here - let it close when user successfully authenticates
   };
 
   const handleSignIn = () => {
-    onClose();
     router.push('/(auth)/sign-in');
+    // Don't close modal here - let it close when user successfully authenticates
   };
 
   const translateY = slideAnim.interpolate({

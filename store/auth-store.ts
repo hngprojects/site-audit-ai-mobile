@@ -71,7 +71,10 @@ export const useAuthStore = create<AuthStore>()(
       signOut: async () => {
         set({ isLoading: true });
         try {
-          await authActions.signOut();
+          const state = get();
+          if (state.token) {
+            await authActions.signOut(state.token);
+          }
           set({
             ...initialState,
             isInitialized: true,
@@ -95,15 +98,24 @@ export const useAuthStore = create<AuthStore>()(
           const storedState = await storage.getItem<AuthState>(STORAGE_KEYS.AUTH_STATE);
           
           if (storedState?.token) {
-            // In a real app, you would verify the token here
-            // For simulation, we'll just restore the state
-            set({
-              user: storedState.user,
-              token: storedState.token,
-              isAuthenticated: !!storedState.token,
-              isLoading: false,
-              isInitialized: true,
-            });
+            // Verify the token with the server
+            const user = await authActions.verifyToken(storedState.token);
+            
+            if (user) {
+              set({
+                user,
+                token: storedState.token,
+                isAuthenticated: true,
+                isLoading: false,
+                isInitialized: true,
+              });
+            } else {
+              // Token is invalid, clear auth state
+              set({
+                ...initialState,
+                isInitialized: true,
+              });
+            }
           } else {
             set({
               ...initialState,

@@ -1,140 +1,143 @@
 import type { AuthResponse, SignInCredentials, SignUpCredentials } from '@/type';
 
 /**
- * Simulates an API call for authentication
- * In a real app, this would make an HTTP request to your backend
+ * Authentication service
+ * Makes HTTP requests to the backend API
  */
 
-const SIMULATED_DELAY = 1500; // 1.5 seconds to simulate network delay
+const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL || '';
 
-// Mock user database (in real app, this would be on the server)
-const mockUsers: Map<string, { password: string; user: AuthResponse['user'] }> = new Map();
+if (!BASE_URL) {
+  console.warn('EXPO_PUBLIC_BASE_URL is not set. Please add it to your .env file.');
+}
 
 export const authService = {
   /**
    * Sign in with email and password
    */
   async signIn(credentials: SignInCredentials): Promise<AuthResponse> {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        const { email, password } = credentials;
+    const { email, password } = credentials;
 
-        // Validate input
-        if (!email || !password) {
-          reject(new Error('Email and password are required'));
-          return;
-        }
+    // Validate input
+    if (!email || !password) {
+      throw new Error('Email and password are required');
+    }
 
-        // Check if user exists
-        const userData = mockUsers.get(email.toLowerCase());
+    try {
+      const response = await fetch(`${BASE_URL}/api/v1/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-        if (!userData) {
-          reject(new Error('Invalid email or password'));
-          return;
-        }
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Invalid email or password');
+      }
 
-        if (userData.password !== password) {
-          reject(new Error('Invalid email or password'));
-          return;
-        }
-
-        // Generate mock token
-        const token = `mock_token_${Date.now()}_${Math.random().toString(36).substring(7)}`;
-
-        resolve({
-          user: userData.user,
-          token,
-        });
-      }, SIMULATED_DELAY);
-    });
+      const data: AuthResponse = await response.json();
+      return data;
+    } catch (error) {
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Failed to sign in. Please try again.');
+    }
   },
 
   /**
    * Sign up with email, password, and full name
    */
   async signUp(credentials: SignUpCredentials): Promise<AuthResponse> {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        const { email, password, fullName } = credentials;
+    const { email, password, fullName } = credentials;
 
-        // Validate input
-        if (!email || !password) {
-          reject(new Error('Email and password are required'));
-          return;
-        }
+    // Validate input
+    if (!email || !password) {
+      throw new Error('Email and password are required');
+    }
 
-        // Validate email format
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-          reject(new Error('Invalid email format'));
-          return;
-        }
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      throw new Error('Invalid email format');
+    }
 
-        // Validate password length
-        if (password.length < 6) {
-          reject(new Error('Password must be at least 6 characters'));
-          return;
-        }
+    // Validate password length
+    if (password.length < 6) {
+      throw new Error('Password must be at least 6 characters');
+    }
 
-        // Check if user already exists
-        if (mockUsers.has(email.toLowerCase())) {
-          reject(new Error('User with this email already exists'));
-          return;
-        }
+    try {
+      const response = await fetch(`${BASE_URL}/api/v1/auth/signup`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password, username:email.split('@')[0] }),
+      });
 
-        // Create new user
-        const newUser = {
-          id: `user_${Date.now()}_${Math.random().toString(36).substring(7)}`,
-          email: email.toLowerCase(),
-          fullName: fullName || '',
-          createdAt: new Date().toISOString(),
-        };
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Failed to sign up');
+      }
 
-        // Store user in mock database
-        mockUsers.set(email.toLowerCase(), {
-          password,
-          user: newUser,
-        });
-
-        // Generate mock token
-        const token = `mock_token_${Date.now()}_${Math.random().toString(36).substring(7)}`;
-
-        resolve({
-          user: newUser,
-          token,
-        });
-      }, SIMULATED_DELAY);
-    });
+      const data: AuthResponse = await response.json();
+      return data;
+    } catch (error) {
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Failed to sign up. Please try again.');
+    }
   },
 
   /**
    * Sign out (clears session)
    */
-  async signOut(): Promise<void> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve();
-      }, 300);
-    });
+  async signOut(token: string): Promise<void> {
+    try {
+      await fetch(`${BASE_URL}/api/v1/auth/logout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    } catch (error) {
+      // Even if the request fails, we still want to sign out locally
+      console.error('Error signing out:', error);
+    }
   },
 
   /**
-   * Verify token (simulate token validation)
+   * Verify token (validate token with server)
    */
   async verifyToken(token: string): Promise<AuthResponse['user'] | null> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        // In a real app, this would validate the token with the server
-        // For simulation, we'll just check if it's a valid format
-        if (token && token.startsWith('mock_token_')) {
-          // Find user by token (in real app, token would contain user info)
-          // For simulation, we'll return null and let the app handle re-authentication
-          resolve(null);
-        } else {
-          resolve(null);
-        }
-      }, 500);
-    });
+    if (!token) {
+      return null;
+    }
+
+    try {
+      const response = await fetch(`${BASE_URL}/api/v1/auth/verify-email`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        return null;
+      }
+
+      const data = await response.json();
+      return data.user || null;
+    } catch (error) {
+      console.error('Error verifying token:', error);
+      return null;
+    }
   },
 };
 

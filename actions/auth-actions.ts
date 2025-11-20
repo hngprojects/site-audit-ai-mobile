@@ -23,8 +23,8 @@ export const signUp = async (
   return await authService.signUp(credentials);
 };
 
-export const signOut = async (): Promise<void> => {
-  return await authService.signOut();
+export const signOut = async (token: string): Promise<void> => {
+  return await authService.signOut(token);
 };
 
 export const verifyToken = async (token: string) => {
