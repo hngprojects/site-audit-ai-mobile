@@ -202,5 +202,30 @@ export const authService = {
       return null;
     }
   },
+
+  async forgotPassword(email: string): Promise<void> {
+    if (!email) {
+      throw new Error('Email is required');
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      throw new Error('Invalid email format');
+    }
+
+    try {
+      await apiClient.post('/api/v1/auth/forgot-password', { email });
+    } catch (error) {
+      if (isAxiosError(error)) {
+        const errorData = error.response?.data || {};
+        const errorMessage = formatErrorMessage(errorData);
+        throw new Error(errorMessage);
+      }
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Failed to send password reset email. Please try again.');
+    }
+  },
 };
 
