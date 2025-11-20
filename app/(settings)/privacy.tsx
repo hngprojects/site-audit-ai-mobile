@@ -3,8 +3,8 @@ import {
   ScrollView,
   TouchableOpacity,
   View,
-  SafeAreaView,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/themed-text';
 import styles from '@/Stylesheets/privacy-stylesheet';
 import { useRouter } from 'expo-router';
@@ -34,7 +34,7 @@ export default function PrivacyScreen() {
       {/* Scrollable Content */}
       <ScrollView contentContainerStyle={styles.scrollContentContainer}>
         <ThemedText style={styles.dateText}>
-          Last updated: October 26, 2023
+          Last updated: October 2025
         </ThemedText>
 
         <PolicySection title="1. Information We Collect">
@@ -62,15 +62,15 @@ export default function PrivacyScreen() {
 
         <PolicySection title="5. Your Rights">
           You can request to access, edit, or delete your data anytime. Email us
-          at privacy@sitelytics.ai for assistance.
+          at <ThemedText style={styles.contactEmail}>privacy@sitelytics.ai</ThemedText> for assistance.
         </PolicySection>
 
         <PolicySection title="6. Updates to this Policy">
           We may update this policy as the app evolves. Any major changes will
           be shared in the app. {'\n\n'}
           Contact: {'\n'}
-          privacy@sitelytics.ai {'\n'}
-          www.sitelytics.ai
+          <ThemedText style={styles.contactEmail}>privacy@sitelytics.ai</ThemedText> {'\n'}
+          <ThemedText style={styles.contactEmail}>www.sitelytics.ai</ThemedText>
         </PolicySection>
       </ScrollView>
     </SafeAreaView>

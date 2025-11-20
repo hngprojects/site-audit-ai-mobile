@@ -47,7 +47,7 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack initialRouteName='splash'>
+      <Stack initialRouteName='(settings)'>
         <Stack.Screen name="splash" options={{ headerShown: false }} />
         <Stack.Screen name="(main)" options={{ headerShown: false }} />
         <Stack.Screen name="(reports)" options={{ headerShown: false }} />

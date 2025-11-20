@@ -16,9 +16,10 @@ export const useAuthGuard = () => {
 
     const inAuthGroup = segments[0] === '(auth)';
     const inOnboardingGroup = segments[0] === '(onboarding)';
+    const inSettingsGroup = segments[0] === '(settings)'; // Add settings group check
     const inTabsGroup = segments[0] === '(tabs)';
 
-    if (!isAuthenticated && !inAuthGroup && !inOnboardingGroup) {
+    if (!isAuthenticated && !inAuthGroup && !inOnboardingGroup && !inSettingsGroup) {
       // User is not authenticated and trying to access protected route
       router.replace('/(auth)/sign-in');
     } else if (isAuthenticated && (inAuthGroup || inOnboardingGroup)) {
