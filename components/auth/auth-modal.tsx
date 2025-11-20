@@ -2,14 +2,14 @@ import styles from '@/stylesheets/profile-stylesheet';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-    Animated,
-    Image,
-    Keyboard,
-    Modal,
-    Text,
-    TouchableOpacity,
-    TouchableWithoutFeedback,
-    View,
+  Animated,
+  Image,
+  Keyboard,
+  Modal,
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -90,7 +90,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose }) => {
 
               <View style={styles.logoContainer}>
                 <Image
-                  source={require('@/assets/imgs/logo-variant-2.svg')}
+                  source={require('../../assets/imgs/logo-variant-2.png')}
                   style={styles.logoImage}
                   resizeMode="contain"
                 />
@@ -120,16 +120,24 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose }) => {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  style={styles.emailButton}
+                  style={styles.socialButton}
                   onPress={handleSignUp}
                 >
-                  <Text style={styles.emailButtonText}>Sign up with email</Text>
+                  <Image
+                    source={require('../../assets/images/Envelope.png')}
+                    style={styles.socialIcon}
+                  />
+                  <Text style={styles.emailButtonSecondaryText}>Sign up with email</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  style={styles.emailButtonSecondary}
+                  style={styles.socialButton}
                   onPress={handleSignIn}
                 >
+                  <Image
+                    source={require('../../assets/images/Envelope.png')}
+                    style={styles.socialIcon}
+                  />
                   <Text style={styles.emailButtonSecondaryText}>Sign in with email</Text>
                 </TouchableOpacity>
               </View>

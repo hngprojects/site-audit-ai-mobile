@@ -171,7 +171,7 @@ const SignUp = () => {
         </View>
 
         {displayError && (
-          <Text style={[styles.incorrectPassword, { marginTop: 8 }]}>{displayError}</Text>
+          <Text style={[{ marginTop: 8 }]}>{displayError}</Text>
         )}
 
         <LoadingButton
