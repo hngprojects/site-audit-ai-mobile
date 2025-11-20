@@ -1,7 +1,7 @@
 import { slides } from "@/constants/onboardingSlide";
 import styles from "@/stylesheets/onboarding-stylesheet";
 import { Slide } from "@/type";
-import { useRouter } from "expo-router";
+import { RelativePathString, useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
 import {
   Animated,
@@ -51,7 +51,7 @@ const Onboarding = () => {
     if (index < slides.length - 1) {
       flatListRef.current?.scrollToIndex({ index: index + 1 });
     } else {
-      router.replace("/(auth)/sign-up"); 
+      router.replace(`${"/(auth)/sign-up"}` as RelativePathString); 
     }
   };
 
@@ -59,7 +59,7 @@ const Onboarding = () => {
     <View style={{...styles.container, paddingTop: inset.top, paddingBottom: inset.bottom - 15}}>
       
       <TouchableOpacity
-      onPress={() => router.replace("/(auth)/sign-up")} 
+      onPress={() => router.replace(`${"/(auth)/sign-up"}` as RelativePathString)} 
         style={styles.skipButton}
        >
         <Text style={styles.skipText}>Skip</Text>
