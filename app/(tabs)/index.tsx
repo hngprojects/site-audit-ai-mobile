@@ -3,7 +3,6 @@ import EmptyState from "@/components/homeScreenEmptyState";
 import styles from "@/stylesheets/homeScreenStylesheet";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Octicons from "@expo/vector-icons/Octicons";
-import { RelativePathString, router } from "expo-router";
 import { useState } from "react";
 import { Image, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -24,10 +23,8 @@ export default function HomeScreen() {
   ]);
 
   const RunAudit = () => {
-    if(websiteUrl === ""){
-      return setUrlAvailable(false)
-    }
-    router.push('./(main)/auditing-screen' as RelativePathString);
+    if(websiteUrl === "")
+      return setUrlAvailable( false)
     
   }
 
@@ -35,7 +32,7 @@ export default function HomeScreen() {
     <View
       style={{
         paddingTop: inset.top,
-        paddingBottom: inset.bottom,
+        paddingBottom: inset.bottom - 40,
         ...styles.container,
       }}
     >
@@ -46,9 +43,9 @@ export default function HomeScreen() {
 
       
         <View style={styles.headingSection}>
-          <Text style={styles.title}>Want to know how your website&apos;s doing?</Text>
+          <Text style={styles.title}>Improve your website with a quick scan</Text>
           <Text style={styles.sub}>
-            Enter your link to get a quick AI review.
+            Quick AI review with clear action steps
           </Text>
         </View>
 
@@ -71,15 +68,20 @@ export default function HomeScreen() {
         )}
 
       
-        <View style={styles.tipBox}>
-          <View style={styles.buldIcon}>
-              <MaterialCommunityIcons name="lightbulb-on-10" size={24} color="black" />
-          </View>
-          <Text style={styles.tipText}>
-            Pro tip: Regular audits help you stay ahead of SEO changes and
-            maintain optimal website performance.
-          </Text>
-        </View>
+
+         <TouchableOpacity 
+        onPress={RunAudit}
+        style={styles.runButton}
+      >
+        <Image 
+          source={require("../../assets/images/Logo1.png")}
+          style={
+            styles.runButtonImage
+          }
+          resizeMode="contain"
+        />
+        <Text style={styles.runButtonText}>Start Scan</Text>
+      </TouchableOpacity>
 
         
         <Text style={styles.sectionTitle}>Recent audits</Text>
@@ -87,7 +89,18 @@ export default function HomeScreen() {
       <ScrollView showsVerticalScrollIndicator={false}>
        
         {audits.length === 0 ? (
+          <>
           <EmptyState />
+
+          <View style={styles.tipBox}>
+            <View style={styles.buldIcon}>
+              <MaterialCommunityIcons name="lightbulb-on-10" size={24} color="black" />
+            </View>
+            <Text style={styles.tipText}>
+              Join 2000+ business owners who have improved their sales with Sitelytics
+            </Text>
+          </View>
+        </>
         ) : (
           audits.map((item, index) => (
             <AuditResultCard
@@ -104,19 +117,7 @@ export default function HomeScreen() {
       </ScrollView>
 
    
-      <TouchableOpacity 
-        onPress={RunAudit}
-        style={styles.runButton}
-      >
-        <Image 
-          source={require("../../assets/images/Logo1.png")}
-          style={
-            styles.runButtonImage
-          }
-          resizeMode="contain"
-        />
-        <Text style={styles.runButtonText}>Run audit</Text>
-      </TouchableOpacity>
+     
     </View>
   );
 }

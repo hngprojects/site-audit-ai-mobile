@@ -1,214 +1,174 @@
-import { saveToSecureStore } from '@/expoSecureStore';
+import { LoadingButton } from '@/components/ui/loading-button';
+import { useAuth } from '@/hooks/use-auth';
 import styles from '@/stylesheets/sign-in-stylesheet';
-import { Feather } from '@expo/vector-icons';
-import { useNavigation, useRouter } from 'expo-router';
-import React, { useState } from 'react';
-import { ActivityIndicator, Image, Keyboard, KeyboardAvoidingView, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-// Lazy load social login buttons
-// const SocialLoginButtons = lazy(() => import('@/components/auth/social-login-buttons'));
+import Feather from '@expo/vector-icons/Feather';
+import { useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { Alert, Image, KeyboardAvoidingView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const SignIn = () => {
-    const inset = useSafeAreaInsets();
-    const navigation = useNavigation();
-    const router = useRouter();
-        
-      const [email, setEmail] = useState<string>('');
-      const [Password, setPassword] = useState<string>('');
-      const [secureTextEntry, setSecureTextEntry] = useState<boolean>(true);
-      const [IncorrectPassword, setIncorrectPassword] = useState<boolean>(false);
-      const [loading, setloading] = useState<boolean>(false);
+  const router = useRouter();
+  const { signIn, isLoading, error, clearError, isAuthenticated } = useAuth();
 
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [secureTextEntry, setSecureTextEntry] = useState<boolean>(true);
+  const [localError, setLocalError] = useState<string | null>(null);
 
-      const handleSignIn = async () => {
-        setloading(true);
-        
-        if (!email) {
-            alert("Please enter your email.");
-            setloading(false);
-            return;
-        }
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.replace('/(tabs)');
+    }
+  }, [isAuthenticated, router]);
 
+  // Show error alerts
+  useEffect(() => {
+    if (error) {
+      Alert.alert('Sign In Error', error, [
+        { text: 'OK', onPress: clearError },
+      ]);
+    }
+  }, [error, clearError]);
 
-        if (!Password) {
-            alert("Please enter your password ");
-            setloading(false);
-            return;
-        }
-        
-        
-        try {
-            
-            await saveToSecureStore("jwt", "hereItIs")
-             router.replace("./(tabs)/"); 
-            
-        } catch (error: any) {
+  const handleSignIn = async () => {
+    // Reset local error
+    setLocalError(null);
+    clearError();
 
-            console.error("Sign-in error:", error);
+    // Validation
+    if (!email.trim()) {
+      setLocalError('Email is required');
+      return;
+    }
 
-            if(error.code === 'AUTH_INVALID_CREDENTIALS'){
-                alert("The email or password you entered is incorrect. Please try again.");
-                setIncorrectPassword(true);
-                return;
-            }
+    if (!password.trim()) {
+      setLocalError('Password is required');
+      return;
+    }
 
-            alert("An error occurred during sign-in. Please try again.");
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      setLocalError('Please enter a valid email address');
+      return;
+    }
 
-        } finally {
-            setloading(false);
-        }
+    try {
+      await signIn(email.trim(), password);
+      // Navigation is handled by useEffect when isAuthenticated changes
+    } catch (err) {
+      // Error is handled by the store and shown via Alert
+      console.error('Sign in error:', err);
+    }
+  };
 
-      }
-
+  const displayError = localError || error;
+  const hasError = !!displayError;
 
   return (
-    <TouchableWithoutFeedback
-    onPress={Keyboard.dismiss}
-    >
-        <KeyboardAvoidingView
-            behavior={"padding"}
-            style={{
-                ...styles.container,
-                paddingTop: inset.top , 
-                paddingBottom: inset.bottom
-            }}
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+      <KeyboardAvoidingView
+        behavior="padding"
+        style={{
+          ...styles.container,
+        }}
+      >
+        <Image
+          source={require('../../assets/imgs/logo-variant-2.png')}
+          style={styles.logo}
+        />
+
+        <Text style={{ ...styles.textInputLabel }}>Email</Text>
+
+        <TextInput
+          placeholder="user@gmail.com"
+          style={styles.textInput}
+          placeholderTextColor="#dfdfdfff"
+          value={email}
+          onChangeText={(text) => {
+            setEmail(text);
+            setLocalError(null);
+            clearError();
+          }}
+          autoCapitalize="none"
+          keyboardType="email-address"
+          editable={!isLoading}
+        />
+
+        <Text style={{ ...styles.textInputLabel }}>Password</Text>
+
+        <View
+          style={{
+            borderColor: hasError ? '#ff5a3d' : '#babec6',
+            ...styles.passwordContainer,
+          }}
         >
-            <Image
-                source={require('../../assets/images/icon.png')}
-                style={{
-                    width: 140,
-                    resizeMode: "contain",
-                    alignSelf: "center",
-                    ...styles.logo,
-                }}
-            />
-      
-              <Text style={{...styles.createAccountTitle}}>
-                  Sign in to your account
-              </Text>
-      
-      
-              <Text style={{...styles.textInputLabel}}>
-                  Email
-              </Text>
-      
-              <TextInput
-                  placeholder="user@gmail.com"
-                  style={styles.textInput}
-                  placeholderTextColor="#dfdfdfff"
-                  value={email}
-                  onChangeText={x => setEmail(x)}
-      
-              />
-      
-              <Text style={{...styles.textInputLabel}}>
-                  Password
-              </Text>
-      
-            <View style={{
-                borderColor: IncorrectPassword ? "#ff5a3d" : "#babec6",
-                ...styles.passwordContainer
-                }}>
-                  <TextInput
-                      placeholder="***********"
-                      style={styles.passwordTextInput}
-                      placeholderTextColor="#dfdfdfff"
-                      value={Password}
-                      onChangeText={x => setPassword(x)}
-                      secureTextEntry={secureTextEntry}
-                  />
-      
-                  {secureTextEntry ? 
-                      <TouchableOpacity onPress={() => setSecureTextEntry(!secureTextEntry)}>
-                          <Feather name="eye-off" size={24} color="#9ba1ab" />
-                      </TouchableOpacity>
-                  :
-                  <TouchableOpacity onPress={() => setSecureTextEntry(!secureTextEntry)}>
-                      <Feather name="eye" size={24} color="#9ba1ab" />
-                  </TouchableOpacity>
-                  }
-      
-              </View>
-      
-              {IncorrectPassword && (
-                <Text style={styles.incorrectPassword}> 
-                  The password you entered is incorrect. Please try again
-                </Text>
-              )}
+          <TextInput
+            placeholder="Enter your password"
+            style={styles.passwordTextInput}
+            placeholderTextColor="#dfdfdfff"
+            value={password}
+            onChangeText={(text) => {
+              setPassword(text);
+              setLocalError(null);
+              clearError();
+            }}
+            secureTextEntry={secureTextEntry}
+            editable={!isLoading}
+          />
 
-      <Text style={{ ...styles.createAccountTitle }}>Sign in to your account</Text>
+          {secureTextEntry ? (
+            <TouchableOpacity onPress={() => setSecureTextEntry(!secureTextEntry)}>
+              <Feather name="eye-off" size={24} color="#9ba1ab" />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity onPress={() => setSecureTextEntry(!secureTextEntry)}>
+              <Feather name="eye" size={24} color="#9ba1ab" />
+            </TouchableOpacity>
+          )}
+        </View>
 
-              {loading ? (
-                <ActivityIndicator 
-                    size="large" 
-                    color="#ff5a3d" 
-                    style={{marginTop: 20}} 
-                />
-              ) : (
-                
-                <TouchableOpacity 
-                    onPress={handleSignIn}
-                    style={styles.signUpButton}>
-                        <Text style={styles.signUpText}>
-                            Sign in
-                        </Text>
-                </TouchableOpacity>
+        <View style={styles.forgotPasswordContainer}>
+          <TouchableOpacity onPress={() => {}}>
+            <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+          </TouchableOpacity>
+        </View>
 
-              )}
-              
-              <View style={styles.continueWithSection}>
-                  <View style={styles.Line}/>
-      
-                  <Text style={styles.continueText}>
-                      Or continue with
-                  </Text>
-      
-                  <View style={styles.Line}/>
-              </View>
-      
-      
-               <TouchableOpacity style={styles.SocialSIgninButton}>
-      
-                  <Image 
-                  source={require('../../assets/images/google.png')}
-                  style={{
-                      height: 25,
-                      width: 25,
-                  }}
-                  />
-      
-                  <Text style={styles.Google}>
-                      Continue with Google
-                  </Text>
-              </TouchableOpacity>
-               <TouchableOpacity style={styles.AppleSocialSIgninButton}>
-      
-                  <Image 
-                  source={require('../../assets/images/apple.png')}
-                  style={{
-                      height: 35,
-                      width: 35,
-                  }}
-                  />
-      
-                  <Text style={styles.Google}>
-                      Continue with Apple
-                  </Text>
-              </TouchableOpacity>
-      
-              <View style={styles.SignUpContainer}>
-                  <Text style = {styles.existingAccountText}>
-                      Don&apos;t have an account?
-                  </Text>
-                  <TouchableOpacity onPress={() => router.push('/(auth)/sign-up')}>
-                      <Text style= {styles.SignUp}>Sign Up</Text>
-                  </TouchableOpacity>
-              </View>
-        </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
-  )
-}
+        {displayError && (
+          <Text style={styles.incorrectPassword}>{displayError}</Text>
+        )}
 
+        <LoadingButton
+          onPress={handleSignIn}
+          loading={isLoading}
+          disabled={isLoading}
+          text="Sign In"
+          buttonStyle={styles.signInButton}
+          textStyle={styles.signInText}
+        />
+        <View style={styles.tipBox}>
+          <Image
+            source={require('../../assets/images/light-bulb.png')}
+            style={styles.lightBulbIcon}
+            resizeMode="contain"
+          />
+          <Text style={styles.tipText}>
+            Join 2000+ business owners who&apos;ve improved their sales with Sitelytics.
+          </Text>
+        </View>
+      </KeyboardAvoidingView>
+
+      <View style={styles.signUpButtonContainer}>
+        <TouchableOpacity 
+          style={styles.signUpButton}
+          onPress={() => router.push('/(auth)/sign-up')}
+        >
+          <Text style={styles.signUpButtonText}>Sign Up</Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
+  );
+};
 
 export default SignIn;

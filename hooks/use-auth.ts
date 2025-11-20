@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
-import { useRouter } from 'expo-router';
 import { useAuthStore } from '@/store/auth-store';
+import { useRouter } from 'expo-router';
+import { useEffect } from 'react';
 
 /**
  * Custom hook for authentication
@@ -53,7 +53,7 @@ export const useAuth = () => {
 
     // Actions
     signIn,
-    signUp,
+    signUp: (email: string, password: string) => signUp(email, password),
     signOut,
     clearError,
   };
