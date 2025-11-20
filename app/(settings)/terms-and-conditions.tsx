@@ -10,7 +10,6 @@ import styles from '@/Stylesheets/terms-and-conditions-stylesheet';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
-// Helper component for each section to keep the code clean
 const PolicySection = ({ title, children }: { title: string; children: React.ReactNode }) => (
   <View style={styles.sectionContainer}>
     <ThemedText style={styles.sectionTitle}>{title}</ThemedText>
@@ -23,7 +22,7 @@ export default function TermsAndConditionsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Custom Header */}
+      
       <View style={styles.headerContainer}>
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
           <Ionicons name="arrow-back" size={24} color="#1C1C1C" />
@@ -31,7 +30,6 @@ export default function TermsAndConditionsScreen() {
         <ThemedText style={styles.headerTitle}>Terms & Conditions</ThemedText>
       </View>
 
-      {/* Scrollable Content */}
       <ScrollView contentContainerStyle={styles.scrollContentContainer}>
         <ThemedText style={styles.dateText}>
           Last updated: October 2025

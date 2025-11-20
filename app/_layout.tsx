@@ -9,7 +9,7 @@ import 'react-native-reanimated';
 import { useAuthGuard } from '@/hooks/use-auth-guard';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
-// Prevent the splash screen from auto-hiding before fonts are loaded
+
 SplashScreen.preventAutoHideAsync();
 
 export const unstable_settings = {
@@ -18,7 +18,7 @@ export const unstable_settings = {
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
-  useAuthGuard(); // Protect routes based on auth state
+  useAuthGuard(); 
 
   const [fontsLoaded, fontError] = useFonts({
     'RethinkSans-Regular': require('../assets/font/rethink_sans/RethinkSans-Regular.ttf'),

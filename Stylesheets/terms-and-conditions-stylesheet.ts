@@ -10,14 +10,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 16,
-    paddingTop: 20, // Adjusted for status bar - can be fine-tuned
+    paddingTop: 20, 
     paddingBottom: 12,
     position: 'relative',
   },
   backButton: {
     position: 'absolute',
     left: 16,
-    top: 20, // Align with paddingTop of container
+    top: 20, 
     padding: 8,
   },
   headerTitle: {
