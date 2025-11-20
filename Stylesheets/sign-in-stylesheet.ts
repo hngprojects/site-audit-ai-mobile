@@ -7,8 +7,12 @@ const styles = StyleSheet.create({
         flex: 1
     },
     logo: {
-        alignItems: "center",
-        marginTop: -45,
+        alignSelf: "center",
+        marginTop: 20,
+        marginBottom: 20,
+        width: 150,
+        height: 40,
+        resizeMode: 'contain'
     },
     createAccountTitle: {
         color: "#000",
@@ -23,12 +27,12 @@ const styles = StyleSheet.create({
         marginTop: 15
     },
     textInput: {
-        fontSize: 20,     
-        padding: 10,
+        fontSize: 16,     
+        padding: 12,
         borderWidth: 1,
         borderColor: "#babec6",
         borderRadius: 12,
-        marginTop: 12
+        marginTop: 8
     },
     passwordContainer: {
         flexDirection: 'row',
@@ -38,12 +42,14 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         borderWidth: 1,
         borderRadius: 12,
-        marginTop: 12
+        marginTop: 8
     },
     passwordTextInput: {
-        fontSize: 20,
+        fontSize: 16,
+        flex: 1,
     },
-    signUpButton: {
+    // RENAMED from signUpButton for clarity
+    signInButton: {
         width: '100%',
         height: 50,
         borderRadius: 10,
@@ -52,12 +58,12 @@ const styles = StyleSheet.create({
         padding: 10, 
         justifyContent: "center",
         alignItems: 'center',
-        paddingVertical: 8
     },
-    signUpText: {
+    // RENAMED from signUpText for clarity
+    signInText: {
         color: "#fff",
         fontSize: 18,
-        fontFamily: "RethinkSans-Regular"
+        fontFamily: "RethinkSans-Bold"
     },
     continueWithSection: {
         flexDirection: "row",
@@ -107,24 +113,6 @@ const styles = StyleSheet.create({
         fontSize: 16,
         marginLeft: 10,
     },
-    SignUpContainer: {
-        flexDirection: 'row',
-        alignItems: "center",
-        justifyContent: 'center',
-    },
-    existingAccountText: {
-        marginTop: 30,
-        marginRight: 10,
-        color: "#bbbcbc",
-        fontFamily: "RethinkSans-Regular",
-        fontSize: 18
-    },
-    SignUp: {
-        marginTop: 30,
-        color: "blue",
-        fontFamily: "RethinkSans-SemiBold",
-        fontSize: 18
-    },
     incorrectPassword: {
         color: "#ff5a3d",
         fontFamily: "RethinkSans-Regular",
@@ -135,12 +123,64 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'flex-end',
-        marginTop: 25
+        marginTop: 12
     },
     forgotPasswordText: {
-        color: "blue",
+        color: "#ff5a3d",
+        fontFamily: "RethinkSans-SemiBold",
+        fontSize: 14,
+    },
+    // --- ADDED MISSING STYLES ---
+    tipBox: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#f0f0f0',
+        padding: 10,
+        borderRadius: 8,
+        marginTop: 20,
+    },
+    lightBulbIcon: {
+        width: 20,
+        height: 20,
+        marginRight: 10,
+    },
+    tipText: {
+        flex: 1,
         fontFamily: "RethinkSans-Regular",
-        fontSize: 14.5,
+        fontSize: 14,
+        color: '#494949',
+    },
+    signUpButtonContainer: {
+        padding: 16,
+        borderTopWidth: 1,
+        borderTopColor: '#e0e0e0',
+        backgroundColor: '#fff',
+    },
+    signUpButton: {
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    signUpButtonText: {
+        color: "#ff5a3d",
+        fontFamily: "RethinkSans-SemiBold",
+        fontSize: 16,
+    },
+    SignUpContainer: {
+        flexDirection: 'row',
+        alignItems: "center",
+        justifyContent: 'center',
+        marginTop: 20
+    },
+    existingAccountText: {
+        marginRight: 5,
+        color: "#676767",
+        fontFamily: "RethinkSans-Regular",
+        fontSize: 16
+    },
+    SignUp: {
+        color: "#ff5a3d",
+        fontFamily: "RethinkSans-SemiBold",
+        fontSize: 16
     },
 })
 

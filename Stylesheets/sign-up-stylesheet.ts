@@ -7,8 +7,12 @@ const styles = StyleSheet.create({
         flex: 1
     },
     logo: {
-        alignItems: "center",
-        marginTop: -60,
+        alignSelf: "center",
+        marginTop: 20,
+        marginBottom: 20,
+        width: 150,
+        height: 40,
+        resizeMode: 'contain'
     },
     createAccountTitle: {
         color: "#000",
@@ -23,112 +27,127 @@ const styles = StyleSheet.create({
         marginTop: 15
     },
     textInput: {
-        fontSize: 20,     
-        padding: 10,
+        fontSize: 16,     
+        padding: 12,
         borderWidth: 1,
         borderColor: "#babec6",
         borderRadius: 12,
-        marginTop: 12
+        marginTop: 8
     },
     passwordContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: 5,
         paddingHorizontal: 10,
         borderWidth: 1,
         borderRadius: 12,
-        marginTop: 12
+        marginTop: 8,
+        height: 50
     },
     passwordTextInput: {
-        fontSize: 20,
+        fontSize: 16,
+        flex: 1,
     },
     incorrectPassword: {
         color: '#ff5a3d',
         marginTop: 5,
+        fontFamily: "RethinkSans-Regular",
     },
     signUpButton: {
         width: '100%',
         height: 50,
         borderRadius: 10,
         backgroundColor: "#ff5a3d",
-        marginTop: 35,
-        padding: 10, 
+        marginTop: 25,
         justifyContent: "center",
         alignItems: 'center',
-        paddingVertical: 8
     },
     signUpText: {
         color: "#fff",
         fontSize: 18,
-        fontFamily: "RethinkSans-Regular"
+        fontFamily: "RethinkSans-Bold"
     },
-    continueWithSection: {
-        flexDirection: "row",
-        alignItems: 'center',
-        justifyContent: "center",
-        marginTop: 20
-    },
-    Line: {
-        width: 85,
-        height: 1,
-        backgroundColor: "#676767"
-    },
-    continueText: {
-        fontFamily: "RethinkSans-SemiBold",
-        fontSize: 15,
-        marginHorizontal: 10
-    },
-    SocialSIgninButton: {
-         width: '100%',
-        height: 50,
-        borderRadius: 10,
+    // --- ADDED MISSING STYLES ---
+    passwordRequirements: {
+        marginTop: 12,
+        padding: 12,
+        backgroundColor: '#f9f9f9',
+        borderRadius: 8,
         borderWidth: 1,
-        borderColor: "#babec6",
+        borderColor: '#f0f0f0',
+    },
+    requirementsTitle: {
+        fontFamily: 'RethinkSans-SemiBold',
+        fontSize: 14,
+        color: '#1C1C1C',
+        marginBottom: 8,
+    },
+    requirementItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 6,
+    },
+    requirementText: {
+        fontFamily: 'RethinkSans-Regular',
+        fontSize: 14,
+        color: '#494949',
+        marginLeft: 8,
+    },
+    requirementTextValid: {
+        color: '#4CAF50', // Green color for valid requirements
+        textDecorationLine: 'none', // No strikethrough for better readability
+    },
+    tipBox: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#f0f0f0',
+        padding: 10,
+        borderRadius: 8,
         marginTop: 20,
-        padding: 10, 
-        justifyContent: "center",
-        alignItems: 'center',
-        paddingVertical: 8,
-        flexDirection: 'row',
     },
-    AppleSocialSIgninButton: {
-        width: '100%',
-        height: 50,
-        borderRadius: 10,
-        borderWidth: 1,
-        borderColor: "#babec6",
-        marginTop: 15,
-        padding: 10, 
-        justifyContent: "center",
-        alignItems: 'center',
-        paddingVertical: 8,
-        flexDirection: 'row',
+    lightBulbIcon: {
+        width: 20,
+        height: 20,
+        marginRight: 10,
     },
-    Google: {
-        color: "#000",
+    tipText: {
+        flex: 1,
+        fontFamily: "RethinkSans-Regular",
+        fontSize: 14,
+        color: '#494949',
+    },
+    signInButtonContainer: {
+        padding: 16,
+        borderTopWidth: 1,
+        borderTopColor: '#e0e0e0',
+        backgroundColor: '#fff',
+    },
+    signInButton: {
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    signInButtonText: {
+        color: "#ff5a3d",
         fontFamily: "RethinkSans-SemiBold",
         fontSize: 16,
-        marginLeft: 10,
     },
+    // --- END ADDED STYLES ---
     SignInContainer: {
         flexDirection: 'row',
         alignItems: "center",
         justifyContent: 'center',
-        marginTop: -20
+        marginTop: 20
     },
     existingAccountText: {
-        marginTop: 40,
-        marginRight: 10,
-        color: "#bbbcbc",
+        marginRight: 5,
+        color: "#676767",
         fontFamily: "RethinkSans-Regular",
-        fontSize: 18
+        fontSize: 16
     },
     SignIN: {
-         marginTop: 40,
-        color: "blue",
+        color: "#ff5a3d",
         fontFamily: "RethinkSans-SemiBold",
-        fontSize: 18
+        fontSize: 16
     },
 })
 
