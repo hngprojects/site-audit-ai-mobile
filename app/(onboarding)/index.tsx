@@ -1,4 +1,5 @@
 import { slides } from "@/constants/onboardingSlide";
+import { storage, STORAGE_KEYS } from "@/lib/storage";
 import styles from "@/stylesheets/onboarding-stylesheet";
 import { Slide } from "@/type";
 import { RelativePathString, useRouter } from "expo-router";
@@ -47,11 +48,13 @@ const Onboarding = () => {
     viewAreaCoveragePercentThreshold: 60,
   }).current;
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (index < slides.length - 1) {
       flatListRef.current?.scrollToIndex({ index: index + 1 });
     } else {
-      router.replace(`${"/(auth)/sign-up"}` as RelativePathString); 
+      // Mark onboarding as completed and navigate to homepage
+      await storage.setItem(STORAGE_KEYS.ONBOARDING_COMPLETED, true);
+      router.replace('./(tabs)/' as RelativePathString); 
     }
   };
 
@@ -59,7 +62,11 @@ const Onboarding = () => {
     <View style={{...styles.container, paddingTop: inset.top, paddingBottom: inset.bottom - 15}}>
       
       <TouchableOpacity
-      onPress={() => router.replace(`${"/(auth)/sign-up"}` as RelativePathString)} 
+      onPress={async () => {
+        // Mark onboarding as completed when skipped and navigate to homepage
+        await storage.setItem(STORAGE_KEYS.ONBOARDING_COMPLETED, true);
+        router.replace('./(tabs)/' as RelativePathString);
+      }} 
         style={styles.skipButton}
        >
         <Text style={styles.skipText}>Skip</Text>

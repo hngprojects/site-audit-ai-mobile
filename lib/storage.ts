@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const STORAGE_KEYS = {
   AUTH_STATE: '@auth_state',
+  ONBOARDING_COMPLETED: '@onboarding_completed',
 } as const;
 
 export const storage = {

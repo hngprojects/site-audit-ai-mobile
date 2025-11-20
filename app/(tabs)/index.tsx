@@ -3,6 +3,7 @@ import EmptyState from "@/components/homeScreenEmptyState";
 import styles from "@/stylesheets/homeScreenStylesheet";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Octicons from "@expo/vector-icons/Octicons";
+import { RelativePathString, router } from "expo-router";
 import { useState } from "react";
 import { Image, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -23,8 +24,10 @@ export default function HomeScreen() {
   ]);
 
   const RunAudit = () => {
-    if(websiteUrl === "")
-      return setUrlAvailable( false)
+    if(websiteUrl === ""){
+      return setUrlAvailable(false)
+    }
+    router.push('./(main)/auditing-screen' as RelativePathString);
     
   }
 
