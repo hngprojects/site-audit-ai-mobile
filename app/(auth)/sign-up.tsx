@@ -3,19 +3,14 @@ import { useAuth } from '@/hooks/use-auth';
 import styles from '@/stylesheets/sign-up-stylesheet';
 import Feather from '@expo/vector-icons/Feather';
 import { useRouter } from 'expo-router';
-import React, { lazy, Suspense, useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Image, Keyboard, KeyboardAvoidingView, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-// Lazy load social login buttons
-const SocialLoginButtons = lazy(() => import('@/components/auth/social-login-buttons'));
+import React, { useEffect, useState } from 'react';
+import { Alert, Image, KeyboardAvoidingView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const SignUp = () => {
   const router = useRouter();
-  const inset = useSafeAreaInsets();
   const { signUp, isLoading, error, clearError, isAuthenticated } = useAuth();
 
-  const [fullName, setFullName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [secureTextEntry, setSecureTextEntry] = useState<boolean>(true);
@@ -42,11 +37,6 @@ const SignUp = () => {
     clearError();
 
     // Validation
-    if (!fullName.trim()) {
-      setLocalError('Full name is required');
-      return;
-    }
-
     if (!email.trim()) {
       setLocalError('Email is required');
       return;
@@ -71,7 +61,7 @@ const SignUp = () => {
     }
 
     try {
-      await signUp(fullName.trim(), email.trim(), password);
+      await signUp('', email.trim(), password);
       // Navigation is handled by useEffect when isAuthenticated changes
     } catch (err) {
       // Error is handled by the store and shown via Alert
@@ -83,41 +73,19 @@ const SignUp = () => {
   const hasError = !!displayError;
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+    // <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
       <KeyboardAvoidingView
         behavior="padding"
         style={{
           ...styles.container,
-          paddingTop: inset.top,
-          paddingBottom: inset.bottom,
         }}
       >
         <Image
-          source={require('../../assets/images/icon.png')}
-          style={{
-            width: 140,
-            resizeMode: 'contain',
-            alignSelf: 'center',
-            ...styles.logo,
-          }}
-        />
-
-        <Text style={{ ...styles.createAccountTitle }}>Create your account</Text>
-
-        <Text style={{ ...styles.textInputLabel }}>Full Name</Text>
-
-        <TextInput
-          placeholder="Enter your full name"
-          style={styles.textInput}
-          placeholderTextColor="#dfdfdfff"
-          value={fullName}
-          onChangeText={(text) => {
-            setFullName(text);
-            setLocalError(null);
-            clearError();
-          }}
-          autoCapitalize="words"
-          editable={!isLoading}
+          source={require('../../assets/imgs/logo-variant-2.png')}
+          style={
+           styles.logo
+          }
         />
 
         <Text style={{ ...styles.textInputLabel }}>Email</Text>
@@ -171,7 +139,7 @@ const SignUp = () => {
         </View>
 
         {displayError && (
-          <Text style={[{ marginTop: 8 }]}>{displayError}</Text>
+          <Text style={styles.incorrectPassword}>{displayError}</Text>
         )}
 
         <LoadingButton
@@ -183,32 +151,27 @@ const SignUp = () => {
           textStyle={styles.signUpText}
         />
 
-        <View style={styles.continueWithSection}>
-          <View style={styles.Line} />
-
-          <Text style={styles.continueText}>Or continue with</Text>
-
-          <View style={styles.Line} />
-        </View>
-
-        <Suspense
-          fallback={
-            <View style={styles.SocialSIgninButton}>
-              <ActivityIndicator size="small" color="#9ba1ab" />
-            </View>
-          }
-        >
-          <SocialLoginButtons />
-        </Suspense>
-
-        <View style={styles.SignInContainer}>
-          <Text style={styles.existingAccountText}>Already have an account?</Text>
-          <TouchableOpacity onPress={() => router.push('/(auth)/sign-in')}>
-            <Text style={styles.SignIN}>Sign In</Text>
-          </TouchableOpacity>
+        <View style={styles.tipBox}>
+          <Image
+            source={require('../../assets/images/light-bulb.png')}
+            style={styles.lightBulbIcon}
+            resizeMode="contain"
+          />
+          <Text style={styles.tipText}>
+            Join 2000+ business owners who&apos;ve improved their sales with Sitelytics.
+          </Text>
         </View>
       </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
+
+      <View style={styles.signInButtonContainer}>
+        <TouchableOpacity 
+          style={styles.signInButton}
+          onPress={() => router.push('/(auth)/sign-in')}
+        >
+          <Text style={styles.signInButtonText}>Sign In</Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
   );
 };
 

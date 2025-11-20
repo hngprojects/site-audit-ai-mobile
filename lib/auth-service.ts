@@ -58,8 +58,8 @@ export const authService = {
         const { email, password, fullName } = credentials;
 
         // Validate input
-        if (!email || !password || !fullName) {
-          reject(new Error('All fields are required'));
+        if (!email || !password) {
+          reject(new Error('Email and password are required'));
           return;
         }
 
@@ -86,7 +86,7 @@ export const authService = {
         const newUser = {
           id: `user_${Date.now()}_${Math.random().toString(36).substring(7)}`,
           email: email.toLowerCase(),
-          fullName,
+          fullName: fullName || '',
           createdAt: new Date().toISOString(),
         };
 
