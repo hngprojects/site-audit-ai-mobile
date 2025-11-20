@@ -15,7 +15,7 @@ const Splash = () => {
          router.replace("./(tabs)/"); 
       }
 
-      router.replace("./onboarding"); 
+      router.replace("./(onboarding)/"); 
 
     }, 3000);
 
