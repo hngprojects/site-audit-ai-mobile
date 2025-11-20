@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, ActivityIndicator } from 'react-native';
+import { ActivityIndicator } from 'react-native';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
+import styles from '@/stylesheets/delete-account-choice-selection-stylesheet';
 
 const DeleteAccountChoiceSelectionContent = () => (
   <ThemedView style={styles.container}>
@@ -31,18 +32,4 @@ export default function DeleteAccountChoiceSelection() {
 
   return <DeleteAccountChoiceSelectionContent />;
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
 

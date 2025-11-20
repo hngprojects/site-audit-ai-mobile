@@ -1,7 +1,8 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, StyleSheet } from 'react-native';
+import { ActivityIndicator } from 'react-native';
+import styles from '@/stylesheets/change-password-stylesheet';
 
 const ChangePasswordContent = () => (
   <ThemedView style={styles.container}>
@@ -31,18 +32,4 @@ export default function ChangePassword() {
 
   return <ChangePasswordContent />;
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
 

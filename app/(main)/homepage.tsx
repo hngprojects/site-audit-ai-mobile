@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, ActivityIndicator } from 'react-native';
-import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '@/components/themed-view';
+import styles from '@/stylesheets/homepage-stylesheet';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator } from 'react-native';
 
 const HomepageContent = () => (
   <ThemedView style={styles.container}>
@@ -32,18 +33,4 @@ export default function Homepage() {
 
   return <HomepageContent />;
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
 
