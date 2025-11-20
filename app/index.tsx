@@ -1,5 +1,5 @@
 import { getAllCountries } from '@/service/httpsRequest';
-import styles from '@/stylesheets/languageScreenStylesheet';
+import styles from '@/stylesheets/language-screen-stylesheet';
 import { Country } from '@/type';
 import Feather from '@expo/vector-icons/Feather';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';

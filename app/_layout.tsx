@@ -47,13 +47,14 @@ export default function RootLayout() {
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack initialRouteName='splash'>
         <Stack.Screen name="splash" options={{ headerShown: false }} />
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="otpVerification" options={{ headerShown: false }} />
-        <Stack.Screen name="newPassword" options={{ headerShown: false }} />
-        <Stack.Screen name="passwordResetSuccess" options={{ headerShown: false }} />
-        <Stack.Screen name="forgotPassword" options={{ headerShown: false }} />
-        <Stack.Screen name="onboarding" options={{ headerShown: false }} />
-        <Stack.Screen name="signUp" options={{ headerShown: false }} />
+        {/**Language Selector Screen removed from app but code implmentation is still available in the index.tsx file below */}
+        {/* <Stack.Screen name="index" options={{ headerShown: false }} /> */}
+      
+       
+       
+        
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+        <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
       </Stack>

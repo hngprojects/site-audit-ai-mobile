@@ -1,4 +1,4 @@
-import styles from '@/stylesheets/forgotPasswordStylesheet';
+import styles from '@/stylesheets/forgot-password-stylesheet';
 import { useResetPasswordEmailStore } from '@/zustardStore/resetPasswordEmailStore';
 import { Feather } from '@expo/vector-icons';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -134,4 +134,5 @@ const ForgotPassword = () => {
   )
 }
 
-export default ForgotPassword;
+export default ForgotPassword
+

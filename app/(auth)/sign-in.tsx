@@ -1,5 +1,5 @@
 import { saveToSecureStore } from '@/expoSecureStore';
-import styles from '@/stylesheets/signInStylesheet';
+import styles from '@/stylesheets/sign-in-stylesheet';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -77,7 +77,7 @@ const SignIn = () => {
             }}
         >
             <Image
-                source={require('../assets/images/icon.png')}
+                source={require('../../assets/images/icon.png')}
                 style={{
                     width: 140,
                     resizeMode: "contain",
@@ -140,7 +140,7 @@ const SignIn = () => {
               )}
 
               <TouchableOpacity 
-              onPress={() => router.push('/forgotPassword')}
+              onPress={() => router.push('/(auth)/forgot-password')}
               style={styles.forgotPasswordContainer}>
                 <Text style={styles.forgotPasswordText}>
                   Forgot Password?
@@ -179,7 +179,7 @@ const SignIn = () => {
                <TouchableOpacity style={styles.SocialSIgninButton}>
       
                   <Image 
-                  source={require('../assets/images/google.png')}
+                  source={require('../../assets/images/google.png')}
                   style={{
                       height: 25,
                       width: 25,
@@ -193,7 +193,7 @@ const SignIn = () => {
                <TouchableOpacity style={styles.AppleSocialSIgninButton}>
       
                   <Image 
-                  source={require('../assets/images/apple.png')}
+                  source={require('../../assets/images/apple.png')}
                   style={{
                       height: 35,
                       width: 35,
@@ -209,7 +209,7 @@ const SignIn = () => {
                   <Text style = {styles.existingAccountText}>
                       Don&apos;t have an account?
                   </Text>
-                  <TouchableOpacity onPress={() => router.push("./signUp")}>
+                  <TouchableOpacity onPress={() => router.push('/(auth)/sign-up')}>
                       <Text style= {styles.SignUp}>Sign Up</Text>
                   </TouchableOpacity>
               </View>
@@ -219,3 +219,4 @@ const SignIn = () => {
 }
 
 export default SignIn
+
