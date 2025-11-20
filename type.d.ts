@@ -30,6 +30,36 @@ export interface Slide {
   subtitle: string;
 }
 
+export interface User {
+  id: string;
+  email: string;
+  fullName: string;
+  createdAt: string;
+}
+
+export interface AuthState {
+  user: User | null;
+  token: string | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  isInitialized: boolean;
+}
+
+export interface SignInCredentials {
+  email: string;
+  password: string;
+}
+
+export interface SignUpCredentials {
+  fullName: string;
+  email: string;
+  password: string;
+}
+
+export interface AuthResponse {
+  user: User;
+  token: string;
+}
 export type AuditResultCardProps = {
   url: string;
   status: "Passed" | "Average" | "Failed";

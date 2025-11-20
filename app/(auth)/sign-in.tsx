@@ -2,9 +2,12 @@ import { saveToSecureStore } from '@/expoSecureStore';
 import styles from '@/stylesheets/sign-in-stylesheet';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation, useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { ActivityIndicator, Image, Keyboard, KeyboardAvoidingView, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+// Lazy load social login buttons
+// const SocialLoginButtons = lazy(() => import('@/components/auth/social-login-buttons'));
 
 const SignIn = () => {
     const inset = useSafeAreaInsets();
@@ -59,11 +62,6 @@ const SignIn = () => {
       }
 
 
-    useEffect(() => {
-        navigation.setOptions({ headerShown: false });
-          
-    }, [navigation])
-    
   return (
     <TouchableWithoutFeedback
     onPress={Keyboard.dismiss}
@@ -139,13 +137,7 @@ const SignIn = () => {
                 </Text>
               )}
 
-              <TouchableOpacity 
-              onPress={() => router.push('/(auth)/forgot-password')}
-              style={styles.forgotPasswordContainer}>
-                <Text style={styles.forgotPasswordText}>
-                  Forgot Password?
-                </Text>
-              </TouchableOpacity>
+      <Text style={{ ...styles.createAccountTitle }}>Sign in to your account</Text>
 
               {loading ? (
                 <ActivityIndicator 
@@ -218,5 +210,5 @@ const SignIn = () => {
   )
 }
 
-export default SignIn
 
+export default SignIn;

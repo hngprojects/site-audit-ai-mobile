@@ -1,7 +1,7 @@
 # SiteMate AI
 
 <div align="center">
-  <img src="assets/imgs/logo.png" alt="SiteMate AI Logo" width="200"/>
+  <img src="assets/imgs/logo.svg" alt="SiteMate AI Logo" width="200"/>
 </div>
 
 SiteMate AI is an easy-to-use app that checks your website's health. It finds problems, suggests quick fixes, and helps your website perform better - no tech skills needed.
