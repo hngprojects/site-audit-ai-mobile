@@ -3,8 +3,8 @@ import {
   ScrollView,
   TouchableOpacity,
   View,
-  SafeAreaView,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/themed-text';
 import styles from '@/Stylesheets/terms-and-conditions-stylesheet';
 import { useRouter } from 'expo-router';
@@ -34,7 +34,7 @@ export default function TermsAndConditionsScreen() {
       {/* Scrollable Content */}
       <ScrollView contentContainerStyle={styles.scrollContentContainer}>
         <ThemedText style={styles.dateText}>
-          Last updated: October 26, 2023
+          Last updated: October 2025
         </ThemedText>
 
         <PolicySection title="1. Acceptance of Terms">
@@ -96,7 +96,8 @@ export default function TermsAndConditionsScreen() {
         </PolicySection>
 
         <PolicySection title="11. Contact">
-          For questions, email us at: privacy@sitelytics.ai
+          <ThemedText style={styles.sectionBody}>For questions, email us at: </ThemedText>
+          <ThemedText style={styles.contactEmail}>privacy@sitelytics.ai</ThemedText>
         </PolicySection>
       </ScrollView>
     </SafeAreaView>

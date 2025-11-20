@@ -50,6 +50,10 @@ const styles = StyleSheet.create({
     color: '#494949',
     lineHeight: 20,
   },
+  contactEmail: {
+    color: '#FF5A3D',
+    fontFamily: 'RethinkSans-SemiBold', // Assuming it should stand out like a link
+  },
 });
 
 export default styles;
