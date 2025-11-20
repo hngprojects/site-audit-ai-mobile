@@ -1,140 +1,206 @@
 import type { AuthResponse, SignInCredentials, SignUpCredentials } from '@/type';
+import axios, { isAxiosError } from 'axios';
 
-/**
- * Simulates an API call for authentication
- * In a real app, this would make an HTTP request to your backend
- */
+const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL || '';
 
-const SIMULATED_DELAY = 1500; // 1.5 seconds to simulate network delay
+if (!BASE_URL) {
+  console.warn('EXPO_PUBLIC_BASE_URL is not set. Please add it to your .env file.');
+}
 
-// Mock user database (in real app, this would be on the server)
-const mockUsers: Map<string, { password: string; user: AuthResponse['user'] }> = new Map();
+const apiClient = axios.create({
+  baseURL: BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+const formatErrorMessage = (errorData: any): string => {
+  if (errorData.data?.errors && Array.isArray(errorData.data.errors)) {
+    const flattenErrors = (arr: any[]): string[] => {
+      const result: string[] = [];
+      for (const item of arr) {
+        if (typeof item === 'string') {
+          result.push(item);
+        } else if (Array.isArray(item)) {
+          result.push(...flattenErrors(item));
+        } else if (item && typeof item === 'object') {
+          if (item.message) {
+            result.push(item.message);
+          } else if (item.error) {
+            result.push(item.error);
+          } else {
+            Object.values(item).forEach((val) => {
+              if (typeof val === 'string') {
+                result.push(val);
+              } else if (Array.isArray(val)) {
+                result.push(...flattenErrors(val));
+              }
+            });
+          }
+        }
+      }
+      return result;
+    };
+    
+    const errorMessages = flattenErrors(errorData.data.errors);
+    
+    if (errorMessages.length > 0) {
+      return errorMessages.join('. ');
+    }
+  }
+  
+  return errorData.message || errorData.error || 'An error occurred';
+};
 
 export const authService = {
-  /**
-   * Sign in with email and password
-   */
   async signIn(credentials: SignInCredentials): Promise<AuthResponse> {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        const { email, password } = credentials;
+    const { email, password } = credentials;
 
-        // Validate input
-        if (!email || !password) {
-          reject(new Error('Email and password are required'));
-          return;
-        }
+    if (!email || !password) {
+      throw new Error('Email and password are required');
+    }
 
-        // Check if user exists
-        const userData = mockUsers.get(email.toLowerCase());
-
-        if (!userData) {
-          reject(new Error('Invalid email or password'));
-          return;
-        }
-
-        if (userData.password !== password) {
-          reject(new Error('Invalid email or password'));
-          return;
-        }
-
-        // Generate mock token
-        const token = `mock_token_${Date.now()}_${Math.random().toString(36).substring(7)}`;
-
-        resolve({
-          user: userData.user,
-          token,
-        });
-      }, SIMULATED_DELAY);
-    });
+    try {
+      const response = await apiClient.post('/api/v1/auth/login', { email, password });
+      const responseData = response.data;
+      
+      const token = responseData.data?.access_token || responseData.data?.token || responseData.access_token || responseData.token;
+      const apiUser = responseData.data?.user || responseData.user;
+      
+      if (!apiUser || !token) {
+        throw new Error('Invalid response from server');
+      }
+      
+      const user = {
+        id: apiUser.id,
+        email: apiUser.email,
+        fullName: apiUser.first_name && apiUser.last_name 
+          ? `${apiUser.first_name} ${apiUser.last_name}`.trim()
+          : apiUser.fullName || apiUser.username || '',
+        createdAt: apiUser.created_at || apiUser.createdAt || new Date().toISOString(),
+      };
+      
+      return { user, token };
+    } catch (error) {
+      if (isAxiosError(error)) {
+        const errorData = error.response?.data || {};
+        const errorMessage = formatErrorMessage(errorData);
+        throw new Error(errorMessage);
+      }
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Failed to sign in. Please try again.');
+    }
   },
 
-  /**
-   * Sign up with email, password, and full name
-   */
   async signUp(credentials: SignUpCredentials): Promise<AuthResponse> {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        const { email, password, fullName } = credentials;
+    const { email, password } = credentials;
 
-        // Validate input
-        if (!email || !password || !fullName) {
-          reject(new Error('All fields are required'));
-          return;
-        }
+    if (!email || !password) {
+      throw new Error('Email and password are required');
+    }
 
-        // Validate email format
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-          reject(new Error('Invalid email format'));
-          return;
-        }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      throw new Error('Invalid email format');
+    }
 
-        // Validate password length
-        if (password.length < 6) {
-          reject(new Error('Password must be at least 6 characters'));
-          return;
-        }
+    if (password.length < 6) {
+      throw new Error('Password must be at least 6 characters');
+    }
 
-        // Check if user already exists
-        if (mockUsers.has(email.toLowerCase())) {
-          reject(new Error('User with this email already exists'));
-          return;
-        }
-
-        // Create new user
-        const newUser = {
-          id: `user_${Date.now()}_${Math.random().toString(36).substring(7)}`,
-          email: email.toLowerCase(),
-          fullName,
-          createdAt: new Date().toISOString(),
-        };
-
-        // Store user in mock database
-        mockUsers.set(email.toLowerCase(), {
-          password,
-          user: newUser,
-        });
-
-        // Generate mock token
-        const token = `mock_token_${Date.now()}_${Math.random().toString(36).substring(7)}`;
-
-        resolve({
-          user: newUser,
-          token,
-        });
-      }, SIMULATED_DELAY);
-    });
+    try {
+      const response = await apiClient.post('/api/v1/auth/signup', {
+        email,
+        password,
+        username: email.split('@')[0],
+      });
+      
+      const responseData = response.data;
+      console.log(responseData);
+      
+      const token = responseData.data?.access_token || responseData.data?.token || responseData.access_token || responseData.token;
+      const apiUser = responseData.data?.user || responseData.user;
+      
+      if (!apiUser || !token) {
+        throw new Error('Invalid response from server');
+      }
+      
+      const user = {
+        id: apiUser.id,
+        email: apiUser.email,
+        fullName: apiUser.first_name && apiUser.last_name 
+          ? `${apiUser.first_name} ${apiUser.last_name}`.trim()
+          : apiUser.fullName || apiUser.username || '',
+        createdAt: apiUser.created_at || apiUser.createdAt || new Date().toISOString(),
+      };
+      
+      return { user, token };
+    } catch (error) {
+      if (isAxiosError(error)) {
+        const errorData = error.response?.data || {};
+        console.log(errorData);
+        const errorMessage = formatErrorMessage(errorData);
+        throw new Error(errorMessage);
+      }
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Failed to sign up. Please try again.');
+    }
   },
 
-  /**
-   * Sign out (clears session)
-   */
-  async signOut(): Promise<void> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve();
-      }, 300);
-    });
+  async signOut(token: string): Promise<void> {
+    try {
+      await apiClient.post(
+        '/api/v1/auth/logout',
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+    } catch (error) {
+      // Even if the request fails, we still want to sign out locally
+      console.error('Error signing out:', error);
+    }
   },
 
-  /**
-   * Verify token (simulate token validation)
-   */
   async verifyToken(token: string): Promise<AuthResponse['user'] | null> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        // In a real app, this would validate the token with the server
-        // For simulation, we'll just check if it's a valid format
-        if (token && token.startsWith('mock_token_')) {
-          // Find user by token (in real app, token would contain user info)
-          // For simulation, we'll return null and let the app handle re-authentication
-          resolve(null);
-        } else {
-          resolve(null);
-        }
-      }, 500);
-    });
+    if (!token) {
+      return null;
+    }
+
+    try {
+      const response = await apiClient.get('/api/v1/auth/me', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const responseData = response.data;
+      const apiUser = responseData.data?.user || responseData.data || responseData.user || responseData;
+      
+      if (!apiUser || !apiUser.id) {
+        return null;
+      }
+      
+      const user = {
+        id: apiUser.id,
+        email: apiUser.email,
+        fullName: apiUser.first_name && apiUser.last_name 
+          ? `${apiUser.first_name} ${apiUser.last_name}`.trim()
+          : apiUser.fullName || apiUser.username || '',
+        createdAt: apiUser.created_at || apiUser.createdAt || new Date().toISOString(),
+      };
+      
+      return user;
+    } catch (error) {
+      console.error('Error verifying token:', error);
+      return null;
+    }
   },
 };
 
