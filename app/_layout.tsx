@@ -49,12 +49,12 @@ export default function RootLayout() {
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack initialRouteName='splash'>
         <Stack.Screen name="splash" options={{ headerShown: false }} />
-        {/**Language Selector Screen removed from app but code implmentation is still available in the index.tsx file below */}
-        {/* <Stack.Screen name="index" options={{ headerShown: false }} /> */}
-      
-       
-       
-        
+        <Stack.Screen name="(main)" options={{ headerShown: false }} />
+        <Stack.Screen name="(reports)" options={{ headerShown: false }} />
+        <Stack.Screen name="(profile)" options={{ headerShown: false }} />
+        <Stack.Screen name="(settings)" options={{ headerShown: false }} />
+        <Stack.Screen name="(support)" options={{ headerShown: false }} />
+        <Stack.Screen name="(general)" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
