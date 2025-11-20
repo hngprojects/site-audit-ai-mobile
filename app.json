@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "site-audit-ai-fe",
-    "slug": "site-audit-ai-fe",
+    "slug": "sitelytics",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -20,7 +20,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.omegafast.siteauditaife"
+      "package": "com.peliah.sitelytics"
     },
     "web": {
       "output": "static",
@@ -39,7 +39,8 @@
             "backgroundColor": "#000000"
           }
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true,
@@ -48,8 +49,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "118c9f3d-11c8-4dc5-8c2c-04ff30c6c7df"
+        "projectId": "c79758da-0b13-4a7a-bf58-ed343449a3c2"
       }
-    }
+    },
+    "owner": "peliah"
   }
 }

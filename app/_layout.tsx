@@ -6,6 +6,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 
+import { useAuthGuard } from '@/hooks/use-auth-guard';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
 // Prevent the splash screen from auto-hiding before fonts are loaded
@@ -17,6 +18,7 @@ export const unstable_settings = {
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
+  useAuthGuard(); // Protect routes based on auth state
 
   const [fontsLoaded, fontError] = useFonts({
     'RethinkSans-Regular': require('../assets/font/rethink_sans/RethinkSans-Regular.ttf'),
@@ -47,7 +49,12 @@ export default function RootLayout() {
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack initialRouteName='splash'>
         <Stack.Screen name="splash" options={{ headerShown: false }} />
-        <Stack.Screen name="index" options={{ headerShown: false }} />
+        {/**Language Selector Screen removed from app but code implmentation is still available in the index.tsx file below */}
+        {/* <Stack.Screen name="index" options={{ headerShown: false }} /> */}
+      
+       
+       
+        
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />

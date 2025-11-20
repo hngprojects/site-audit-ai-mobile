@@ -43,6 +43,10 @@ const styles = StyleSheet.create({
     passwordTextInput: {
         fontSize: 20,
     },
+    incorrectPassword: {
+        color: '#ff5a3d',
+        marginTop: 5,
+    },
     signUpButton: {
         width: '100%',
         height: 50,

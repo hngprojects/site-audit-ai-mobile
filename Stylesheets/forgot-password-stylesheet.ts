@@ -55,6 +55,20 @@ const styles = StyleSheet.create({
         alignItems: "center",
 
     },
+   outerGlowCircle: {
+        position: "absolute",
+        top: 220,
+        width: 120,
+        height: 120,
+        backgroundColor: "#d32f2f",
+        borderRadius: 60,
+        opacity: 0.1,
+        shadowColor: "#e64e4e34",
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 1,
+        shadowRadius: 40,
+        elevation: 20,
+   },
    glowCircle: {
         position: "absolute",
         top:240,

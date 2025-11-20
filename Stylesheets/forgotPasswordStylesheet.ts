@@ -55,12 +55,26 @@ const styles = StyleSheet.create({
         alignItems: "center",
 
     },
+   outerGlowCircle: {
+        position: "absolute",
+        top:180,
+        width: 120,
+        height: 120,
+        backgroundColor: "#ffccc3",
+        borderRadius: 60,
+        opacity: 0.25,
+        shadowColor: "#e64e4e34",
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 1,
+        shadowRadius: 40, 
+        elevation: 20,  
+    },
    glowCircle: {
         position: "absolute",
-        top:240,
+        top:200,
         width: 80,
         height: 80,
-        backgroundColor: "#d32f2f",
+        backgroundColor: "#ff907d",
         borderRadius: 60,
         opacity: 0.25,
         shadowColor: "#e64e4e34",
@@ -72,13 +86,13 @@ const styles = StyleSheet.create({
     Icon: {
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop:260
+        marginTop:220
     },
     checkyourmail: {
         color: "#000",
         fontFamily: "RethinkSans-Bold",
         fontSize: 22,
-        marginTop: 40
+        marginTop: 60
     },
     subText: {
         justifyContent: 'center',
@@ -87,7 +101,8 @@ const styles = StyleSheet.create({
         fontFamily: "RethinkSans-Regular",
         textAlign: "center",
         color: "#929696ff",
-        marginBottom: 68,
+        marginBottom: 100,
+        marginTop: 10
     }
     
   })

@@ -1,32 +1,79 @@
+import { saveToSecureStore } from '@/expoSecureStore';
 import styles from '@/Stylesheets/sign-in-stylesheet';
 import { Feather } from '@expo/vector-icons';
-import { useNavigation, useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
-import { Image, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { ActivityIndicator, Image, Keyboard, KeyboardAvoidingView, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+// Lazy load social login buttons
+// const SocialLoginButtons = lazy(() => import('@/components/auth/social-login-buttons'));
 
 const SignIn = () => {
     const inset = useSafeAreaInsets();
-    const navigation = useNavigation();
+
     const router = useRouter();
         
       const [email, setEmail] = useState<string>('');
       const [Password, setPassword] = useState<string>('');
       const [secureTextEntry, setSecureTextEntry] = useState<boolean>(true);
       const [IncorrectPassword, setIncorrectPassword] = useState<boolean>(false);
+      const [loading, setloading] = useState<boolean>(false);
 
-    useEffect(() => {
-        navigation.setOptions({ headerShown: false });
-          
-    }, [navigation])
-    
+
+      const handleSignIn = async () => {
+        setloading(true);
+        
+        if (!email) {
+            alert("Please enter your email.");
+            setloading(false);
+            return;
+        }
+
+
+        if (!Password) {
+            alert("Please enter your password ");
+            setloading(false);
+            return;
+        }
+        
+        
+        try {
+            
+            await saveToSecureStore("jwt", "hereItIs")
+             router.replace("./(tabs)/"); 
+            
+        } catch (error: any) {
+
+            console.error("Sign-in error:", error);
+
+            if(error.code === 'AUTH_INVALID_CREDENTIALS'){
+                alert("The email or password you entered is incorrect. Please try again.");
+                setIncorrectPassword(true);
+                return;
+            }
+
+            alert("An error occurred during sign-in. Please try again.");
+
+        } finally {
+            setloading(false);
+        }
+
+      }
+
+
   return (
-    <View style = {{
-        paddingTop: inset.top, 
-        paddingBottom: inset.bottom,
-        ...styles.container
-    }}>
-      
+    <TouchableWithoutFeedback
+    onPress={Keyboard.dismiss}
+    >
+        <KeyboardAvoidingView
+            behavior={"padding"}
+            style={{
+                ...styles.container,
+                paddingTop: inset.top , 
+                paddingBottom: inset.bottom
+            }}
+        >
             <Image
                 source={require('../../assets/images/icon.png')}
                 style={{
@@ -59,7 +106,7 @@ const SignIn = () => {
                   Password
               </Text>
       
-              <View style={{
+            <View style={{
                 borderColor: IncorrectPassword ? "#ff5a3d" : "#babec6",
                 ...styles.passwordContainer
                 }}>
@@ -90,19 +137,25 @@ const SignIn = () => {
                 </Text>
               )}
 
-              <TouchableOpacity 
-              onPress={() => router.push('/(auth)/forgot-password')}
-              style={styles.forgotPasswordContainer}>
-                <Text style={styles.forgotPasswordText}>
-                  Forgot Password?
-                </Text>
-              </TouchableOpacity>
+      <Text style={{ ...styles.createAccountTitle }}>Sign in to your account</Text>
 
-              <TouchableOpacity style={styles.signUpButton}>
-                  <Text style={styles.signUpText}>
-                      Sign in
-                  </Text>
-              </TouchableOpacity>
+              {loading ? (
+                <ActivityIndicator 
+                    size="large" 
+                    color="#ff5a3d" 
+                    style={{marginTop: 20}} 
+                />
+              ) : (
+                
+                <TouchableOpacity 
+                    onPress={handleSignIn}
+                    style={styles.signUpButton}>
+                        <Text style={styles.signUpText}>
+                            Sign in
+                        </Text>
+                </TouchableOpacity>
+
+              )}
               
               <View style={styles.continueWithSection}>
                   <View style={styles.Line}/>
@@ -152,9 +205,10 @@ const SignIn = () => {
                       <Text style= {styles.SignUp}>Sign Up</Text>
                   </TouchableOpacity>
               </View>
-    </View>
+        </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   )
 }
 
-export default SignIn
 
+export default SignIn;
