@@ -7,7 +7,7 @@ import * as authActions from '@/actions/auth-actions';
 interface AuthStore extends AuthState {
   // Actions
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (fullName: string, email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   initialize: () => Promise<void>;
   clearError: () => void;
@@ -48,10 +48,10 @@ export const useAuthStore = create<AuthStore>()(
         }
       },
 
-      signUp: async (fullName: string, email: string, password: string) => {
+      signUp: async (email: string, password: string) => {
         set({ isLoading: true, error: null });
         try {
-          const response = await authActions.signUp(fullName, email, password);
+          const response = await authActions.signUp(email, password);
           set({
             user: response.user,
             token: response.token,
@@ -71,7 +71,10 @@ export const useAuthStore = create<AuthStore>()(
       signOut: async () => {
         set({ isLoading: true });
         try {
-          await authActions.signOut();
+          const state = get();
+          if (state.token) {
+            await authActions.signOut(state.token);
+          }
           set({
             ...initialState,
             isInitialized: true,
@@ -95,15 +98,24 @@ export const useAuthStore = create<AuthStore>()(
           const storedState = await storage.getItem<AuthState>(STORAGE_KEYS.AUTH_STATE);
           
           if (storedState?.token) {
-            // In a real app, you would verify the token here
-            // For simulation, we'll just restore the state
-            set({
-              user: storedState.user,
-              token: storedState.token,
-              isAuthenticated: !!storedState.token,
-              isLoading: false,
-              isInitialized: true,
-            });
+            // Verify the token with the server
+            const user = await authActions.verifyToken(storedState.token);
+            
+            if (user) {
+              set({
+                user,
+                token: storedState.token,
+                isAuthenticated: true,
+                isLoading: false,
+                isInitialized: true,
+              });
+            } else {
+              // Token is invalid, clear auth state
+              set({
+                ...initialState,
+                isInitialized: true,
+              });
+            }
           } else {
             set({
               ...initialState,
