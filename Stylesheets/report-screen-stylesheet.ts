@@ -43,7 +43,7 @@ export default StyleSheet.create({
   },
   searchText: {
     fontFamily: "RethinkSans-Medium",
-    color: "#9CA3AF",
+    color: "#000000",
     fontSize: 14,
     marginLeft: 4,
     marginTop: 3,
