@@ -86,6 +86,7 @@ const ReportsScreen: React.FC = () => {
           value={search}
         />
       </View>
+      
 
       {loading ? (
         <ActivityIndicator size="large" color={"#F04438"} style={{ flex: 1, justifyContent: "center", alignItems: "center" }} />
