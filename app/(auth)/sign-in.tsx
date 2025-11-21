@@ -1,6 +1,6 @@
 import { LoadingButton } from '@/components/ui/loading-button';
 import { useAuth } from '@/hooks/use-auth';
-import styles from '@/stylesheets/sign-in-stylesheet';
+import styles from '@/Stylesheets/sign-in-stylesheet';
 import Feather from '@expo/vector-icons/Feather';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';

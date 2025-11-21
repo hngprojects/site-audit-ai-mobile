@@ -1,4 +1,4 @@
-import styles from "@/stylesheets/homeScreenEmptyStateStylesheet";
+import styles from "@/Stylesheets/homeScreenEmptyStateStylesheet";
 import React from "react";
 import { Image, Text, View } from "react-native";
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ActivityIndicator } from 'react-native';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
-import styles from '@/stylesheets/language-screen-stylesheet';
+import styles from '@/Stylesheets/language-screen-stylesheet';
 
 const LanguageContent = () => (
   <ThemedView style={styles.container}>

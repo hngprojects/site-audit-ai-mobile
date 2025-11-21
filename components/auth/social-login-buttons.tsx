@@ -1,4 +1,4 @@
-import styles from '@/stylesheets/sign-in-stylesheet';
+import styles from '@/Stylesheets/sign-in-stylesheet';
 import { Image, Text, TouchableOpacity } from 'react-native';
 
 const SocialLoginButtons: React.FC = () => {

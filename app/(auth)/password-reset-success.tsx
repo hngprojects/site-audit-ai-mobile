@@ -1,4 +1,4 @@
-import styles from "@/stylesheets/passwordResetSuccessStylesheet";
+import styles from "@/Stylesheets/passwordResetSuccessStylesheet";
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import { useRouter } from "expo-router";
 import { Platform, Text, TouchableOpacity, View } from "react-native";

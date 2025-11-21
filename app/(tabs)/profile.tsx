@@ -1,6 +1,6 @@
 import AuthModal from '@/components/auth/auth-modal';
 import { useAuth } from '@/hooks/use-auth';
-import styles from '@/stylesheets/profile-stylesheet';
+import styles from '@/Stylesheets/profile-stylesheet';
 import { useFocusEffect } from '@react-navigation/native';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Text, View } from 'react-native';

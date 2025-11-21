@@ -1,6 +1,6 @@
 import { slides } from "@/constants/onboardingSlide";
 import { storage, STORAGE_KEYS } from "@/lib/storage";
-import styles from "@/stylesheets/onboarding-stylesheet";
+import styles from "@/Stylesheets/onboarding-stylesheet";
 import { Slide } from "@/type";
 import { RelativePathString, useRouter } from "expo-router";
 import React, { useRef, useState } from "react";

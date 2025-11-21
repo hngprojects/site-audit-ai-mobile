@@ -1,4 +1,4 @@
-import styles from '@/stylesheets/profile-stylesheet';
+import styles from '@/Stylesheets/profile-stylesheet';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
