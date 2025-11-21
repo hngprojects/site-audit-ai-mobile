@@ -1,4 +1,4 @@
-import styles from "@/stylesheets/auditResultCardStylesheet";
+import styles from "@/Stylesheets/auditResultCardStylesheet";
 import { AuditResultCardProps } from "@/type";
 import React from "react";
 import { Text, View } from "react-native";

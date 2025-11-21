@@ -2,14 +2,14 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
+import { StatusBar } from 'react-native';
 import 'react-native-reanimated';
 
 import { useAuthGuard } from '@/hooks/use-auth-guard';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
-// Prevent the splash screen from auto-hiding before fonts are loaded
+
 SplashScreen.preventAutoHideAsync();
 
 export const unstable_settings = {
@@ -18,7 +18,7 @@ export const unstable_settings = {
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
-  useAuthGuard(); // Protect routes based on auth state
+  useAuthGuard(); 
 
   const [fontsLoaded, fontError] = useFonts({
     'RethinkSans-Regular': require('../assets/font/rethink_sans/RethinkSans-Regular.ttf'),
@@ -60,7 +60,7 @@ export default function RootLayout() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
       </Stack>
-      <StatusBar style="auto" />
+      <StatusBar barStyle={colorScheme === 'dark' ? 'light-content' : 'dark-content'} />
     </ThemeProvider>
   );
 }

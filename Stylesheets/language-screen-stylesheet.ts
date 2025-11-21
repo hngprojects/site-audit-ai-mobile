@@ -7,6 +7,12 @@ const styles = StyleSheet.create({
         marginTop: '10%',
         backgroundColor: "#fff"
     },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: "#fff",
+    },
     chooseYourLanguageTitle : {
         color: "#000",
         fontFamily: 'RethinkSans-Bold',

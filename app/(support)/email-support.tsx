@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ActivityIndicator } from 'react-native';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
-import styles from '@/stylesheets/email-support-stylesheet';
+import styles from '@/Stylesheets/email-support-stylesheet';
 
 const EmailSupportContent = () => (
   <ThemedView style={styles.container}>

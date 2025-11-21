@@ -1,6 +1,6 @@
 import AuditResultCard from "@/components/auditResultCard";
 import EmptyState from "@/components/homeScreenEmptyState";
-import styles from "@/stylesheets/homeScreenStylesheet";
+import styles from "@/Stylesheets/homeScreenStylesheet";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Octicons from "@expo/vector-icons/Octicons";
 import { useState } from "react";

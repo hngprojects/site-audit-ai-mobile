@@ -1,5 +1,5 @@
 import { authService } from '@/lib/auth-service';
-import styles from '@/stylesheets/forgot-password-stylesheet';
+import styles from '@/Stylesheets/forgot-password-stylesheet';
 import { useResetPasswordEmailStore } from '@/zustardStore/resetPasswordEmailStore';
 import { Feather } from '@expo/vector-icons';
 import Ionicons from '@expo/vector-icons/Ionicons';

@@ -1,5 +1,5 @@
 import { resendResetToken } from '@/actions/auth-actions';
-import styles from "@/stylesheets/otpVerificationStylesheet";
+import styles from "@/Stylesheets/otpVerificationStylesheet";
 import { useResetPasswordEmailStore } from "@/zustardStore/resetPasswordEmailStore";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";

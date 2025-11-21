@@ -1,5 +1,5 @@
 import { authService, MIN_PASSWORD_LENGTH } from '@/lib/auth-service';
-import styles from "@/stylesheets/newPasswordStylesheet";
+import styles from "@/Stylesheets/newPasswordStylesheet";
 import { useResetPasswordEmailStore } from '@/zustardStore/resetPasswordEmailStore';
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";

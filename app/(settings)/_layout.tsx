@@ -4,6 +4,7 @@ export default function SettingsLayout() {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="privacy" />
+      <Stack.Screen name="terms-and-conditions" />
       <Stack.Screen name="language" />
     </Stack>
   );

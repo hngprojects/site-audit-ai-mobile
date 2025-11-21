@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ActivityIndicator } from 'react-native';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
-import styles from '@/stylesheets/contact-support-stylesheet';
+import styles from '@/Stylesheets/contact-support-stylesheet';
 
 const ContactSupportContent = () => (
   <ThemedView style={styles.container}>
