@@ -1,4 +1,4 @@
-import { authService } from '@/lib/auth-service';
+import { authService, MIN_PASSWORD_LENGTH } from '@/lib/auth-service';
 import styles from "@/stylesheets/newPasswordStylesheet";
 import { useResetPasswordEmailStore } from '@/zustardStore/resetPasswordEmailStore';
 import { Feather, Ionicons } from "@expo/vector-icons";
@@ -40,9 +40,9 @@ export default function NewPassword() {
             return;   
         }
 
-        if (password.length < 6) {
+        if (password.length < MIN_PASSWORD_LENGTH) {
             setMismatchedPassword(true);
-            setError("Password must be at least 6 characters");
+            setError(`Password must be at least ${MIN_PASSWORD_LENGTH} characters`);
             setLoading(false);
             return;
         }
@@ -152,7 +152,7 @@ export default function NewPassword() {
             </View>
 
             {error && (
-                <Text style={{ color: '#d32f2f', marginTop: 10, fontSize: 14 }}>
+                <Text style={styles.errorText}>
                     {error}
                 </Text>
             )}

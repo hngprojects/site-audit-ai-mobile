@@ -2,6 +2,7 @@ import type { AuthResponse, SignInCredentials, SignUpCredentials } from '@/type'
 import axios, { isAxiosError } from 'axios';
 
 const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL || '';
+export const MIN_PASSWORD_LENGTH = 6;
 
 if (!BASE_URL) {
   console.warn('EXPO_PUBLIC_BASE_URL is not set. Please add it to your .env file.');
@@ -106,8 +107,8 @@ export const authService = {
       throw new Error('Invalid email format');
     }
 
-    if (password.length < 6) {
-      throw new Error('Password must be at least 6 characters');
+    if (password.length < MIN_PASSWORD_LENGTH) {
+      throw new Error(`Password must be at least ${MIN_PASSWORD_LENGTH} characters`);
     }
 
     try {
@@ -238,8 +239,8 @@ export const authService = {
       throw new Error('Invalid email format');
     }
 
-    if (newPassword.length < 6) {
-      throw new Error('Password must be at least 6 characters');
+    if (newPassword.length < MIN_PASSWORD_LENGTH) {
+      throw new Error(`Password must be at least ${MIN_PASSWORD_LENGTH} characters`);
     }
 
     try {

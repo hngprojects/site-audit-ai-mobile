@@ -26,7 +26,8 @@ const OTPVerification = () => {
         setOtpToken(otpCode);
         router.push("./new-password")
         
-    } catch {
+    } catch (error) {
+        console.error('Error in confirmCode:', error);
         setInvalidOtp(true)
         setOtpFilled(false)
     } finally {
