@@ -7,7 +7,7 @@ type Notification = {
   unread: boolean;
 };
 
-const DUMMY_NOTIFICATIONS: Notification[] = [
+let DUMMY_NOTIFICATIONS: Notification[] = [
   { id: '1', title: 'Welcome to Sitelytics', message: 'Welcome to Sitelytics, get started with your first audit today', time: '2 hours ago', unread: true },
   { id: '2', title: 'Report Received', message: 'Your website audit is ready. 3 issues found! 2 are critical.', time: '2 hours ago', unread: true },
   { id: '3', title: 'Fix Started', message: 'Your assigned fix is now in progress', time: '2 hours ago', unread: false },

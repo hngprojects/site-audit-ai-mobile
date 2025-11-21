@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
 
   time: {
     fontSize: 12,
-    fontWeight: 'semibold',
+    fontWeight: '600',
     fontFamily: 'RethinkSans-Regular',
   },
 
@@ -88,12 +88,11 @@ const styles = StyleSheet.create({
   },
 
   rightAction: {
-    backgroundColor: '#FF4D4F',
+    backgroundColor: 'red',
+    display:"flex",
     justifyContent: 'center',
     alignItems: 'center',
-    width: 64,
-    borderRadius: 12,
-    marginVertical: 6,
+    width: 74
   },
 
   rightActionText: {
@@ -126,6 +125,39 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     tintColor: '#E0E0E0',
     resizeMode: 'contain',
+  },
+
+  headerTitle: {
+    color: '#111',
+    fontSize: 24,
+  },
+
+  markAllRead: {
+    color: '#FF6A45',
+  },
+
+  unreadTitle: {
+    color: '#111',
+  },
+
+  readTitle: {
+    color: '#9f9f9fff',
+  },
+
+  unreadTime: {
+    color: '#111',
+  },
+
+  readTime: {
+    color: '#666',
+  },
+
+  unreadMessage: {
+    color: '#444',
+  },
+
+  readMessage: {
+    color: '#888',
   },
 });
 

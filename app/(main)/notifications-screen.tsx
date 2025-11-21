@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   FlatList,
   View,
@@ -19,6 +19,7 @@ import {
 import type { Notification } from '../../service/notifications';
 import { Swipeable } from 'react-native-gesture-handler';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { router } from 'expo-router';
 
 const SkeletonCard = () => (
   <View style={[styles.card, { opacity: 0.6, backgroundColor: '#f2f2f2' }]}>
@@ -71,7 +72,7 @@ const NotificationItem = ({
       style={styles.rightAction}
       onPress={() => onDelete(item.id)}
     >
-      <MaterialIcons name="delete" size={22} color="#fff" />
+      <Image source={require('@/assets/images/delete.png')} style={{ width: 22, height: 22 }} />
     </TouchableOpacity>
   );
 
@@ -125,7 +126,10 @@ const NotificationItem = ({
             >
               <ThemedText
                 type="defaultSemiBold"
-                style={{ color: item.unread ? '#111' : '#9f9f9fff', flex: 1 }}
+                style={[
+                  item.unread ? styles.unreadTitle : styles.readTitle,
+                  { flex: 1 },
+                ]}
                 numberOfLines={1}
                 ellipsizeMode="tail"
               >
@@ -135,7 +139,8 @@ const NotificationItem = ({
               <ThemedText
                 style={[
                   styles.time,
-                  { marginLeft: 8, color: item.unread ? '#111' : '#666' },
+                  { marginLeft: 8 },
+                  item.unread ? styles.unreadTime : styles.readTime,
                 ]}
               >
                 {item.time}
@@ -145,7 +150,8 @@ const NotificationItem = ({
             <ThemedText
               style={[
                 styles.message,
-                { marginTop: 6, color: item.unread ? '#444' : '#888' },
+                { marginTop: 6 },
+                item.unread ? styles.unreadMessage : styles.readMessage,
               ]}
               numberOfLines={2}
               ellipsizeMode="tail"
@@ -165,6 +171,16 @@ export default function NotificationsScreen() {
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
 
+  const filteredNotifications = useMemo(() => {
+    if (!search) return notifications;
+    const lowercasedSearch = search.toLowerCase();
+    return notifications.filter(
+      n =>
+        n.title.toLowerCase().includes(lowercasedSearch) ||
+        n.message.toLowerCase().includes(lowercasedSearch)
+    );
+  }, [notifications, search]);
+
   const load = useCallback(async () => {
     setIsLoading(true);
     setError(null);
@@ -183,13 +199,8 @@ export default function NotificationsScreen() {
     load();
   }, [load]);
 
-  const markAllRead = async () => {
-    try {
-      // update local state since backend is dummy
-      setNotifications(prev => prev.map(n => ({ ...n, unread: false })));
-    } catch (e) {
-      console.error('Mark all read error', e);
-    }
+  const markAllRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, unread: false })));
   };
 
   const handleMarkRead = async (id: string) => {
@@ -253,14 +264,14 @@ export default function NotificationsScreen() {
           justifyContent: 'space-between',
         }}
       >
-        <TouchableOpacity style={{ padding: 8 }}>
+        <TouchableOpacity style={{ padding: 8 }} onPress={() => router.back()}>
           <MaterialIcons name="arrow-back" size={18} color="#595959ff" />
         </TouchableOpacity>
-        <ThemedText style={{ color: '#111', fontSize: 24 }} type="title">
+        <ThemedText style={styles.headerTitle} type="title">
           Notification
         </ThemedText>
         <TouchableOpacity onPress={markAllRead}>
-          <ThemedText style={{ color: '#FF6A45' }}>Mark all as read</ThemedText>
+          <ThemedText style={styles.markAllRead}>Mark all as read</ThemedText>
         </TouchableOpacity>
       </View>
 
@@ -285,12 +296,7 @@ export default function NotificationsScreen() {
         </View>
       ) : (
         <FlatList
-          data={notifications.filter(
-            n =>
-              !search ||
-              n.title.toLowerCase().includes(search.toLowerCase()) ||
-              n.message.toLowerCase().includes(search.toLowerCase())
-          )}
+          data={filteredNotifications}
           keyExtractor={i => i.id}
           renderItem={({ item }) => (
             <NotificationItem
