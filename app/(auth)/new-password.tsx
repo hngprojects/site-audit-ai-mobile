@@ -1,15 +1,19 @@
 import { authService, MIN_PASSWORD_LENGTH } from '@/lib/auth-service';
-import styles from "@/Stylesheets/newPasswordStylesheet";
+import { getNewPasswordStyles } from "@/Stylesheets/newPasswordStylesheet";
 import { useResetPasswordEmailStore } from '@/zustardStore/resetPasswordEmailStore';
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { ActivityIndicator, Alert, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, Text, TextInput, TouchableOpacity, View, useColorScheme } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Colors } from '@/constants/theme';
 
 export default function NewPassword() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const colorScheme = useColorScheme() ?? 'light';
+  const styles = getNewPasswordStyles(colorScheme);
+  const colors = Colors[colorScheme];
 
     const [secureTextEntry, setSecureTextEntry] = useState<boolean>(true);
     const [password, setPassword] = useState<string>('');
@@ -75,7 +79,7 @@ export default function NewPassword() {
                 onPress={router.back}
                 style={styles.backarrow}
             >
-                <Ionicons name="arrow-back" size={24} color="black" />
+                <Ionicons name="arrow-back" size={24} color={colors.text} />
             </TouchableOpacity>
       
             <Text style={styles.headerText}>
@@ -96,13 +100,13 @@ export default function NewPassword() {
       
             <View style={{
                 ...styles.input,
-                borderColor: mismatchedPassword ? "#d32f2f" : "#babec6",
+                borderColor: mismatchedPassword ? colors.tint : colors.icon,
                 }}
             >
                   <TextInput
                       placeholder="***********"
                       style={styles.passwordTextInput}
-                      placeholderTextColor="#dfdfdfff"
+                      placeholderTextColor={colors.placeholder}
                       value={password}
                       onChangeText={x => setPassword(x)}
                       secureTextEntry={secureTextEntry}
@@ -110,11 +114,11 @@ export default function NewPassword() {
       
                   {secureTextEntry ? 
                       <TouchableOpacity onPress={() => setSecureTextEntry(!secureTextEntry)}>
-                          <Feather name="eye-off" size={24} color="#9ba1ab" />
+                          <Feather name="eye-off" size={24} color={colors.icon} />
                       </TouchableOpacity>
                   :
                   <TouchableOpacity onPress={() => setSecureTextEntry(!secureTextEntry)}>
-                      <Feather name="eye" size={24} color="#9ba1ab" />
+                      <Feather name="eye" size={24} color={colors.icon} />
                   </TouchableOpacity>
                   }
       
@@ -127,13 +131,13 @@ export default function NewPassword() {
       
             <View style={{
                 ...styles.input,
-                borderColor: mismatchedPassword ? "#d32f2f" : "#babec6",
+                borderColor: mismatchedPassword ? colors.tint : colors.icon,
                 }} 
             >
                   <TextInput
                       placeholder="***********"
                       style={styles.passwordTextInput}
-                      placeholderTextColor="#dfdfdfff"
+                      placeholderTextColor={colors.placeholder}
                       value={confirmPassword}
                       onChangeText={x => setConfirmPassword(x)}
                       secureTextEntry={secureTextEntry}
@@ -141,11 +145,11 @@ export default function NewPassword() {
       
                   {secureTextEntry ? 
                       <TouchableOpacity onPress={() => setSecureTextEntry(!secureTextEntry)}>
-                          <Feather name="eye-off" size={24} color="#9ba1ab" />
+                          <Feather name="eye-off" size={24} color={colors.icon} />
                       </TouchableOpacity>
                   :
                   <TouchableOpacity onPress={() => setSecureTextEntry(!secureTextEntry)}>
-                      <Feather name="eye" size={24} color="#9ba1ab" />
+                      <Feather name="eye" size={24} color={colors.icon} />
                   </TouchableOpacity>
                   }
       
@@ -160,7 +164,7 @@ export default function NewPassword() {
             {loading ? (
                  <ActivityIndicator 
                     size="large" 
-                    color="#ff5a3d" 
+                    color={colors.tint} 
                     style={{marginTop: 20}} 
                 />
             ) : (
