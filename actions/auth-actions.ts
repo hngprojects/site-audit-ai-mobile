@@ -26,7 +26,3 @@ export const signOut = async (token: string): Promise<void> => {
   return await authService.signOut(token);
 };
 
-export const verifyToken = async (token: string) => {
-  return await authService.verifyToken(token);
-};
-

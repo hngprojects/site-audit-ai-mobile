@@ -169,41 +169,6 @@ export const authService = {
     }
   },
 
-  async verifyToken(token: string): Promise<AuthResponse['user'] | null> {
-    if (!token) {
-      return null;
-    }
-
-    try {
-      const response = await apiClient.get('/api/v1/auth/me', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const responseData = response.data;
-      const apiUser = responseData.data?.user || responseData.data || responseData.user || responseData;
-      
-      if (!apiUser || !apiUser.id) {
-        return null;
-      }
-      
-      const user = {
-        id: apiUser.id,
-        email: apiUser.email,
-        fullName: apiUser.first_name && apiUser.last_name 
-          ? `${apiUser.first_name} ${apiUser.last_name}`.trim()
-          : apiUser.fullName || apiUser.username || '',
-        createdAt: apiUser.created_at || apiUser.createdAt || new Date().toISOString(),
-      };
-      
-      return user;
-    } catch (error) {
-      console.error('Error verifying token:', error);
-      return null;
-    }
-  },
-
   async forgotPassword(email: string): Promise<void> {
     if (!email) {
       throw new Error('Email is required');

@@ -94,28 +94,11 @@ export const useAuthStore = create<AuthStore>()(
         set({ isLoading: true });
 
         try {
-          // Check if we have a stored token
-          const storedState = await storage.getItem<AuthState>(STORAGE_KEYS.AUTH_STATE);
-          
-          if (storedState?.token) {
-            // Verify the token with the server
-            const user = await authActions.verifyToken(storedState.token);
-            
-            if (user) {
-              set({
-                user,
-                token: storedState.token,
-                isAuthenticated: true,
-                isLoading: false,
-                isInitialized: true,
-              });
-            } else {
-              // Token is invalid, clear auth state
-              set({
-                ...initialState,
-                isInitialized: true,
-              });
-            }
+          if (state.token && state.user) {
+            set({
+              isLoading: false,
+              isInitialized: true,
+            });
           } else {
             set({
               ...initialState,
@@ -139,14 +122,27 @@ export const useAuthStore = create<AuthStore>()(
       name: STORAGE_KEYS.AUTH_STATE,
       storage: createJSONStorage(() => ({
         getItem: async (name: string): Promise<string | null> => {
-          const item = await storage.getItem(name);
-          return item ? JSON.stringify(item) : null;
+          try {
+            const item = await storage.getItem(name);
+            return item ? JSON.stringify(item) : null;
+          } catch (error) {
+            console.error('Error getting item from storage in persist:', error);
+            return null;
+          }
         },
         setItem: async (name: string, value: string): Promise<void> => {
-          await storage.setItem(name, JSON.parse(value));
+          try {
+            await storage.setItem(name, JSON.parse(value));
+          } catch (error) {
+            console.error('Error setting item to storage in persist:', error);
+          }
         },
         removeItem: async (name: string): Promise<void> => {
-          await storage.removeItem(name);
+          try {
+            await storage.removeItem(name);
+          } catch (error) {
+            console.error('Error removing item from storage in persist:', error);
+          }
         },
       })),
       partialize: (state) => ({
