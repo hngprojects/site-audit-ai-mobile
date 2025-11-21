@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingTop: 32,
+    paddingTop: 16,
   },
   formSection: {
     gap: 24,

@@ -29,7 +29,7 @@ const PrivacyPolicyContent = () => {
 
           {PRIVACY_POLICY_DATA.sections.map((section, sectionIndex) => (
             <View key={sectionIndex} style={styles.section}>
-              <Text style={styles.sectionHeader}>{section.header}</Text>
+              <Text style={styles.sectionHeader}>{sectionIndex + 1}. {section.header}</Text>
               {section.listHeader && (
                 <Text style={styles.listHeader}>{section.listHeader}</Text>
               )}

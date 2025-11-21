@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingTop: 24,
+    paddingTop: 6,
     paddingHorizontal: 16,
   },
   lastUpdatedText: {
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
     fontFamily: 'RethinkSans-Regular',
   },
   contactSection: {
-    marginTop: 16,
+    marginTop: 1,
   },
   contactHeader: {
     fontSize: 16,
