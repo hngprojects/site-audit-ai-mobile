@@ -1,9 +1,10 @@
+import { resendResetToken } from '@/actions/auth-actions';
 import styles from "@/stylesheets/otpVerificationStylesheet";
 import { useResetPasswordEmailStore } from "@/zustardStore/resetPasswordEmailStore";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { ActivityIndicator, Keyboard, KeyboardAvoidingView, Platform, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { ActivityIndicator, Alert, Keyboard, KeyboardAvoidingView, Platform, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { OtpInput } from "react-native-otp-entry";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -15,6 +16,7 @@ const OTPVerification = () => {
   const [otpFilled, setOtpFilled] = useState<boolean>(false);
   const [invalidOtp, setInvalidOtp] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [resending, setResending] = useState<boolean>(false);
   
 
   const emailWeSentYourCode = useResetPasswordEmailStore((state) => state.passwordRecoveryEmail);
@@ -32,6 +34,27 @@ const OTPVerification = () => {
         setOtpFilled(false)
     } finally {
         setLoading(false);
+    }
+  }
+
+  const handleResend = async () => {
+    if (!emailWeSentYourCode) {
+      Alert.alert('Error', 'Email not found. Please start the password reset process again.');
+      return;
+    }
+
+    setResending(true);
+    try {
+      await resendResetToken(emailWeSentYourCode);
+      Alert.alert('Success', 'Reset code has been resent to your email.');
+      setOtpCode('');
+      setOtpFilled(false);
+      setInvalidOtp(false);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to resend code. Please try again.';
+      Alert.alert('Error', errorMessage);
+    } finally {
+      setResending(false);
     }
   }
 
@@ -99,8 +122,13 @@ const OTPVerification = () => {
         <Text style={styles.resendText}>
             Didn&apos;t receive a code?
         </Text>
-        <TouchableOpacity>
-             <Text style={styles.resend}>Resend</Text>
+        <TouchableOpacity 
+          onPress={handleResend}
+          disabled={resending}
+        >
+             <Text style={styles.resend}>
+               {resending ? 'Resending...' : 'Resend'}
+             </Text>
         </TouchableOpacity>
       </View>
       

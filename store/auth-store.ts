@@ -1,8 +1,8 @@
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
-import type { AuthState, User, AuthResponse } from '@/type';
-import { storage, STORAGE_KEYS } from '@/lib/storage';
 import * as authActions from '@/actions/auth-actions';
+import { storage, STORAGE_KEYS } from '@/lib/storage';
+import type { AuthState } from '@/type';
+import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
 interface AuthStore extends AuthState {
   // Actions

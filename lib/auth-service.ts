@@ -226,5 +226,30 @@ export const authService = {
       throw new Error('Failed to reset password. Please try again.');
     }
   },
+
+  async resendResetToken(email: string): Promise<void> {
+    if (!email) {
+      throw new Error('Email is required');
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      throw new Error('Invalid email format');
+    }
+
+    try {
+      await apiClient.post('/api/v1/auth/resend-reset-token', { email });
+    } catch (error) {
+      if (isAxiosError(error)) {
+        const errorData = error.response?.data || {};
+        const errorMessage = formatErrorMessage(errorData);
+        throw new Error(errorMessage);
+      }
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Failed to resend reset token. Please try again.');
+    }
+  },
 };
 

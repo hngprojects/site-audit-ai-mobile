@@ -26,3 +26,7 @@ export const signOut = async (token: string): Promise<void> => {
   return await authService.signOut(token);
 };
 
+export const resendResetToken = async (email: string): Promise<void> => {
+  return await authService.resendResetToken(email);
+};
+
