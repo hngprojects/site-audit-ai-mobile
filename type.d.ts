@@ -70,4 +70,6 @@ export type AuditResultCardProps = {
 export interface ResetPasswordEmailState {
   passwordRecoveryEmail: string;
   setPasswordRecoveryEmail: (email: string) => void;
+  otpToken: string;
+  setOtpToken: (token: string) => void;
 }

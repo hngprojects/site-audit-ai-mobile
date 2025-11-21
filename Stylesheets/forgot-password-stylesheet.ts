@@ -55,21 +55,21 @@ const styles = StyleSheet.create({
         alignItems: "center",
 
     },
-   outerGlowCircle: {
+    outerGlowCircle: {
         position: "absolute",
-        top: 220,
+        top: 180,
         width: 120,
         height: 120,
-        backgroundColor: "#d32f2f",
+        backgroundColor: "#ffccc3",
         borderRadius: 60,
-        opacity: 0.1,
+        opacity: 0.25,
         shadowColor: "#e64e4e34",
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 1,
         shadowRadius: 40,
         elevation: 20,
-   },
-   glowCircle: {
+    },
+    glowCircle: {
         position: "absolute",
         top:240,
         width: 80,
@@ -102,6 +102,12 @@ const styles = StyleSheet.create({
         textAlign: "center",
         color: "#929696ff",
         marginBottom: 68,
+    },
+    errorText: {
+        color: "#ff5a3d",
+        fontFamily: "RethinkSans-Regular",
+        fontSize: 14,
+        marginTop: 8,
     }
     
   })

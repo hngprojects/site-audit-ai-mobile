@@ -7,4 +7,7 @@ export const useResetPasswordEmailStore = create<ResetPasswordEmailState>((set) 
   passwordRecoveryEmail: '',
   setPasswordRecoveryEmail: (email) =>
     set({ passwordRecoveryEmail: email }),
+  otpToken: '',
+  setOtpToken: (token) =>
+    set({ otpToken: token }),
 }));

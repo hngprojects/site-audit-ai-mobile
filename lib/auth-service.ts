@@ -2,6 +2,7 @@ import type { AuthResponse, SignInCredentials, SignUpCredentials } from '@/type'
 import axios, { isAxiosError } from 'axios';
 
 const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL || '';
+export const MIN_PASSWORD_LENGTH = 6;
 
 if (!BASE_URL) {
   console.warn('EXPO_PUBLIC_BASE_URL is not set. Please add it to your .env file.');
@@ -106,8 +107,8 @@ export const authService = {
       throw new Error('Invalid email format');
     }
 
-    if (password.length < 6) {
-      throw new Error('Password must be at least 6 characters');
+    if (password.length < MIN_PASSWORD_LENGTH) {
+      throw new Error(`Password must be at least ${MIN_PASSWORD_LENGTH} characters`);
     }
 
     try {
@@ -168,38 +169,86 @@ export const authService = {
     }
   },
 
-  async verifyToken(token: string): Promise<AuthResponse['user'] | null> {
-    if (!token) {
-      return null;
+  async forgotPassword(email: string): Promise<void> {
+    if (!email) {
+      throw new Error('Email is required');
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      throw new Error('Invalid email format');
     }
 
     try {
-      const response = await apiClient.get('/api/v1/auth/me', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const responseData = response.data;
-      const apiUser = responseData.data?.user || responseData.data || responseData.user || responseData;
-      
-      if (!apiUser || !apiUser.id) {
-        return null;
-      }
-      
-      const user = {
-        id: apiUser.id,
-        email: apiUser.email,
-        fullName: apiUser.first_name && apiUser.last_name 
-          ? `${apiUser.first_name} ${apiUser.last_name}`.trim()
-          : apiUser.fullName || apiUser.username || '',
-        createdAt: apiUser.created_at || apiUser.createdAt || new Date().toISOString(),
-      };
-      
-      return user;
+      await apiClient.post('/api/v1/auth/forgot-password', { email });
     } catch (error) {
-      console.error('Error verifying token:', error);
-      return null;
+      if (isAxiosError(error)) {
+        const errorData = error.response?.data || {};
+        const errorMessage = formatErrorMessage(errorData);
+        throw new Error(errorMessage);
+      }
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Failed to send password reset email. Please try again.');
+    }
+  },
+
+  async verifyForgotPassword(email: string, token: string, newPassword: string): Promise<void> {
+    if (!email || !token || !newPassword) {
+      throw new Error('Email, token, and new password are required');
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      throw new Error('Invalid email format');
+    }
+
+    if (newPassword.length < MIN_PASSWORD_LENGTH) {
+      throw new Error(`Password must be at least ${MIN_PASSWORD_LENGTH} characters`);
+    }
+
+    try {
+      await apiClient.post('/api/v1/auth/verify-forgot-password', {
+        email,
+        token,
+        new_password: newPassword,
+      });
+    } catch (error) {
+      if (isAxiosError(error)) {
+        const errorData = error.response?.data || {};
+        const errorMessage = formatErrorMessage(errorData);
+        throw new Error(errorMessage);
+      }
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Failed to reset password. Please try again.');
+    }
+  },
+
+  async resendResetToken(email: string): Promise<void> {
+    if (!email) {
+      throw new Error('Email is required');
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      throw new Error('Invalid email format');
+    }
+
+    try {
+      await apiClient.post('/api/v1/auth/resend-reset-token', { email });
+    } catch (error) {
+      if (isAxiosError(error)) {
+        const errorData = error.response?.data || {};
+        const errorMessage = formatErrorMessage(errorData);
+        throw new Error(errorMessage);
+      }
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Failed to resend reset token. Please try again.');
     }
   },
 };
