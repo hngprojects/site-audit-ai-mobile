@@ -11,19 +11,22 @@ const OTPVerification = () => {
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
+  const [otpCode, setOtpCode] = useState<string>('');
   const [otpFilled, setOtpFilled] = useState<boolean>(false);
   const [invalidOtp, setInvalidOtp] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   
 
   const emailWeSentYourCode = useResetPasswordEmailStore((state) => state.passwordRecoveryEmail);
+  const setOtpToken = useResetPasswordEmailStore((state) => state.setOtpToken);
 
   const confirmCode = () => {
     setLoading(true);
     try {
-        router.push("./newPassword")
+        setOtpToken(otpCode);
+        router.push("./new-password")
         
-    } catch (error) {
+    } catch {
         setInvalidOtp(true)
         setOtpFilled(false)
     } finally {
@@ -75,7 +78,14 @@ const OTPVerification = () => {
         },
           pinCodeTextStyle: styles.otpText, 
         }}
-        onFilled={() => setOtpFilled(true)}
+        onTextChange={(text) => {
+          setOtpCode(text);
+          setInvalidOtp(false);
+        }}
+        onFilled={(text) => {
+          setOtpCode(text);
+          setOtpFilled(true);
+        }}
       />
 
       {invalidOtp && (

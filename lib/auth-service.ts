@@ -227,5 +227,38 @@ export const authService = {
       throw new Error('Failed to send password reset email. Please try again.');
     }
   },
+
+  async verifyForgotPassword(email: string, token: string, newPassword: string): Promise<void> {
+    if (!email || !token || !newPassword) {
+      throw new Error('Email, token, and new password are required');
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      throw new Error('Invalid email format');
+    }
+
+    if (newPassword.length < 6) {
+      throw new Error('Password must be at least 6 characters');
+    }
+
+    try {
+      await apiClient.post('/api/v1/auth/verify-forgot-password', {
+        email,
+        token,
+        new_password: newPassword,
+      });
+    } catch (error) {
+      if (isAxiosError(error)) {
+        const errorData = error.response?.data || {};
+        const errorMessage = formatErrorMessage(errorData);
+        throw new Error(errorMessage);
+      }
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Failed to reset password. Please try again.');
+    }
+  },
 };
 
