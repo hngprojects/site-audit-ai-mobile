@@ -1,4 +1,5 @@
 import * as authActions from '@/actions/auth-actions';
+import EditProfileSkeleton from '@/components/profile/edit-profile-skeleton';
 import { useAuth } from '@/hooks/use-auth';
 import { useAuthStore } from '@/store/auth-store';
 import styles from '@/stylesheets/edit-profile-stylesheet';
@@ -118,13 +119,7 @@ const EditProfileContent = () => {
   };
 
   if (isLoadingData) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.loadingContainer}>
-          <Text>Loading...</Text>
-        </View>
-      </SafeAreaView>
-    );
+    return <EditProfileSkeleton />;
   }
 
   return (
