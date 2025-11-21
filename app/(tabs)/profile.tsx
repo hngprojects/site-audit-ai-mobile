@@ -30,10 +30,9 @@ const Profile = () => {
   }, [isAuthenticated, isInitialized]);
 
   const closeModal = () => {
-    // Only allow closing if user is authenticated
-    if (isAuthenticated) {
-      setModalVisible(false);
-    }
+    setModalVisible(false);
+    // User can close modal and stay on profile tab
+    // The profile content will show "Please sign in to view your profile"
   };
 
   // Show loading state while initializing
@@ -45,30 +44,34 @@ const Profile = () => {
     );
   }
 
-  // Don't render profile content if not authenticated - show modal instead
-  if (!isAuthenticated) {
-    return <AuthModal visible={modalVisible} onClose={closeModal} />;
-  }
-
-  // Render profile content when authenticated
+  // Render profile content with modal overlay when not authenticated
   return (
-    <View style={styles.container}>
-      <Text style={{ fontSize: 24, fontFamily: 'RethinkSans-Bold', marginBottom: 20 }}>
-        Profile
-      </Text>
-      {user && (
-        <View>
-          <Text style={{ fontSize: 16, fontFamily: 'RethinkSans-Regular', marginBottom: 10 }}>
-            Email: {user.email}
-          </Text>
-          {user.fullName && (
-            <Text style={{ fontSize: 16, fontFamily: 'RethinkSans-Regular' }}>
-              Name: {user.fullName}
+    <>
+      <View style={styles.container}>
+        <Text style={{ fontSize: 24, fontFamily: 'RethinkSans-Bold', marginBottom: 20 }}>
+          Profile
+        </Text>
+        {isAuthenticated && user ? (
+          <View>
+            <Text style={{ fontSize: 16, fontFamily: 'RethinkSans-Regular', marginBottom: 10 }}>
+              Email: {user.email}
             </Text>
-          )}
-        </View>
-      )}
-    </View>
+            {user.fullName && (
+              <Text style={{ fontSize: 16, fontFamily: 'RethinkSans-Regular' }}>
+                Name: {user.fullName}
+              </Text>
+            )}
+          </View>
+        ) : (
+          <View>
+            <Text style={{ fontSize: 16, fontFamily: 'RethinkSans-Regular', marginBottom: 10 }}>
+              Please sign in to view your profile
+            </Text>
+          </View>
+        )}
+      </View>
+      <AuthModal visible={modalVisible && !isAuthenticated} onClose={closeModal} />
+    </>
   );
 };
 
