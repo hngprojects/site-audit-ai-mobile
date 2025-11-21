@@ -130,7 +130,7 @@ const SignIn = () => {
         </View>
 
         <View style={styles.forgotPasswordContainer}>
-          <TouchableOpacity onPress={() => {}}>
+          <TouchableOpacity onPress={() => {router.push('/(auth)/forgot-password')}}>
             <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
           </TouchableOpacity>
         </View>

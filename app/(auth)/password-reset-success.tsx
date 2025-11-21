@@ -29,7 +29,7 @@ export default function ResetSuccess() {
    
       <TouchableOpacity
         style={styles.continueBtn}
-        onPress={() => router.replace("./signIn")}
+        onPress={() => router.replace("./sign-in")}
       >
         <Text style={styles.continueBtnText}>Continue</Text>
       </TouchableOpacity>
