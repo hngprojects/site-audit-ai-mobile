@@ -65,6 +65,11 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose }) => {
     outputRange: [600, 0],
   });
 
+  const handleOverlayPress = () => {
+    Keyboard.dismiss();
+    onClose();
+  };
+
   return (
     <Modal
       visible={visible}
@@ -72,9 +77,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose }) => {
       animationType="none"
       onRequestClose={onClose}
     >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <TouchableWithoutFeedback onPress={handleOverlayPress}>
         <View style={styles.modalOverlay}>
-          <TouchableWithoutFeedback>
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <Animated.View
               style={[
                 styles.modalContent,

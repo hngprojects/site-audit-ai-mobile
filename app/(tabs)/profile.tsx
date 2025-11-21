@@ -1,6 +1,5 @@
 import AuthModal from '@/components/auth/auth-modal';
 import LogoutModal from '@/components/profile/logout-modal';
-import { useAuth } from '@/hooks/use-auth';
 import styles from '@/stylesheets/profile-stylesheet';
 import { useFocusEffect } from '@react-navigation/native';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -10,7 +9,6 @@ import { useRouter } from 'expo-router';
 import { useAuthStore } from '@/store/auth-store';
 
 const Profile = () => {
-  const { isAuthenticated, isInitialized, user } = useAuth();
   const isAuthenticated = true;
   const isInitialized = true;
   const user = null;
@@ -37,10 +35,9 @@ const Profile = () => {
   }, [isAuthenticated, isInitialized]);
 
   const closeModal = () => {
-    // Only allow closing if user is authenticated
-    if (isAuthenticated) {
-      setModalVisible(false);
-    }
+    setModalVisible(false);
+    // User can close modal and stay on profile tab
+    // The profile content will show "Please sign in to view your profile"
   };
 
   // Show loading state while initializing
@@ -52,12 +49,7 @@ const Profile = () => {
     );
   }
 
-  // Don't render profile content if not authenticated - show modal instead
-  if (!isAuthenticated) {
-    return <AuthModal visible={modalVisible} onClose={closeModal} />;
-  }
-
-  // Render profile content when authenticated
+  // Render profile content with modal overlay when not authenticated
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
