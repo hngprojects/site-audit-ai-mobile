@@ -1,3 +1,5 @@
+import { resetPassword } from '@/actions/auth-actions';
+import { useAuth } from '@/hooks/use-auth';
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -7,6 +9,7 @@ import styles from '@/stylesheets/change-password-stylesheet';
 
 const ChangePasswordContent = () => {
   const router = useRouter();
+  const { token } = useAuth();
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -39,12 +42,11 @@ const ChangePasswordContent = () => {
   };
 
   const handleUpdatePassword = async () => {
-    if (!validateForm()) return;
+    if (!validateForm() || !token) return;
 
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await resetPassword(token, currentPassword, newPassword);
 
       Alert.alert(
         'Success',
@@ -52,7 +54,8 @@ const ChangePasswordContent = () => {
         [{ text: 'OK', onPress: () => router.back() }]
       );
     } catch (error) {
-      Alert.alert('Error', 'Failed to update password. Please try again.');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update password. Please try again.';
+      Alert.alert('Error', errorMessage);
     } finally {
       setIsLoading(false);
     }

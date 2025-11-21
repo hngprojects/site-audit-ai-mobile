@@ -251,5 +251,147 @@ export const authService = {
       throw new Error('Failed to resend reset token. Please try again.');
     }
   },
+
+  async getUser(token: string): Promise<AuthResponse['user']> {
+    if (!token) {
+      throw new Error('Token is required');
+    }
+
+    try {
+      const response = await apiClient.get('/api/v1/users/me', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const responseData = response.data;
+      const apiUser = responseData.data?.user || responseData.user || responseData.data || responseData;
+
+      if (!apiUser) {
+        throw new Error('Invalid response from server');
+      }
+
+      const user = {
+        id: apiUser.id,
+        email: apiUser.email,
+        fullName: apiUser.first_name && apiUser.last_name
+          ? `${apiUser.first_name} ${apiUser.last_name}`.trim()
+          : apiUser.fullName || apiUser.username || '',
+        createdAt: apiUser.created_at || apiUser.createdAt || new Date().toISOString(),
+      };
+
+      return user;
+    } catch (error) {
+      if (isAxiosError(error)) {
+        const errorData = error.response?.data || {};
+        const errorMessage = formatErrorMessage(errorData);
+        throw new Error(errorMessage);
+      }
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Failed to fetch user data. Please try again.');
+    }
+  },
+
+  async updateUser(
+    token: string,
+    data: { first_name: string; last_name: string; phone_number: string }
+  ): Promise<AuthResponse['user']> {
+    if (!token) {
+      throw new Error('Token is required');
+    }
+
+    if (!data.first_name || !data.last_name) {
+      throw new Error('First name and last name are required');
+    }
+
+    try {
+      const response = await apiClient.put(
+        '/api/v1/users/me',
+        {
+          first_name: data.first_name,
+          last_name: data.last_name,
+          phone_number: data.phone_number,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const responseData = response.data;
+      const apiUser = responseData.data?.user || responseData.user || responseData.data || responseData;
+
+      if (!apiUser) {
+        throw new Error('Invalid response from server');
+      }
+
+      const user = {
+        id: apiUser.id,
+        email: apiUser.email,
+        fullName: apiUser.first_name && apiUser.last_name
+          ? `${apiUser.first_name} ${apiUser.last_name}`.trim()
+          : apiUser.fullName || apiUser.username || '',
+        createdAt: apiUser.created_at || apiUser.createdAt || new Date().toISOString(),
+      };
+
+      return user;
+    } catch (error) {
+      if (isAxiosError(error)) {
+        const errorData = error.response?.data || {};
+        const errorMessage = formatErrorMessage(errorData);
+        throw new Error(errorMessage);
+      }
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Failed to update user. Please try again.');
+    }
+  },
+
+  async resetPassword(
+    token: string,
+    currentPassword: string,
+    newPassword: string
+  ): Promise<void> {
+    if (!token) {
+      throw new Error('Token is required');
+    }
+
+    if (!currentPassword || !newPassword) {
+      throw new Error('Current password and new password are required');
+    }
+
+    if (newPassword.length < MIN_PASSWORD_LENGTH) {
+      throw new Error(`Password must be at least ${MIN_PASSWORD_LENGTH} characters`);
+    }
+
+    try {
+      await apiClient.post(
+        '/api/v1/auth/reset-password',
+        {
+          current_password: currentPassword,
+          new_password: newPassword,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+    } catch (error) {
+      if (isAxiosError(error)) {
+        const errorData = error.response?.data || {};
+        const errorMessage = formatErrorMessage(errorData);
+        throw new Error(errorMessage);
+      }
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Failed to reset password. Please try again.');
+    }
+  },
 };
 

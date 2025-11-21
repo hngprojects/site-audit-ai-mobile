@@ -1,17 +1,48 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import * as authActions from '@/actions/auth-actions';
+import { useAuth } from '@/hooks/use-auth';
+import { useAuthStore } from '@/store/auth-store';
+import styles from '@/stylesheets/edit-profile-stylesheet';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import styles from '@/stylesheets/edit-profile-stylesheet';
+import React, { useEffect, useState } from 'react';
+import { Alert, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const EditProfileContent = () => {
   const router = useRouter();
-  const [fullName, setFullName] = useState('Damian Amadi');
-  const [email, setEmail] = useState('Damianamadi@gmail.com');
-  const [phoneNumber, setPhoneNumber] = useState('+1 234 567 8900');
+  const { user, token } = useAuth();
+  const { updateUser: updateUserStore } = useAuthStore();
+  const [fullName, setFullName] = useState(user?.fullName || '');
+  const [email, setEmail] = useState(user?.email || '');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingData, setIsLoadingData] = useState(true);
   const [errors, setErrors] = useState<{fullName?: string; email?: string; phoneNumber?: string}>({});
+
+  useEffect(() => {
+    const loadUserData = async () => {
+      if (!token || !user) {
+        setIsLoadingData(false);
+        return;
+      }
+
+      try {
+        const userData = await authActions.getUser(token);
+        if (userData) {
+          setFullName(userData.fullName || '');
+          setEmail(userData.email || '');
+          // Note: phone_number is not in the User type, so we'll need to handle it separately
+          // For now, we'll leave it empty and let the user enter it
+        }
+      } catch (error) {
+        console.error('Error loading user data:', error);
+      } finally {
+        setIsLoadingData(false);
+      }
+    };
+
+    loadUserData();
+  }, [token, user]);
 
   const validateForm = () => {
     const newErrors: {fullName?: string; email?: string; phoneNumber?: string} = {};
@@ -22,15 +53,15 @@ const EditProfileContent = () => {
       newErrors.fullName = 'Full name must be at least 2 characters';
     }
 
+    // Email is read-only, but we validate it anyway
     if (!email.trim()) {
       newErrors.email = 'Email is required';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       newErrors.email = 'Incorrect email format';
     }
 
-    if (!phoneNumber.trim()) {
-      newErrors.phoneNumber = 'Phone number is required';
-    } else if (!/^\+?[\d\s\-\(\)]+$/.test(phoneNumber)) {
+    // Phone number is optional but if provided, should be valid
+    if (phoneNumber.trim() && !/^\+?[\d\s\-\(\)]+$/.test(phoneNumber)) {
       newErrors.phoneNumber = 'Please enter a valid phone number';
     }
 
@@ -39,12 +70,23 @@ const EditProfileContent = () => {
   };
 
   const handleSave = async () => {
-    if (!validateForm()) return;
+    if (!validateForm() || !token) return;
 
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Split full name into first_name and last_name
+      const nameParts = fullName.trim().split(/\s+/);
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || '';
+
+      const updatedUser = await authActions.updateUser(token, {
+        first_name: firstName,
+        last_name: lastName,
+        phone_number: phoneNumber.trim(),
+      });
+
+      // Update the store with the new user data
+      updateUserStore(updatedUser);
 
       Alert.alert(
         'Success',
@@ -52,7 +94,8 @@ const EditProfileContent = () => {
         [{ text: 'OK', onPress: () => router.back() }]
       );
     } catch (error) {
-      Alert.alert('Error', 'Failed to update profile. Please try again.');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update profile. Please try again.';
+      Alert.alert('Error', errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -73,6 +116,16 @@ const EditProfileContent = () => {
       ]
     );
   };
+
+  if (isLoadingData) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <Text>Loading...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -122,12 +175,9 @@ const EditProfileContent = () => {
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>Email Address</Text>
               <TextInput
-                style={[styles.input, errors.email && styles.inputError]}
+                style={[styles.input, errors.email && styles.inputError, { opacity: 0.6 }]}
                 value={email}
-                onChangeText={(text: string) => {
-                  setEmail(text);
-                  if (errors.email) setErrors({...errors, email: undefined});
-                }}
+                editable={false}
                 placeholder="Enter your email"
                 placeholderTextColor="#B9B9B9"
                 keyboardType="email-address"

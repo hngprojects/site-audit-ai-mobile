@@ -30,3 +30,22 @@ export const resendResetToken = async (email: string): Promise<void> => {
   return await authService.resendResetToken(email);
 };
 
+export const getUser = async (token: string): Promise<AuthResponse['user']> => {
+  return await authService.getUser(token);
+};
+
+export const updateUser = async (
+  token: string,
+  data: { first_name: string; last_name: string; phone_number: string }
+): Promise<AuthResponse['user']> => {
+  return await authService.updateUser(token, data);
+};
+
+export const resetPassword = async (
+  token: string,
+  currentPassword: string,
+  newPassword: string
+): Promise<void> => {
+  return await authService.resetPassword(token, currentPassword, newPassword);
+};
+

@@ -5,7 +5,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Octicons from "@expo/vector-icons/Octicons";
 import { useState } from "react";
 import { Image, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 
 export default function HomeScreen() {
@@ -29,7 +29,7 @@ export default function HomeScreen() {
   }
 
   return (
-    <View
+    <SafeAreaView edges={['top']}
       style={{
         paddingTop: inset.top,
         paddingBottom: inset.bottom - 40,
@@ -118,6 +118,6 @@ export default function HomeScreen() {
 
    
      
-    </View>
+    </SafeAreaView>
   );
 }
