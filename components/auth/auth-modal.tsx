@@ -1,4 +1,3 @@
-import styles from '@/stylesheets/profile-stylesheet';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
@@ -12,6 +11,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import styles from '../../Stylesheets/profile-stylesheet';
 
 interface AuthModalProps {
   visible: boolean;

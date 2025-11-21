@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { ActivityIndicator } from 'react-native';
-import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
-import styles from '@/stylesheets/faq-stylesheet';
+import { ThemedView } from '@/components/themed-view';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator } from 'react-native';
+import styles from '../../Stylesheets/faq-stylesheet';
 
 const FAQContent = () => (
   <ThemedView style={styles.container}>

@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { ActivityIndicator } from 'react-native';
-import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
-import styles from '@/stylesheets/delete-account-screen-stylesheet';
+import { ThemedView } from '@/components/themed-view';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator } from 'react-native';
+import styles from '../../Stylesheets/delete-account-screen-stylesheet';
 
 const DeleteAccountScreenContent = () => (
   <ThemedView style={styles.container}>

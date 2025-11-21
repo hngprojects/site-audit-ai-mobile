@@ -119,6 +119,15 @@ const styles = StyleSheet.create({
     fontFamily: "RethinkSans-Regular",
     flex: 1,
   },
+  SocialSIgninButton: {
+      
+  },
+  Google: {
+
+  },
+  AppleSocialSIgninButton: {
+    
+  },
 });
 
 export default styles;

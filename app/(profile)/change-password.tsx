@@ -2,7 +2,7 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator } from 'react-native';
-import styles from '@/stylesheets/change-password-stylesheet';
+import styles from '../../Stylesheets/change-password-stylesheet';
 
 const ChangePasswordContent = () => (
   <ThemedView style={styles.container}>
