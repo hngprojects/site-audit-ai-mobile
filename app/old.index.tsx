@@ -6,7 +6,7 @@ import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, Image, Keyboard, KeyboardAvoidingView, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { getAllCountries } from '../Service/httpsRequest';
+import { getAllCountries } from '../service/httpsRequest';
 import styles from '../stylesheets/language-screen-stylesheet';
 
 

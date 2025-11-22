@@ -35,7 +35,6 @@ export interface User {
   email: string;
   fullName: string;
   createdAt: string;
-  profilePicture?: string;
 }
 
 export interface AuthState {

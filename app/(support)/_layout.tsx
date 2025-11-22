@@ -7,6 +7,7 @@ export default function SupportLayout() {
       <Stack.Screen name="contact-support" />
       <Stack.Screen name="email-support" />
       <Stack.Screen name="live-chat-support" />
+      <Stack.Screen name="message-sent-confirmation" />
     </Stack>
   );
 }

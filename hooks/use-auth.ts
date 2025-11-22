@@ -1,5 +1,5 @@
 import { useAuthStore } from '@/store/auth-store';
-import { useRouter } from 'expo-router';
+// import { useRouter } from 'expo-router';
 import { useEffect } from 'react';
 
 /**
@@ -7,7 +7,7 @@ import { useEffect } from 'react';
  * Provides auth state and methods, with automatic initialization
  */
 export const useAuth = () => {
-  const router = useRouter();
+  // const router = useRouter();
   const {
     user,
     token,

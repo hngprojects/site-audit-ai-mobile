@@ -9,8 +9,7 @@ const styles = StyleSheet.create({
         width: '100%',
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 16,
-        paddingTop: 60,
+        paddingVertical: 6,
         paddingHorizontal: 16,
     },
     backButton: {
@@ -33,7 +32,6 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontFamily: 'RethinkSans-Bold',
         color: '#1C1C1C',
-        marginTop: 6,
         marginBottom: 20,
         paddingHorizontal: 16,
     },

@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
     width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 32,
+    marginTop: 3,
   },
   profilePictureContainer: {
     width: '100%',
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
     width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 16,
+    // paddingVertical: 16,
     paddingHorizontal: 20,
     gap: 4,
     marginTop: 16,

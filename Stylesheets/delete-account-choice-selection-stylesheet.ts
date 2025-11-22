@@ -16,31 +16,30 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: 16,
-    paddingBottom: 100, // Space for bottom buttons
+    paddingBottom: 40,
   },
   header: {
-    position: 'relative',
+    width: '100%',
+    flexDirection: 'row',
     alignItems: 'center',
-    paddingTop: 16,
-    paddingBottom: 24,
+    paddingVertical: 6,
     paddingHorizontal: 16,
   },
   backButton: {
-    position: 'absolute',
-    left: 16,
-    top: 16,
-    padding: 8,
-    zIndex: 1,
+    marginRight: 16,
   },
   title: {
     fontSize: 20,
     fontFamily: 'RethinkSans-Bold',
     color: '#1c1c1c',
+    flex: 1,
     textAlign: 'center',
   },
   warningContainer: {
-    marginBottom: 32,
+    marginTop: 15,
+    marginBottom: 15,
     gap: 12,
+    paddingHorizontal: 16,
   },
   warningIcon: {
     marginTop: 2,
@@ -116,24 +115,35 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingBottom: 34, // Safe area
     backgroundColor: 'white',
-    borderTopWidth: 1,
-    borderTopColor: '#F0F0F0',
+    // borderTopWidth: 1,
+    // borderTopColor: '#F0F0F0',
     gap: 12,
   },
-  cancelButton: {
+  cancelButtonUnselected: {
     flex: 1,
     height: 48,
-    backgroundColor: '#FCFCFC',
-    borderRadius: 8,
-    borderWidth: 0.2,
-    borderColor: '#C7C8C9',
+    backgroundColor: '#E8E8E8',
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  cancelButtonText: {
+  cancelButtonSelected: {
+    flex: 1,
+    height: 48,
+    backgroundColor: '#FF5A3D',
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cancelButtonTextUnselected: {
     fontSize: 14,
     fontFamily: 'RethinkSans-Medium',
-    color: 'white',
+    color: '#B9B9B9',
+  },
+  cancelButtonTextSelected: {
+    fontSize: 14,
+    fontFamily: 'RethinkSans-Medium',
+    color: '#fff',
   },
   deleteButton: {
 
@@ -143,17 +153,37 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 48,
     backgroundColor: '#FF5A3D',
-    borderRadius: 8,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
   },
   deleteButtonDisabled: {
     backgroundColor: '#CCCCCC',
   },
+  deleteButtonUnselected: {
+    flex: 1,
+    height: 48,
+    backgroundColor: '#ffff',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E8E8E8',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  deleteButtonSelected: {
+    flex: 1,
+    height: 48,
+    // backgroundColor: '#FF5A3D',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#BBBCBC',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   deleteButtonText: {
     fontSize: 14,
     fontFamily: 'RethinkSans-Medium',
-    color: '#1c1c1c',
+    color: '#1C1C1C',
   },
 });
 
