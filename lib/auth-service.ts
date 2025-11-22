@@ -105,8 +105,9 @@ export const authService = {
       const response = await apiClient.post('/api/v1/auth/login', { email, password });
       const responseData = response.data;
       
-      const token = responseData.data?.access_token || responseData.data?.token || responseData.access_token || responseData.token;
-      const apiUser = responseData.data?.user || responseData.user;
+      
+      const token = responseData.data?.access_token;
+      const apiUser = responseData.data?.user;
       
       if (!apiUser || !token) {
         throw new Error('Invalid response from server');
@@ -117,8 +118,9 @@ export const authService = {
         email: apiUser.email,
         fullName: apiUser.first_name && apiUser.last_name 
           ? `${apiUser.first_name} ${apiUser.last_name}`.trim()
-          : apiUser.fullName || apiUser.username || '',
-        createdAt: apiUser.created_at || apiUser.createdAt || new Date().toISOString(),
+          : apiUser.first_name || apiUser.last_name || apiUser.username || '',
+        createdAt: apiUser.created_at || new Date().toISOString(),
+        profilePicture: apiUser.profile_picture_url || undefined,
       };
       
       return { user, token };
@@ -161,8 +163,9 @@ export const authService = {
       const responseData = response.data;
       console.log(responseData);
       
-      const token = responseData.data?.access_token || responseData.data?.token || responseData.access_token || responseData.token;
-      const apiUser = responseData.data?.user || responseData.user;
+      // Extract token from data.access_token (matching the API response structure)
+      const token = responseData.data?.access_token;
+      const apiUser = responseData.data?.user;
       
       if (!apiUser || !token) {
         throw new Error('Invalid response from server');
@@ -173,8 +176,9 @@ export const authService = {
         email: apiUser.email,
         fullName: apiUser.first_name && apiUser.last_name 
           ? `${apiUser.first_name} ${apiUser.last_name}`.trim()
-          : apiUser.fullName || apiUser.username || '',
-        createdAt: apiUser.created_at || apiUser.createdAt || new Date().toISOString(),
+          : apiUser.first_name || apiUser.last_name || apiUser.username || '',
+        createdAt: apiUser.created_at || new Date().toISOString(),
+        profilePicture: apiUser.profile_picture_url || undefined,
       };
       
       return { user, token };
@@ -316,8 +320,9 @@ export const authService = {
         email: apiUser.email,
         fullName: apiUser.first_name && apiUser.last_name
           ? `${apiUser.first_name} ${apiUser.last_name}`.trim()
-          : apiUser.fullName || apiUser.username || '',
-        createdAt: apiUser.created_at || apiUser.createdAt || new Date().toISOString(),
+          : apiUser.first_name || apiUser.last_name || apiUser.username || '',
+        createdAt: apiUser.created_at || new Date().toISOString(),
+        profilePicture: apiUser.profile_picture_url || undefined,
       };
 
       return user;
@@ -373,9 +378,9 @@ export const authService = {
         email: apiUser.email,
         fullName: apiUser.first_name && apiUser.last_name
           ? `${apiUser.first_name} ${apiUser.last_name}`.trim()
-          : apiUser.fullName || apiUser.username || '',
-        createdAt: apiUser.created_at || apiUser.createdAt || new Date().toISOString(),
-        profilePicture: apiUser.profile_picture || apiUser.profilePicture || undefined,
+          : apiUser.first_name || apiUser.last_name || apiUser.username || '',
+        createdAt: apiUser.created_at || new Date().toISOString(),
+        profilePicture: apiUser.profile_picture_url || undefined,
       };
 
       return user;
@@ -471,7 +476,7 @@ export const authService = {
 
       // Return the profile picture URL from response
       const responseData = response.data;
-      return responseData.data?.profile_picture || responseData.profile_picture || responseData.data?.url || '';
+      return responseData.data?.profile_picture_url || responseData.data?.profile_picture || responseData.profile_picture_url || responseData.profile_picture || responseData.data?.url || '';
     } catch (error) {
       if (isAxiosError(error)) {
         const errorData = error.response?.data || {};
