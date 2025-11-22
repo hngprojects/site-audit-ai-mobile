@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import styles from '../../Stylesheets/contact-support-stylesheet';
+import styles from '../../stylesheets/contact-support-stylesheet';
 
 const getIconName = (title: string) => {
   switch (title) {

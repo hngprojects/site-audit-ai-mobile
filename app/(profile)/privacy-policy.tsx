@@ -5,7 +5,7 @@ import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { PRIVACY_POLICY_DATA } from '@/constants/privacy-policy';
-import styles from '../../Stylesheets/privacy-policy-stylesheet';
+import styles from '../../stylesheets/privacy-policy-stylesheet';
 
 const PrivacyPolicyContent = () => {
   const router = useRouter();

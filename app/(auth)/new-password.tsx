@@ -5,7 +5,7 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import { ActivityIndicator, Alert, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import styles from "../../Stylesheets/newPasswordStylesheet";
+import styles from "../../stylesheets/newPasswordStylesheet";
 
 export default function NewPassword() {
   const router = useRouter();

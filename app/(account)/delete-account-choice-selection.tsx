@@ -5,7 +5,7 @@ import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, ScrollView, TouchableOpacity, View } from 'react-native';
-import styles from '../../Stylesheets/delete-account-choice-selection-stylesheet';
+import styles from '../../stylesheets/delete-account-choice-selection-stylesheet';
 
 const DeleteAccountChoiceSelectionContent = () => {
   const router = useRouter();

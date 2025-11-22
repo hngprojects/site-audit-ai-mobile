@@ -5,7 +5,7 @@ import Octicons from "@expo/vector-icons/Octicons";
 import { useState } from "react";
 import { Image, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
-import styles from '../../Stylesheets/homeScreenStylesheet';
+import styles from '../../stylesheets/homeScreenStylesheet';
 
 
 export default function HomeScreen() {

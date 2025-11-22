@@ -6,7 +6,7 @@ import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Alert, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import styles from '../../Stylesheets/change-password-stylesheet';
+import styles from '../../stylesheets/change-password-stylesheet';
 
 const ChangePasswordContent = () => {
   const router = useRouter();

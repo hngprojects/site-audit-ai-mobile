@@ -6,7 +6,7 @@ import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { ActivityIndicator, Alert, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import styles from '../../Stylesheets/forgot-password-stylesheet';
+import styles from '../../stylesheets/forgot-password-stylesheet';
 
 const ForgotPassword = () => {
     const router = useRouter();

@@ -1,6 +1,6 @@
 import React from "react";
 import { Image, Text, View } from "react-native";
-import styles from "../Stylesheets/homeScreenEmptyStateStylesheet";
+import styles from "../stylesheets/homeScreenEmptyStateStylesheet";
 
 export default function EmptyState() {
   return (

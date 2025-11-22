@@ -6,7 +6,7 @@ import { useState } from "react";
 import { ActivityIndicator, Alert, Keyboard, KeyboardAvoidingView, Platform, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { OtpInput } from "react-native-otp-entry";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import styles from "../../Stylesheets/otpVerificationStylesheet";
+import styles from "../../stylesheets/otpVerificationStylesheet";
 
 const OTPVerification = () => {
   const router = useRouter();

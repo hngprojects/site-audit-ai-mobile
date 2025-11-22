@@ -1,17 +1,17 @@
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-  Animated,
-  Image,
-  Keyboard,
-  Modal,
-  Text,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
+    Animated,
+    Image,
+    Keyboard,
+    Modal,
+    Text,
+    TouchableOpacity,
+    TouchableWithoutFeedback,
+    View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import styles from '../../Stylesheets/profile-stylesheet';
+import styles from '../../stylesheets/profile-stylesheet';
 
 interface AuthModalProps {
   visible: boolean;

@@ -6,7 +6,7 @@ import {
     TouchableOpacity,
     View
 } from "react-native";
-import styles, { reportColors } from "../Stylesheets/report-card-stylesheet";
+import styles, { reportColors } from "../stylesheets/report-card-stylesheet";
 
 
 

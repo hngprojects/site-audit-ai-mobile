@@ -5,7 +5,7 @@ import { useRouter } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Alert, Image, KeyboardAvoidingView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import styles from '../../Stylesheets/sign-up-stylesheet';
+import styles from '../../stylesheets/sign-up-stylesheet';
 
 interface PasswordValidation {
   hasMinLength: boolean;

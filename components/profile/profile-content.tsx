@@ -6,7 +6,7 @@ import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Image, Switch, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import styles from '../../Stylesheets/profile-stylesheet';
+import styles from '../../stylesheets/profile-stylesheet';
 
 interface ProfileContentProps {
   user: User | null;

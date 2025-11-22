@@ -14,7 +14,7 @@ import {
   ViewToken
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import styles from "../../Stylesheets/onboarding-stylesheet";
+import styles from "../../stylesheets/onboarding-stylesheet";
 
 
 

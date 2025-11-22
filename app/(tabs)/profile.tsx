@@ -8,7 +8,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import React, { useCallback, useEffect, useState } from 'react';
 import { ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import styles from '../../Stylesheets/profile-stylesheet';
+import styles from '../../stylesheets/profile-stylesheet';
 
 const Profile = () => {
   const { isAuthenticated, isInitialized, user } = useAuth();

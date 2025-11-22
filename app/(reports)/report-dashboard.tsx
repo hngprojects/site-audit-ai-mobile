@@ -4,7 +4,7 @@ import { reportDashboardProps } from '@/type';
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator } from 'react-native';
-import styles from '../../Stylesheets/report-dashboard-stylesheet';
+import styles from '../../stylesheets/report-dashboard-stylesheet';
 
 
 

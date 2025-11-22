@@ -7,7 +7,7 @@ import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, Image, Keyboard, KeyboardAvoidingView, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getAllCountries } from '../Service/httpsRequest';
-import styles from '../Stylesheets/language-screen-stylesheet';
+import styles from '../stylesheets/language-screen-stylesheet';
 
 
 

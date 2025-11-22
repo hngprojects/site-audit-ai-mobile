@@ -2,7 +2,7 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator } from 'react-native';
-import styles from '../../Stylesheets/confirmation-screen-stylesheet';
+import styles from '../../stylesheets/confirmation-screen-stylesheet';
 
 const ConfirmationScreenContent = () => (
   <ThemedView style={styles.container}>

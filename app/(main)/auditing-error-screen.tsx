@@ -6,7 +6,7 @@ import {
   View
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import styles from "../../Stylesheets/auditing-error-screen-stylesheet";
+import styles from "../../stylesheets/auditing-error-screen-stylesheet";
 
 
 export default function WebsiteDown() {

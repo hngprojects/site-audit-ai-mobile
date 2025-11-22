@@ -10,8 +10,8 @@ import {
   View
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import styles from "../../Stylesheets/report-screen-stylesheet";
 import ReportCard from "../../components/report-card";
+import styles from "../../stylesheets/report-screen-stylesheet";
 
 
 

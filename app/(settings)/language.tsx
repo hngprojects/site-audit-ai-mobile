@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import styles from '../../Stylesheets/language-screen-stylesheet';
+import styles from '../../stylesheets/language-screen-stylesheet';
 
 const LanguageContent = () => {
   const router = useRouter();

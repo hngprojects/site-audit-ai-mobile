@@ -9,7 +9,7 @@ import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Image, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import styles from '../../Stylesheets/edit-profile-stylesheet';
+import styles from '../../stylesheets/edit-profile-stylesheet';
 
 const EditProfileContent = () => {
   const router = useRouter();

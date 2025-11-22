@@ -3,7 +3,7 @@ import { ThemedView } from '@/components/themed-view';
 import React from 'react';
 import { ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import styles from '../../Stylesheets/auditing-screen-stylesheet';
+import styles from '../../stylesheets/auditing-screen-stylesheet';
 
 const AuditingScreen = () => {
   return (

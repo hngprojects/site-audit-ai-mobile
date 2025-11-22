@@ -2,7 +2,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import React from 'react';
 import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import styles from '../../Stylesheets/edit-profile-stylesheet';
+import styles from '../../stylesheets/edit-profile-stylesheet';
 
 const EditProfileSkeleton: React.FC = () => {
   return (
