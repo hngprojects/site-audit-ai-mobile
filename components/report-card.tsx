@@ -3,9 +3,9 @@ import { ReportItemProps, Status } from "@/type";
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import React from "react";
 import {
-    Text,
-    TouchableOpacity,
-    View
+  Text,
+  TouchableOpacity,
+  View
 } from "react-native";
 
 

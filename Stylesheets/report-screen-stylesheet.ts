@@ -8,6 +8,10 @@ export default StyleSheet.create({
     backgroundColor: "#F9FAFB",
     paddingHorizontal: 18,
   },
+  loadingContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
 
   headerWrap: {
     marginTop: 18,
