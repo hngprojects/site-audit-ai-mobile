@@ -1,17 +1,17 @@
+import ReportCard from "@/components/report-card";
 import styles from "@/stylesheets/report-screen-stylesheet";
 import { ReportItemProps } from "@/type";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from "expo-router";
 import React, { useEffect } from "react";
 import {
-    ActivityIndicator,
-    FlatList,
-    Text,
-    TextInput,
-    View
+  ActivityIndicator,
+  FlatList,
+  Text,
+  TextInput,
+  View
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import ReportCard from "../../components/report-card";
 
 
 

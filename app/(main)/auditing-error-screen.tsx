@@ -2,9 +2,9 @@ import styles from "@/stylesheets/auditing-error-screen-stylesheet";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import React from "react";
 import {
-    Text,
-    TouchableOpacity,
-    View
+  Text,
+  TouchableOpacity,
+  View
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -51,7 +51,7 @@ export default function WebsiteDown() {
         <Text style={styles.bodyHighlight}>But don&apos;t worry, we can help you.</Text>
 
         <Text style={styles.bodySecondary}>
-          Work with our dedicated experts who can fix this very fast!
+          Work with our dedicated experts at HNG who can fix this very fast!
         </Text>
 
        
