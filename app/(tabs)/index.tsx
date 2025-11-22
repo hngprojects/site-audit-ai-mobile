@@ -3,14 +3,13 @@ import EmptyState from "@/components/homeScreenEmptyState";
 import styles from "@/stylesheets/homeScreenStylesheet";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Octicons from "@expo/vector-icons/Octicons";
+import { router } from "expo-router";
 import { useState } from "react";
 import { Image, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 
 export default function HomeScreen() {
-  const inset = useSafeAreaInsets();
- // const router = useRouter();
   const [websiteUrl, setWebsiteUrl] = useState<string>('');
   const [urlAvailable , setUrlAvailable ] = useState<boolean>(true);
   
@@ -25,17 +24,17 @@ export default function HomeScreen() {
   const RunAudit = () => {
     if(websiteUrl === "")
       return setUrlAvailable( false)
-    
+      return router.push({
+        pathname: "/(main)/auditing-screen",
+        params: {
+          url: websiteUrl,
+        },
+      });
   }
 
   return (
-    <View
-      style={{
-        paddingTop: inset.top,
-        paddingBottom: inset.bottom - 40,
-        ...styles.container,
-      }}
-    >
+    <SafeAreaView
+      style={styles.container}>
      
       <TouchableOpacity style={styles.notificationContainer}>
         <Octicons name="bell" size={24} color="black" />
@@ -118,6 +117,6 @@ export default function HomeScreen() {
 
    
      
-    </View>
+      </SafeAreaView>
   );
 }

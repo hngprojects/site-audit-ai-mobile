@@ -71,4 +71,9 @@ export default StyleSheet.create({
     fontWeight: "700",
     fontSize: 16,
   },
+  errorText: {
+    color: "#d32f2f",
+    marginTop: 10,
+    fontFamily: "RethinkSans-Regular",
+  },
 });

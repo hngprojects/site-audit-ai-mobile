@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { ActivityIndicator, TouchableOpacity, ScrollView, Text, View, Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Feather } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
 import { LANGUAGES } from '@/constants/language';
 import styles from '@/stylesheets/language-screen-stylesheet';
+import { Feather } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const LanguageContent = () => {
   const router = useRouter();

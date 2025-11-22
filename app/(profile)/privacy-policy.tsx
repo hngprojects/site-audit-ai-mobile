@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView , TouchableOpacity } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { PRIVACY_POLICY_DATA } from '@/constants/privacy-policy';
 import styles from '@/stylesheets/privacy-policy-stylesheet';

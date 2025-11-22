@@ -3,8 +3,12 @@ import { ActivityIndicator, TouchableOpacity, ScrollView, View, Text, TextInput,
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import styles from '../../stylesheets/live-chat-support-stylesheet';
+
 import { emojis, initialMessages, Message } from '../../constants/live-chat';
+// import { ThemedText } from '@/components/themed-text';
+// import { ThemedView } from '@/components/themed-view';
+import styles from '@/stylesheets/live-chat-support-stylesheet';
+
 
 const LiveChatSupportContent = () => {
   const router = useRouter();

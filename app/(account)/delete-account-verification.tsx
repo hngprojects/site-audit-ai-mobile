@@ -3,6 +3,9 @@ import { ActivityIndicator, TouchableOpacity, ScrollView, View, TextInput, Alert
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+
+// import { ThemedText } from '@/components/themed-text';
+// import { ThemedView } from '@/components/themed-view';
 import styles from '@/stylesheets/delete-account-verification-stylesheet';
 
 const DeleteAccountVerificationContent = () => {

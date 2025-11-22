@@ -73,3 +73,20 @@ export interface ResetPasswordEmailState {
   otpToken: string;
   setOtpToken: (token: string) => void;
 }
+
+export interface ReportItemProps {
+  domain: string;
+  score: number;
+  status: Status;
+  scanDate: string; 
+  onPress: () => void;
+}
+
+export type Status = "low" | "high" | "medium";
+
+export interface reportDashboardProps {
+  domain: string;
+  score: string;
+  status: string;
+  scanDate: string;
+}

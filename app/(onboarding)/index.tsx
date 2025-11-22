@@ -5,14 +5,14 @@ import { Slide } from "@/type";
 import { RelativePathString, useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
 import {
-  Animated,
-  Dimensions,
-  FlatList,
-  Image,
-  Text,
-  TouchableOpacity,
-  View,
-  ViewToken
+    Animated,
+    Dimensions,
+    FlatList,
+    Image,
+    Text,
+    TouchableOpacity,
+    View,
+    ViewToken
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 

@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { ActivityIndicator, ScrollView, TouchableOpacity, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Feather } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
 import { Collapsible } from '@/components/ui/collapsible';
 import { FAQ_DATA } from '@/constants/faq';
 import styles from '@/stylesheets/faq-stylesheet';
+import { Feather } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const FAQContent = () => {
   const router = useRouter();
