@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { ActivityIndicator, TouchableOpacity, ScrollView, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { CONTACT_SUPPORT_DATA } from '@/constants/contact-support';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { CONTACT_SUPPORT_DATA } from '@/constants/contact-support';
-import styles from '@/stylesheets/contact-support-stylesheet';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import styles from '../../Stylesheets/contact-support-stylesheet';
 
 const getIconName = (title: string) => {
   switch (title) {

@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { ActivityIndicator, TouchableOpacity, ScrollView, Text, View, TextInput, Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import styles from '@/stylesheets/email-support-stylesheet';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, Alert, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import styles from '../../Stylesheets/email-support-stylesheet';
 
 const EmailSupportContent = () => {
   const router = useRouter();

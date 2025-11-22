@@ -1,7 +1,7 @@
-import React from 'react';
-import { Modal, View, Text, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import styles from '@/stylesheets/profile-stylesheet';
+import React from 'react';
+import { Modal, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import styles from '../../Stylesheets/profile-stylesheet';
 
 interface LogoutModalProps {
   visible: boolean;

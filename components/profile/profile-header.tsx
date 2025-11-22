@@ -1,6 +1,6 @@
-import styles from '@/stylesheets/profile-stylesheet';
 import React from 'react';
 import { Text, View } from 'react-native';
+import styles from '../../Stylesheets/profile-stylesheet';
 
 interface ProfileHeaderProps {
   text: string;

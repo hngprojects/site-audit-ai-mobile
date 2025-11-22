@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { ActivityIndicator } from 'react-native';
-import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
-import styles from '@/stylesheets/live-chat-support-stylesheet';
+import { ThemedView } from '@/components/themed-view';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator } from 'react-native';
+import styles from '../../Stylesheets/live-chat-support-stylesheet';
 
 const LiveChatSupportContent = () => (
   <ThemedView style={styles.container}>

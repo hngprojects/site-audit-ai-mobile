@@ -3,13 +3,13 @@ import EditProfileSkeleton from '@/components/profile/edit-profile-skeleton';
 import { useAuth } from '@/hooks/use-auth';
 import { handleAuthError } from '@/lib/auth-error-handler';
 import { useAuthStore } from '@/store/auth-store';
-import styles from '@/stylesheets/edit-profile-stylesheet';
 import { Feather } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Image, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import styles from '../../Stylesheets/edit-profile-stylesheet';
 
 const EditProfileContent = () => {
   const router = useRouter();

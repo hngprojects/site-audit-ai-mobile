@@ -4,11 +4,11 @@ import ProfileEmptyState from '@/components/profile/profile-empty-state';
 import ProfileHeader from '@/components/profile/profile-header';
 import ProfileSkeleton from '@/components/profile/profile-skeleton';
 import { useAuth } from '@/hooks/use-auth';
-import styles from '@/stylesheets/profile-stylesheet';
 import { useFocusEffect } from '@react-navigation/native';
 import React, { useCallback, useEffect, useState } from 'react';
 import { ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import styles from '../../Stylesheets/profile-stylesheet';
 
 const Profile = () => {
   const { isAuthenticated, isInitialized, user } = useAuth();

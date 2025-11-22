@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { ActivityIndicator, TouchableOpacity, ScrollView, View } from 'react-native';
-import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '@/components/themed-view';
+import { feedbackOptions } from '@/constants/delete-account';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { feedbackOptions } from '@/constants/delete-account';
-import styles from '@/stylesheets/delete-account-choice-selection-stylesheet';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, ScrollView, TouchableOpacity, View } from 'react-native';
+import styles from '../../Stylesheets/delete-account-choice-selection-stylesheet';
 
 const DeleteAccountChoiceSelectionContent = () => {
   const router = useRouter();
@@ -39,7 +39,7 @@ const DeleteAccountChoiceSelectionContent = () => {
         <View style={styles.warningContainer}>
         
           <ThemedText style={styles.warningText}>
-            Deleting your account is permanent and cannot be undone, all data and access to features will be erased. Help us improve by sharing why you're leaving, your feedback matters.
+            Deleting your account is permanent and cannot be undone, all data and access to features will be erased. Help us improve by sharing why you&apos;re leaving, your feedback matters.
           </ThemedText>
         </View>
 
