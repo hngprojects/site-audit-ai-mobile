@@ -1,4 +1,5 @@
 import ReportCard from "@/components/report-card";
+import { useAuditStore } from "@/store/audit-store";
 import styles from "@/stylesheets/report-screen-stylesheet";
 import { ReportItemProps } from "@/type";
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -14,30 +15,6 @@ import {
 } from "react-native";
 import { GestureHandlerRootView, PanGestureHandler, State } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
-const INITIAL_DATA: ReportItemProps[] = [
-  {
-    domain: "www.fashionsense.com",
-    score: 50,
-    status: "low",
-    scanDate: "Nov 5, 2025",
-    onPress: () => {},
-  },
-  {
-    domain: "www.techgate.com",
-    score: 86,
-    status: "high",
-    scanDate: "Nov 3, 2025",
-     onPress: () => {},
-  },
-  {
-    domain: "www.cosmos.com",
-    score: 40,
-    status: "low",
-    scanDate: "Oct 30, 2025",
-     onPress: () => {},
-  },
-];
 
 interface SwipeableRowProps {
   item: ReportItemProps;
@@ -134,16 +111,27 @@ const ReportsScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
   const [search, setSearch] = React.useState("");
   const [loading, setLoading] = React.useState(false);
-  const [data, setData] = useState<ReportItemProps[]>(INITIAL_DATA);
+  const auditHistory = useAuditStore((state) => state.auditHistory);
+  const removeFromHistory = useAuditStore((state) => state.removeFromHistory);
+  const setAuditResult = useAuditStore((state) => state.setAuditResult);
 
   const router = useRouter();
 
+  const data: (ReportItemProps & { id: string })[] = auditHistory.map((item) => ({
+    id: item.id,
+    domain: item.domain,
+    score: item.score,
+    status: item.status,
+    scanDate: item.scanDate,
+    onPress: () => {},
+  }));
+
   const filteredData = data.filter(item =>
     item.domain.toLowerCase().includes(search.toLowerCase())
-  ) || data;
+  );
 
-  const handleDelete = (domain: string) => {
-    setData(prevData => prevData.filter(item => item.domain !== domain));
+  const handleDelete = (id: string) => {
+    removeFromHistory(id);
   };
 
 
@@ -187,22 +175,22 @@ const ReportsScreen: React.FC = () => {
         ) : (
           <FlatList
             data={filteredData}
-            keyExtractor={(item) => item.domain}
+            keyExtractor={(item) => (item as any).id || item.domain}
             contentContainerStyle={styles.listWrap}
             showsVerticalScrollIndicator={false}
             renderItem={({ item }) => (
               <SwipeableRow
                 item={item}
-                onDelete={() => handleDelete(item.domain)}
-                onPress={() => router.push({
-                      pathname: "../(reports)/report-dashboard", 
-                        params: {
-                        domain: item.domain,
-                        score: String(item.score),
-                        status: item.status,
-                        scanDate: item.scanDate
-                      }
-                })}
+                onDelete={() => handleDelete((item as any).id)}
+                onPress={() => {
+                  const auditResult = auditHistory.find(a => a.domain === item.domain);
+                  if (auditResult) {
+                    setAuditResult(auditResult);
+                    router.push({
+                      pathname: "../(reports)/report-dashboard",
+                    } as any);
+                  }
+                }}
               />
             )}
             ListFooterComponent={<View style={styles.footerSpacer} />}

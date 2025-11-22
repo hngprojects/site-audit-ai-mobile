@@ -1,8 +1,9 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { useAuditStore } from '@/store/audit-store';
 import styles from '@/stylesheets/report-dashboard-stylesheet';
 import { reportDashboardProps } from '@/type';
-import { useLocalSearchParams } from "expo-router";
+import { router } from "expo-router";
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator } from 'react-native';
 
@@ -23,23 +24,22 @@ const ReportDashboardContent = ({ domain, score, status, scanDate }: reportDashb
 
 export default function ReportDashboard() {
   const [isLoaded, setIsLoaded] = useState(false);
-
-  
-const params = useLocalSearchParams();
-
-const {domain, score, status, scanDate} = params;
-
-
+  const auditResult = useAuditStore((state) => state.auditResult);
 
   useEffect(() => {
+    if (!auditResult) {
+      router.replace('/(tabs)/' as any);
+      return;
+    }
+
     const timer = setTimeout(() => {
       setIsLoaded(true);
     }, 100);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [auditResult]);
 
-  if (!isLoaded) {
+  if (!auditResult || !isLoaded) {
     return (
       <ThemedView style={styles.loadingContainer}>
         <ActivityIndicator size="large" />
@@ -47,11 +47,12 @@ const {domain, score, status, scanDate} = params;
     );
   }
 
- return (
-  <ReportDashboardContent
-    domain={domain as string}
-    score={score as string}
-    status={status as string}
-    scanDate={scanDate as string}
-  />
-);}
+  return (
+    <ReportDashboardContent
+      domain={auditResult.domain}
+      score={String(auditResult.score)}
+      status={auditResult.status}
+      scanDate={auditResult.scanDate}
+    />
+  );
+}

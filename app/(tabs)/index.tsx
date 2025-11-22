@@ -1,5 +1,6 @@
 import AuditResultCard from "@/components/auditResultCard";
 import EmptyState from "@/components/homeScreenEmptyState";
+import { useAuditStore } from "@/store/audit-store";
 import styles from "@/stylesheets/homeScreenStylesheet";
 import { validateWebsiteUrl } from "@/utils/url-validation";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
@@ -14,12 +15,8 @@ export default function HomeScreen() {
   const [websiteUrl, setWebsiteUrl] = useState<string>('');
   const [urlAvailable, setUrlAvailable] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string>('');
-
-  const [audits] = useState([
-    { url: "http://www.figma.com", status: "Passed" },
-    { url: "http://www.figma.com", status: "Average" },
-    { url: "http://www.figma.com", status: "Average" },
-  ]);
+  const setCurrentAudit = useAuditStore((state) => state.setCurrentAudit);
+  const auditHistory = useAuditStore((state) => state.auditHistory);
 
   const handleUrlChange = (text: string) => {
     setWebsiteUrl(text);
@@ -41,11 +38,11 @@ export default function HomeScreen() {
     setUrlAvailable(true);
     setErrorMessage('');
     
+    const trimmedUrl = websiteUrl.trim();
+    setCurrentAudit(trimmedUrl);
+    
     return router.push({
       pathname: "/(main)/auditing-screen",
-      params: {
-        url: websiteUrl.trim(),
-      },
     });
   }
 
@@ -94,8 +91,7 @@ export default function HomeScreen() {
       <Text style={styles.sectionTitle}>Recent audits</Text>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-
-        {audits.length === 0 ? (
+        {auditHistory.length === 0 ? (
           <>
             <EmptyState />
 
@@ -109,15 +105,22 @@ export default function HomeScreen() {
             </View>
           </>
         ) : (
-          audits.map((item, index) => (
-            <AuditResultCard
-              key={index}
-              url={item.url}
-              status={item.status as any}
-              score="70"
-              time="5"
-            />
-          ))
+          auditHistory.slice(0, 5).map((item) => {
+            const statusMap: Record<string, string> = {
+              high: "Passed",
+              medium: "Average",
+              low: "Failed",
+            };
+            return (
+              <AuditResultCard
+                key={item.id}
+                url={item.domain}
+                status={statusMap[item.status] as any}
+                score={String(item.score)}
+                time="5"
+              />
+            );
+          })
         )}
 
         <View style={{ height: 100 }} />
