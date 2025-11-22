@@ -18,14 +18,13 @@ const styles = StyleSheet.create({
 
   container: {
     flex: 1,
-    paddingHorizontal: 28,
+    paddingHorizontal: "5%",
     alignItems: "center",
     backgroundColor: COLORS.background,
-    justifyContent: "space-between",
   },
 
   topSpacer: {
-    height: 3,
+    height: 100,
   },
 
 
@@ -46,7 +45,7 @@ const styles = StyleSheet.create({
 
  
   title: {
-    marginTop: -80,
+    marginTop: 35,
     fontFamily: "RethinkSans-Bold",
     fontSize: 20,
     fontWeight: "700",
@@ -55,7 +54,7 @@ const styles = StyleSheet.create({
   },
 
   bodyPrimary: {
-    marginTop: -95,
+    marginTop: 18,
     fontFamily: "RethinkSans-Regular",
     fontSize: 14,
     fontWeight: "400",
@@ -66,7 +65,7 @@ const styles = StyleSheet.create({
   },
 
   bodyHighlight: {
-    marginTop: -95,
+    marginTop: 14,
     fontFamily: "RethinkSans-Medium",
     fontSize: 14,
     fontWeight: "600",
@@ -76,7 +75,7 @@ const styles = StyleSheet.create({
   },
 
   bodySecondary: {
-    marginTop: -100,
+    marginTop: 20,
     fontFamily: "RethinkSans-Regular",
     fontSize: 13,
     fontWeight: "400",
@@ -90,6 +89,7 @@ const styles = StyleSheet.create({
   buttonGroup: {
     width: "100%",
     marginBottom: 68,
+    marginTop: 100
   },
 
   primaryButton: {

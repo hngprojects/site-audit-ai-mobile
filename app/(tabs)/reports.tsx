@@ -1,3 +1,4 @@
+import ReportCard from "@/components/report-card";
 import styles from "@/stylesheets/report-screen-stylesheet";
 import { ReportItemProps } from "@/type";
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -13,7 +14,6 @@ import {
 } from "react-native";
 import { GestureHandlerRootView, PanGestureHandler, State } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import ReportCard from "../../components/report-card";
 
 const INITIAL_DATA: ReportItemProps[] = [
   {
