@@ -109,7 +109,7 @@ const DeleteAccountVerificationContent = () => {
 
           <View style={styles.resendContainer}>
             <View style={styles.resendTextContainer}>
-              <Text style={styles.resendText}>Didn't receive a code?</Text>
+              <Text style={styles.resendText}>Didn&lsquo;t receive a code?</Text>
               <TouchableOpacity onPress={handleResend} disabled={!canResend}>
                 <Text style={[styles.resendLink, !canResend && styles.resendLinkDisabled]}>Resend</Text>
               </TouchableOpacity>

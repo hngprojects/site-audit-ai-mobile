@@ -84,6 +84,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  errorText: {
+    fontSize: 14,
+    color: 'red',
+    marginTop: 4,
+    fontFamily: 'RethinkSans-Regular',
+  },
 });
 
 export default styles;

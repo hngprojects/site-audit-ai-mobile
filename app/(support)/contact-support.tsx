@@ -44,7 +44,9 @@ const ContactSupportContent = () => {
               key={index}
               style={styles.supportItem}
               onPress={() => {
-                if (item.title === 'Email Support') {
+                if (item.title === 'Live Chat') {
+                  router.push('/(support)/live-chat-support');
+                } else if (item.title === 'Email Support') {
                   router.push('/(support)/email-support');
                 } else if (item.title === 'Phone Support') {
                   router.push('/(support)/phone-support');

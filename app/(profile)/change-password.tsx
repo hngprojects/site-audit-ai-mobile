@@ -51,7 +51,7 @@ const ChangePasswordContent = () => {
         'Password has been changed successfully',
         [{ text: 'OK', onPress: () => router.back() }]
       );
-    } catch (error) {
+    } catch {
       Alert.alert('Error', 'Failed to update password. Please try again.');
     } finally {
       setIsLoading(false);

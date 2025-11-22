@@ -33,8 +33,8 @@ const DeleteAccountFinalConfirmationContent = () => {
         <Text style={styles.title}>We have verified your account and will proceed with deletion.</Text>
 
         <Text style={styles.description}>
-          This is your last chance to cancel. You won't be able to recover your account once deleted and will need to create a new account if you ever wish to return.
-          
+          This is your last chance to cancel. You won&lsquo;t be able to recover your account once deleted and will need to create a new account if you ever wish to return.
+
         </Text >
         <Text style={styles.description}> Are you sure you want to delete your account?</Text>
 

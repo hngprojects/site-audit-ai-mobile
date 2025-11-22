@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ActivityIndicator, TouchableOpacity, ScrollView, Text, View, TextInput, Alert } from 'react-native';
+import { ActivityIndicator, TouchableOpacity, ScrollView, Text, View, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -10,6 +10,9 @@ const SendMessageContent = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('user@gmail.com');
   const [message, setMessage] = useState('');
+  const [nameError, setNameError] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [messageError, setMessageError] = useState('');
 
   const isValidEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -21,28 +24,37 @@ const SendMessageContent = () => {
     const trimmedEmail = email.trim();
     const trimmedMessage = message.trim();
 
+    let hasError = false;
+
     if (!trimmedName) {
-      Alert.alert('Error', 'Please enter your full name');
-      return;
+      setNameError('Please enter your full name');
+      hasError = true;
+    } else {
+      setNameError('');
     }
 
     if (!trimmedEmail) {
-      Alert.alert('Error', 'Please enter your email address');
-      return;
-    }
-
-    if (!isValidEmail(trimmedEmail)) {
-      Alert.alert('Error', 'Please enter a valid email address');
-      return;
+      setEmailError('Please enter your email address');
+      hasError = true;
+    } else if (!isValidEmail(trimmedEmail)) {
+      setEmailError('Please enter a valid email address');
+      hasError = true;
+    } else {
+      setEmailError('');
     }
 
     if (!trimmedMessage) {
-      Alert.alert('Error', 'Please enter your message');
+      setMessageError('Please enter your message');
+      hasError = true;
+    } else {
+      setMessageError('');
+    }
+
+    if (hasError) {
       return;
     }
 
-    Alert.alert('Success', 'Your message has been sent successfully');
-    router.back();
+    router.push('/(support)/message-sent-confirmation');
   };
 
   return (
@@ -60,17 +72,18 @@ const SendMessageContent = () => {
       >
         <View style={styles.content}>
           <Text style={styles.title}>Need Help?</Text>
-          <Text style={styles.subtitle}>We'd love to hear from you. Send us a message and we'll respond within 24 hours.</Text>
+          <Text style={styles.subtitle}>We&lsquo;d love to hear from you. Send us a message and we&lsquo;ll respond within 24 hours.</Text>
 
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Name</Text>
             <TextInput
               style={styles.input}
               value={name}
-              onChangeText={setName}
+              onChangeText={(text) => { setName(text); setNameError(''); }}
               placeholder="Enter your full name"
               placeholderTextColor="#999"
             />
+            {nameError ? <Text style={styles.errorText}>{nameError}</Text> : null}
           </View>
 
           <View style={styles.inputContainer}>
@@ -78,13 +91,14 @@ const SendMessageContent = () => {
             <TextInput
               style={styles.input}
               value={email}
-              onChangeText={setEmail}
+              onChangeText={(text) => { setEmail(text); setEmailError(''); }}
               placeholder="user@gmail.com"
               placeholderTextColor="#999"
               keyboardType="email-address"
               autoCapitalize="none"
               autoCorrect={false}
             />
+            {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
           </View>
 
           <View style={styles.inputContainer}>
@@ -92,13 +106,14 @@ const SendMessageContent = () => {
             <TextInput
               style={[styles.input, styles.messageInput]}
               value={message}
-              onChangeText={setMessage}
+              onChangeText={(text) => { setMessage(text); setMessageError(''); }}
               placeholder="How can we help you?"
               placeholderTextColor="#999"
               multiline
               numberOfLines={6}
               textAlignVertical="top"
             />
+            {messageError ? <Text style={styles.errorText}>{messageError}</Text> : null}
           </View>
 
           <TouchableOpacity style={styles.sendButton} onPress={handleSend}>

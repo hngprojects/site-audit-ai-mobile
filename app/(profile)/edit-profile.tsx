@@ -51,7 +51,7 @@ const EditProfileContent = () => {
         'Profile has been changed successfully',
         [{ text: 'OK', onPress: () => router.back() }]
       );
-    } catch (error) {
+    } catch {
       Alert.alert('Error', 'Failed to update profile. Please try again.');
     } finally {
       setIsLoading(false);
