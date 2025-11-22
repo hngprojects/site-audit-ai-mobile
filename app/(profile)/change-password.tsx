@@ -1,5 +1,6 @@
 import { resetPassword } from '@/actions/auth-actions';
 import { useAuth } from '@/hooks/use-auth';
+import { handleAuthError } from '@/lib/auth-error-handler';
 import styles from '@/stylesheets/change-password-stylesheet';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -54,8 +55,17 @@ const ChangePasswordContent = () => {
         [{ text: 'OK', onPress: () => router.back() }]
       );
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to update password. Please try again.';
-      Alert.alert('Error', errorMessage);
+      const wasLoggedOut = await handleAuthError(error);
+      if (wasLoggedOut) {
+        Alert.alert(
+          'Session Expired',
+          'Your session has expired. Please sign in again.',
+          [{ text: 'OK', onPress: () => router.replace('/(tabs)') }]
+        );
+      } else {
+        const errorMessage = error instanceof Error ? error.message : 'Failed to update password. Please try again.';
+        Alert.alert('Error', errorMessage);
+      }
     } finally {
       setIsLoading(false);
     }

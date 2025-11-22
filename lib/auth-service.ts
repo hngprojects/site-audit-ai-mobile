@@ -15,6 +15,46 @@ const apiClient = axios.create({
   },
 });
 
+// Helper to check if error is an authentication error
+export const isAuthError = (error: unknown): boolean => {
+  if (isAxiosError(error)) {
+    const status = error.response?.status;
+    const errorMessage = error.response?.data?.message || error.response?.data?.error || '';
+    const errorData = error.response?.data || {};
+    
+    // Check for 401 status or authentication-related error messages
+    if (status === 401) {
+      return true;
+    }
+    
+    // Check for authentication error messages
+    const authErrorMessages = [
+      'Invalid authentication credentials',
+      'Unauthenticated',
+      'Authentication failed',
+      'Token expired',
+      'Invalid token',
+    ];
+    
+    const errorText = typeof errorMessage === 'string' 
+      ? errorMessage.toLowerCase() 
+      : formatErrorMessage(errorData).toLowerCase();
+    
+    return authErrorMessages.some(msg => errorText.includes(msg.toLowerCase()));
+  }
+  
+  if (error instanceof Error) {
+    const errorText = error.message.toLowerCase();
+    return errorText.includes('invalid authentication credentials') ||
+           errorText.includes('unauthenticated') ||
+           errorText.includes('authentication failed') ||
+           errorText.includes('token expired') ||
+           errorText.includes('invalid token');
+  }
+  
+  return false;
+};
+
 const formatErrorMessage = (errorData: any): string => {
   if (errorData.data?.errors && Array.isArray(errorData.data.errors)) {
     const flattenErrors = (arr: any[]): string[] => {

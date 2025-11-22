@@ -1,6 +1,7 @@
 import * as authActions from '@/actions/auth-actions';
 import EditProfileSkeleton from '@/components/profile/edit-profile-skeleton';
 import { useAuth } from '@/hooks/use-auth';
+import { handleAuthError } from '@/lib/auth-error-handler';
 import { useAuthStore } from '@/store/auth-store';
 import styles from '@/stylesheets/edit-profile-stylesheet';
 import { Feather } from '@expo/vector-icons';
@@ -21,7 +22,7 @@ const EditProfileContent = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
-  const [errors, setErrors] = useState<{fullName?: string; email?: string; phoneNumber?: string}>({});
+  const [errors, setErrors] = useState<{ fullName?: string; email?: string; phoneNumber?: string }>({});
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -41,16 +42,25 @@ const EditProfileContent = () => {
         }
       } catch (error) {
         console.error('Error loading user data:', error);
+        const wasLoggedOut = await handleAuthError(error);
+        if (wasLoggedOut) {
+          Alert.alert(
+            'Session Expired',
+            'Your session has expired. Please sign in again.',
+            [{ text: 'OK', onPress: () => router.replace('/(tabs)') }]
+          );
+        }
       } finally {
         setIsLoadingData(false);
       }
     };
 
     loadUserData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, user]);
 
   const validateForm = () => {
-    const newErrors: {fullName?: string; email?: string; phoneNumber?: string} = {};
+    const newErrors: { fullName?: string; email?: string; phoneNumber?: string } = {};
 
     if (!fullName.trim()) {
       newErrors.fullName = 'Full name is required';
@@ -99,8 +109,17 @@ const EditProfileContent = () => {
         [{ text: 'OK', onPress: () => router.back() }]
       );
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to update profile. Please try again.';
-      Alert.alert('Error', errorMessage);
+      const wasLoggedOut = await handleAuthError(error);
+      if (wasLoggedOut) {
+        Alert.alert(
+          'Session Expired',
+          'Your session has expired. Please sign in again.',
+          [{ text: 'OK', onPress: () => router.replace('/(tabs)') }]
+        );
+      } else {
+        const errorMessage = error instanceof Error ? error.message : 'Failed to update profile. Please try again.';
+        Alert.alert('Error', errorMessage);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -186,7 +205,7 @@ const EditProfileContent = () => {
     try {
       const profilePictureUrl = await authActions.uploadProfilePicture(token, imageUri);
       setProfilePicture(profilePictureUrl);
-      
+
       // Update user in store with new profile picture
       const userData = await authActions.getUser(token);
       if (userData) {
@@ -195,8 +214,17 @@ const EditProfileContent = () => {
 
       Alert.alert('Success', 'Profile picture updated successfully');
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to upload profile picture. Please try again.';
-      Alert.alert('Error', errorMessage);
+      const wasLoggedOut = await handleAuthError(error);
+      if (wasLoggedOut) {
+        Alert.alert(
+          'Session Expired',
+          'Your session has expired. Please sign in again.',
+          [{ text: 'OK', onPress: () => router.replace('/(tabs)') }]
+        );
+      } else {
+        const errorMessage = error instanceof Error ? error.message : 'Failed to upload profile picture. Please try again.';
+        Alert.alert('Error', errorMessage);
+      }
     } finally {
       setIsUploadingImage(false);
     }
@@ -217,7 +245,7 @@ const EditProfileContent = () => {
             try {
               await authActions.deleteProfilePicture(token);
               setProfilePicture(undefined);
-              
+
               // Update user in store
               const userData = await authActions.getUser(token);
               if (userData) {
@@ -226,8 +254,17 @@ const EditProfileContent = () => {
 
               Alert.alert('Success', 'Profile picture deleted successfully');
             } catch (error) {
-              const errorMessage = error instanceof Error ? error.message : 'Failed to delete profile picture. Please try again.';
-              Alert.alert('Error', errorMessage);
+              const wasLoggedOut = await handleAuthError(error);
+              if (wasLoggedOut) {
+                Alert.alert(
+                  'Session Expired',
+                  'Your session has expired. Please sign in again.',
+                  [{ text: 'OK', onPress: () => router.replace('/(tabs)') }]
+                );
+              } else {
+                const errorMessage = error instanceof Error ? error.message : 'Failed to delete profile picture. Please try again.';
+                Alert.alert('Error', errorMessage);
+              }
             }
           },
         },
@@ -294,7 +331,7 @@ const EditProfileContent = () => {
                 value={fullName}
                 onChangeText={(text: string) => {
                   setFullName(text);
-                  if (errors.fullName) setErrors({...errors, fullName: undefined});
+                  if (errors.fullName) setErrors({ ...errors, fullName: undefined });
                 }}
                 placeholder="Enter your full name"
                 placeholderTextColor="#B9B9B9"
@@ -323,7 +360,7 @@ const EditProfileContent = () => {
                 value={phoneNumber}
                 onChangeText={(text: string) => {
                   setPhoneNumber(text);
-                  if (errors.phoneNumber) setErrors({...errors, phoneNumber: undefined});
+                  if (errors.phoneNumber) setErrors({ ...errors, phoneNumber: undefined });
                 }}
                 placeholder="Enter your phone number"
                 placeholderTextColor="#B9B9B9"
