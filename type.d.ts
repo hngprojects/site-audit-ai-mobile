@@ -91,3 +91,14 @@ export interface reportDashboardProps {
   status: string;
   scanDate: string;
 }
+
+
+export type IssueCardProps = {
+  id?: string;
+  title?: string;
+  score?: string;
+  status?: string
+  description?: string;
+  noIssuesLabel?: string;
+  onPressDetails?: () => void;
+};
