@@ -335,6 +335,7 @@ export const authService = {
           ? `${apiUser.first_name} ${apiUser.last_name}`.trim()
           : apiUser.fullName || apiUser.username || '',
         createdAt: apiUser.created_at || apiUser.createdAt || new Date().toISOString(),
+        profilePicture: apiUser.profile_picture || apiUser.profilePicture || undefined,
       };
 
       return user;
@@ -391,6 +392,80 @@ export const authService = {
         throw error;
       }
       throw new Error('Failed to reset password. Please try again.');
+    }
+  },
+
+  async uploadProfilePicture(token: string, fileUri: string): Promise<string> {
+    if (!token) {
+      throw new Error('Token is required');
+    }
+
+    if (!fileUri) {
+      throw new Error('File is required');
+    }
+
+    try {
+      const formData = new FormData();
+      
+      // Extract filename from URI
+      const filename = fileUri.split('/').pop() || 'profile.jpg';
+      const match = /\.(\w+)$/.exec(filename);
+      const type = match ? `image/${match[1]}` : 'image/jpeg';
+
+      formData.append('file', {
+        uri: fileUri,
+        name: filename,
+        type: type,
+      } as any);
+
+      const response = await apiClient.post(
+        '/api/v1/users/me/profile-picture',
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      // Return the profile picture URL from response
+      const responseData = response.data;
+      return responseData.data?.profile_picture || responseData.profile_picture || responseData.data?.url || '';
+    } catch (error) {
+      if (isAxiosError(error)) {
+        const errorData = error.response?.data || {};
+        const errorMessage = formatErrorMessage(errorData);
+        throw new Error(errorMessage);
+      }
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Failed to upload profile picture. Please try again.');
+    }
+  },
+
+  async deleteProfilePicture(token: string): Promise<void> {
+    if (!token) {
+      throw new Error('Token is required');
+    }
+
+    try {
+      await apiClient.delete('/api/v1/users/me/profile-picture', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    } catch (error) {
+      if (isAxiosError(error)) {
+        const errorData = error.response?.data || {};
+        const errorMessage = formatErrorMessage(errorData);
+        throw new Error(errorMessage);
+      }
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Failed to delete profile picture. Please try again.');
     }
   },
 };

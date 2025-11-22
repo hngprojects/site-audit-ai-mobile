@@ -49,3 +49,14 @@ export const resetPassword = async (
   return await authService.resetPassword(token, currentPassword, newPassword);
 };
 
+export const uploadProfilePicture = async (
+  token: string,
+  fileUri: string
+): Promise<string> => {
+  return await authService.uploadProfilePicture(token, fileUri);
+};
+
+export const deleteProfilePicture = async (token: string): Promise<void> => {
+  return await authService.deleteProfilePicture(token);
+};
+

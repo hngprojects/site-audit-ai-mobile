@@ -4,9 +4,10 @@ import { useAuth } from '@/hooks/use-auth';
 import { useAuthStore } from '@/store/auth-store';
 import styles from '@/stylesheets/edit-profile-stylesheet';
 import { Feather } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Alert, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const EditProfileContent = () => {
@@ -16,8 +17,10 @@ const EditProfileContent = () => {
   const [fullName, setFullName] = useState(user?.fullName || '');
   const [email, setEmail] = useState(user?.email || '');
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [profilePicture, setProfilePicture] = useState<string | undefined>(user?.profilePicture);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(true);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [errors, setErrors] = useState<{fullName?: string; email?: string; phoneNumber?: string}>({});
 
   useEffect(() => {
@@ -32,6 +35,7 @@ const EditProfileContent = () => {
         if (userData) {
           setFullName(userData.fullName || '');
           setEmail(userData.email || '');
+          setProfilePicture(userData.profilePicture);
           // Note: phone_number is not in the User type, so we'll need to handle it separately
           // For now, we'll leave it empty and let the user enter it
         }
@@ -107,13 +111,126 @@ const EditProfileContent = () => {
   };
 
   const handleChangePhoto = () => {
+    if (!token) return;
+
+    const options: { text: string; onPress?: () => void | Promise<void>; style?: 'default' | 'cancel' | 'destructive' }[] = [
+      { text: 'Take Photo', onPress: handleTakePhoto },
+      { text: 'Choose from Gallery', onPress: handlePickImage },
+    ];
+
+    if (profilePicture) {
+      options.push({ text: 'Delete Photo', onPress: handleDeletePhoto, style: 'destructive' });
+    }
+
+    options.push({ text: 'Cancel', style: 'cancel' });
+
+    Alert.alert('Change Profile Photo', 'Choose an option', options);
+  };
+
+  const handleTakePhoto = async () => {
+    if (!token) return;
+
+    try {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission Denied', 'Camera permission is required to take a photo.');
+        return;
+      }
+
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: 'images',
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        await uploadImage(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error('Error taking photo:', error);
+      Alert.alert('Error', 'Failed to take photo. Please try again.');
+    }
+  };
+
+  const handlePickImage = async () => {
+    if (!token) return;
+
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission Denied', 'Gallery permission is required to select a photo.');
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: 'images',
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        await uploadImage(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error('Error picking image:', error);
+      Alert.alert('Error', 'Failed to pick image. Please try again.');
+    }
+  };
+
+  const uploadImage = async (imageUri: string) => {
+    if (!token) return;
+
+    setIsUploadingImage(true);
+    try {
+      const profilePictureUrl = await authActions.uploadProfilePicture(token, imageUri);
+      setProfilePicture(profilePictureUrl);
+      
+      // Update user in store with new profile picture
+      const userData = await authActions.getUser(token);
+      if (userData) {
+        updateUserStore(userData);
+      }
+
+      Alert.alert('Success', 'Profile picture updated successfully');
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to upload profile picture. Please try again.';
+      Alert.alert('Error', errorMessage);
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
+
+  const handleDeletePhoto = async () => {
+    if (!token) return;
+
     Alert.alert(
-      'Change Profile Photo',
-      'Choose an option',
+      'Delete Profile Picture',
+      'Are you sure you want to delete your profile picture?',
       [
-        { text: 'Take Photo', onPress: () => console.log('Take photo') },
-        { text: 'Choose from Gallery', onPress: () => console.log('Choose from gallery') },
-        { text: 'Cancel', style: 'cancel' }
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await authActions.deleteProfilePicture(token);
+              setProfilePicture(undefined);
+              
+              // Update user in store
+              const userData = await authActions.getUser(token);
+              if (userData) {
+                updateUserStore(userData);
+              }
+
+              Alert.alert('Success', 'Profile picture deleted successfully');
+            } catch (error) {
+              const errorMessage = error instanceof Error ? error.message : 'Failed to delete profile picture. Please try again.';
+              Alert.alert('Error', errorMessage);
+            }
+          },
+        },
       ]
     );
   };
@@ -140,13 +257,31 @@ const EditProfileContent = () => {
           {/* Profile Image Section */}
           <View style={styles.profileImageSection}>
             <View style={styles.profileImageContainer}>
-              <View style={styles.profileImage} />
-              <TouchableOpacity style={styles.editImageButton} onPress={handleChangePhoto}>
+              {isUploadingImage ? (
+                <View style={[styles.profileImage, { justifyContent: 'center', alignItems: 'center' }]}>
+                  <ActivityIndicator size="large" color="#1A2373" />
+                </View>
+              ) : profilePicture ? (
+                <Image
+                  source={{ uri: profilePicture }}
+                  style={styles.profileImage}
+                  resizeMode="cover"
+                />
+              ) : (
+                <View style={styles.profileImage} />
+              )}
+              <TouchableOpacity
+                style={styles.editImageButton}
+                onPress={handleChangePhoto}
+                disabled={isUploadingImage}
+              >
                 <Feather name="camera" size={18} color="white" />
               </TouchableOpacity>
             </View>
-            <TouchableOpacity onPress={handleChangePhoto}>
-              <Text style={styles.changePhotoText}>Change Photo</Text>
+            <TouchableOpacity onPress={handleChangePhoto} disabled={isUploadingImage}>
+              <Text style={styles.changePhotoText}>
+                {isUploadingImage ? 'Uploading...' : 'Change Photo'}
+              </Text>
             </TouchableOpacity>
           </View>
 
