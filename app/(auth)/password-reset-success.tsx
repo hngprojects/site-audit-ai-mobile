@@ -1,8 +1,8 @@
+import styles from "@/stylesheets/passwordResetSuccessStylesheet";
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import { useRouter } from "expo-router";
 import { Platform, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import styles from "../../stylesheets/passwordResetSuccessStylesheet";
 
 export default function ResetSuccess() {
   const router = useRouter();

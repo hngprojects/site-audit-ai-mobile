@@ -1,10 +1,10 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import styles from '@/stylesheets/report-dashboard-stylesheet';
 import { reportDashboardProps } from '@/type';
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator } from 'react-native';
-import styles from '../../stylesheets/report-dashboard-stylesheet';
 
 
 

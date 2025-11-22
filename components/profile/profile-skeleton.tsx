@@ -1,9 +1,9 @@
 import ProfileHeader from '@/components/profile/profile-header';
 import { Skeleton } from '@/components/ui/skeleton';
+import styles from '@/stylesheets/profile-stylesheet';
 import React from 'react';
 import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import styles from '../../stylesheets/profile-stylesheet';
 
 const ProfileSkeleton: React.FC = () => {
   return (

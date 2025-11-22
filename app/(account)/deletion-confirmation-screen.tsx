@@ -1,8 +1,8 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import styles from '@/stylesheets/deletion-confirmation-screen-stylesheet';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator } from 'react-native';
-import styles from '../../stylesheets/deletion-confirmation-screen-stylesheet';
 
 const DeletionConfirmationScreenContent = () => (
   <ThemedView style={styles.container}>

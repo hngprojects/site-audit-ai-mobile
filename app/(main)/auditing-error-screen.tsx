@@ -1,3 +1,4 @@
+import styles from "@/stylesheets/auditing-error-screen-stylesheet";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import React from "react";
 import {
@@ -6,7 +7,6 @@ import {
   View
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import styles from "../../stylesheets/auditing-error-screen-stylesheet";
 
 
 export default function WebsiteDown() {

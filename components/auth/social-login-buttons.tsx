@@ -1,5 +1,5 @@
+import styles from '@/stylesheets/sign-in-stylesheet';
 import { Image, Text, TouchableOpacity } from 'react-native';
-import styles from '../../stylesheets/sign-in-stylesheet';
 
 const SocialLoginButtons: React.FC = () => {
   const handleGoogleLogin = () => {
