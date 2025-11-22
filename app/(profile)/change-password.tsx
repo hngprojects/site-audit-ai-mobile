@@ -1,12 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { resetPassword } from '@/actions/auth-actions';
+import { useAuth } from '@/hooks/use-auth';
+import { handleAuthError } from '@/lib/auth-error-handler';
+import styles from '@/stylesheets/change-password-stylesheet';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import styles from '@/stylesheets/change-password-stylesheet';
+import React, { useEffect, useState } from 'react';
+import { Alert, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const ChangePasswordContent = () => {
   const router = useRouter();
+  const { token } = useAuth();
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -39,12 +43,11 @@ const ChangePasswordContent = () => {
   };
 
   const handleUpdatePassword = async () => {
-    if (!validateForm()) return;
+    if (!validateForm() || !token) return;
 
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await resetPassword(token, currentPassword, newPassword);
 
       Alert.alert(
         'Success',
@@ -52,7 +55,17 @@ const ChangePasswordContent = () => {
         [{ text: 'OK', onPress: () => router.back() }]
       );
     } catch (error) {
-      Alert.alert('Error', 'Failed to update password. Please try again.');
+      const wasLoggedOut = await handleAuthError(error);
+      if (wasLoggedOut) {
+        Alert.alert(
+          'Session Expired',
+          'Your session has expired. Please sign in again.',
+          [{ text: 'OK', onPress: () => router.replace('/(tabs)') }]
+        );
+      } else {
+        const errorMessage = error instanceof Error ? error.message : 'Failed to update password. Please try again.';
+        Alert.alert('Error', errorMessage);
+      }
     } finally {
       setIsLoading(false);
     }

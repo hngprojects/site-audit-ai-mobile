@@ -15,6 +15,46 @@ const apiClient = axios.create({
   },
 });
 
+// Helper to check if error is an authentication error
+export const isAuthError = (error: unknown): boolean => {
+  if (isAxiosError(error)) {
+    const status = error.response?.status;
+    const errorMessage = error.response?.data?.message || error.response?.data?.error || '';
+    const errorData = error.response?.data || {};
+    
+    // Check for 401 status or authentication-related error messages
+    if (status === 401) {
+      return true;
+    }
+    
+    // Check for authentication error messages
+    const authErrorMessages = [
+      'Invalid authentication credentials',
+      'Unauthenticated',
+      'Authentication failed',
+      'Token expired',
+      'Invalid token',
+    ];
+    
+    const errorText = typeof errorMessage === 'string' 
+      ? errorMessage.toLowerCase() 
+      : formatErrorMessage(errorData).toLowerCase();
+    
+    return authErrorMessages.some(msg => errorText.includes(msg.toLowerCase()));
+  }
+  
+  if (error instanceof Error) {
+    const errorText = error.message.toLowerCase();
+    return errorText.includes('invalid authentication credentials') ||
+           errorText.includes('unauthenticated') ||
+           errorText.includes('authentication failed') ||
+           errorText.includes('token expired') ||
+           errorText.includes('invalid token');
+  }
+  
+  return false;
+};
+
 const formatErrorMessage = (errorData: any): string => {
   if (errorData.data?.errors && Array.isArray(errorData.data.errors)) {
     const flattenErrors = (arr: any[]): string[] => {
@@ -65,8 +105,9 @@ export const authService = {
       const response = await apiClient.post('/api/v1/auth/login', { email, password });
       const responseData = response.data;
       
-      const token = responseData.data?.access_token || responseData.data?.token || responseData.access_token || responseData.token;
-      const apiUser = responseData.data?.user || responseData.user;
+      
+      const token = responseData.data?.access_token;
+      const apiUser = responseData.data?.user;
       
       if (!apiUser || !token) {
         throw new Error('Invalid response from server');
@@ -77,8 +118,9 @@ export const authService = {
         email: apiUser.email,
         fullName: apiUser.first_name && apiUser.last_name 
           ? `${apiUser.first_name} ${apiUser.last_name}`.trim()
-          : apiUser.fullName || apiUser.username || '',
-        createdAt: apiUser.created_at || apiUser.createdAt || new Date().toISOString(),
+          : apiUser.first_name || apiUser.last_name || apiUser.username || '',
+        createdAt: apiUser.created_at || new Date().toISOString(),
+        profilePicture: apiUser.profile_picture_url || undefined,
       };
       
       return { user, token };
@@ -121,8 +163,9 @@ export const authService = {
       const responseData = response.data;
       console.log(responseData);
       
-      const token = responseData.data?.access_token || responseData.data?.token || responseData.access_token || responseData.token;
-      const apiUser = responseData.data?.user || responseData.user;
+      // Extract token from data.access_token (matching the API response structure)
+      const token = responseData.data?.access_token;
+      const apiUser = responseData.data?.user;
       
       if (!apiUser || !token) {
         throw new Error('Invalid response from server');
@@ -133,8 +176,9 @@ export const authService = {
         email: apiUser.email,
         fullName: apiUser.first_name && apiUser.last_name 
           ? `${apiUser.first_name} ${apiUser.last_name}`.trim()
-          : apiUser.fullName || apiUser.username || '',
-        createdAt: apiUser.created_at || apiUser.createdAt || new Date().toISOString(),
+          : apiUser.first_name || apiUser.last_name || apiUser.username || '',
+        createdAt: apiUser.created_at || new Date().toISOString(),
+        profilePicture: apiUser.profile_picture_url || undefined,
       };
       
       return { user, token };
@@ -249,6 +293,224 @@ export const authService = {
         throw error;
       }
       throw new Error('Failed to resend reset token. Please try again.');
+    }
+  },
+
+  async getUser(token: string): Promise<AuthResponse['user']> {
+    if (!token) {
+      throw new Error('Token is required');
+    }
+
+    try {
+      const response = await apiClient.get('/api/v1/users/me', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const responseData = response.data;
+      const apiUser = responseData.data?.user || responseData.user || responseData.data || responseData;
+
+      if (!apiUser) {
+        throw new Error('Invalid response from server');
+      }
+
+      const user = {
+        id: apiUser.id,
+        email: apiUser.email,
+        fullName: apiUser.first_name && apiUser.last_name
+          ? `${apiUser.first_name} ${apiUser.last_name}`.trim()
+          : apiUser.first_name || apiUser.last_name || apiUser.username || '',
+        createdAt: apiUser.created_at || new Date().toISOString(),
+        profilePicture: apiUser.profile_picture_url || undefined,
+      };
+
+      return user;
+    } catch (error) {
+      if (isAxiosError(error)) {
+        const errorData = error.response?.data || {};
+        const errorMessage = formatErrorMessage(errorData);
+        throw new Error(errorMessage);
+      }
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Failed to fetch user data. Please try again.');
+    }
+  },
+
+  async updateUser(
+    token: string,
+    data: { first_name: string; last_name: string; phone_number: string }
+  ): Promise<AuthResponse['user']> {
+    if (!token) {
+      throw new Error('Token is required');
+    }
+
+    if (!data.first_name || !data.last_name) {
+      throw new Error('First name and last name are required');
+    }
+
+    try {
+      const response = await apiClient.put(
+        '/api/v1/users/me',
+        {
+          first_name: data.first_name,
+          last_name: data.last_name,
+          phone_number: data.phone_number,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const responseData = response.data;
+      const apiUser = responseData.data?.user || responseData.user || responseData.data || responseData;
+
+      if (!apiUser) {
+        throw new Error('Invalid response from server');
+      }
+
+      const user = {
+        id: apiUser.id,
+        email: apiUser.email,
+        fullName: apiUser.first_name && apiUser.last_name
+          ? `${apiUser.first_name} ${apiUser.last_name}`.trim()
+          : apiUser.first_name || apiUser.last_name || apiUser.username || '',
+        createdAt: apiUser.created_at || new Date().toISOString(),
+        profilePicture: apiUser.profile_picture_url || undefined,
+      };
+
+      return user;
+    } catch (error) {
+      if (isAxiosError(error)) {
+        const errorData = error.response?.data || {};
+        const errorMessage = formatErrorMessage(errorData);
+        throw new Error(errorMessage);
+      }
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Failed to update user. Please try again.');
+    }
+  },
+
+  async resetPassword(
+    token: string,
+    currentPassword: string,
+    newPassword: string
+  ): Promise<void> {
+    if (!token) {
+      throw new Error('Token is required');
+    }
+
+    if (!currentPassword || !newPassword) {
+      throw new Error('Current password and new password are required');
+    }
+
+    if (newPassword.length < MIN_PASSWORD_LENGTH) {
+      throw new Error(`Password must be at least ${MIN_PASSWORD_LENGTH} characters`);
+    }
+
+    try {
+      await apiClient.post(
+        '/api/v1/auth/reset-password',
+        {
+          current_password: currentPassword,
+          new_password: newPassword,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+    } catch (error) {
+      if (isAxiosError(error)) {
+        const errorData = error.response?.data || {};
+        const errorMessage = formatErrorMessage(errorData);
+        throw new Error(errorMessage);
+      }
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Failed to reset password. Please try again.');
+    }
+  },
+
+  async uploadProfilePicture(token: string, fileUri: string): Promise<string> {
+    if (!token) {
+      throw new Error('Token is required');
+    }
+
+    if (!fileUri) {
+      throw new Error('File is required');
+    }
+
+    try {
+      const formData = new FormData();
+      
+      // Extract filename from URI
+      const filename = fileUri.split('/').pop() || 'profile.jpg';
+      const match = /\.(\w+)$/.exec(filename);
+      const type = match ? `image/${match[1]}` : 'image/jpeg';
+
+      formData.append('file', {
+        uri: fileUri,
+        name: filename,
+        type: type,
+      } as any);
+
+      const response = await apiClient.post(
+        '/api/v1/users/me/profile-picture',
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      // Return the profile picture URL from response
+      const responseData = response.data;
+      return responseData.data?.profile_picture_url || responseData.data?.profile_picture || responseData.profile_picture_url || responseData.profile_picture || responseData.data?.url || '';
+    } catch (error) {
+      if (isAxiosError(error)) {
+        const errorData = error.response?.data || {};
+        const errorMessage = formatErrorMessage(errorData);
+        throw new Error(errorMessage);
+      }
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Failed to upload profile picture. Please try again.');
+    }
+  },
+
+  async deleteProfilePicture(token: string): Promise<void> {
+    if (!token) {
+      throw new Error('Token is required');
+    }
+
+    try {
+      await apiClient.delete('/api/v1/users/me/profile-picture', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    } catch (error) {
+      if (isAxiosError(error)) {
+        const errorData = error.response?.data || {};
+        const errorMessage = formatErrorMessage(errorData);
+        throw new Error(errorMessage);
+      }
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Failed to delete profile picture. Please try again.');
     }
   },
 };

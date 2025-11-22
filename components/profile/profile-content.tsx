@@ -1,12 +1,12 @@
 import LogoutModal from '@/components/profile/logout-modal';
 import { useAuthStore } from '@/store/auth-store';
 import styles from '@/stylesheets/profile-stylesheet';
+import type { User } from '@/type';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Switch, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Switch, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import type { User } from '@/type';
 
 interface ProfileContentProps {
   user: User | null;
@@ -43,7 +43,14 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
       <View style={styles.profilePictureContainer}>
         <View style={styles.profileInfoContainer}>
           <View style={styles.avatarContainer}>
-            <View style={styles.avatarPlaceholder} />
+            {user?.profilePicture ? (
+              <Image
+                source={{ uri: user.profilePicture }}
+                style={styles.avatarPlaceholder}
+              />
+            ) : (
+              <View style={styles.avatarPlaceholder} />
+            )}
             <View style={styles.editIconContainer}>
               <Feather name="edit-2" size={16} color="white" />
             </View>
