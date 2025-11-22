@@ -1,11 +1,11 @@
 import { authService, MIN_PASSWORD_LENGTH } from '@/lib/auth-service';
+import styles from "@/stylesheets/newPasswordStylesheet";
 import { useResetPasswordEmailStore } from '@/zustardStore/resetPasswordEmailStore';
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { ActivityIndicator, Alert, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import styles from "../../Stylesheets/newPasswordStylesheet";
 
 export default function NewPassword() {
   const router = useRouter();

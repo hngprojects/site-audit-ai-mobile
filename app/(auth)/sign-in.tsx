@@ -1,11 +1,11 @@
 import { LoadingButton } from '@/components/ui/loading-button';
 import { useAuth } from '@/hooks/use-auth';
+import styles from '@/stylesheets/sign-in-stylesheet';
 import Feather from '@expo/vector-icons/Feather';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Alert, Image, KeyboardAvoidingView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import styles from '../../Stylesheets/sign-in-stylesheet';
 
 const SignIn = () => {
   const router = useRouter();

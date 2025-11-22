@@ -1,8 +1,8 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import styles from '@/stylesheets/website-review-request-screen-stylesheet';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator } from 'react-native';
-import styles from '../../Stylesheets/website-review-request-screen-stylesheet';
 
 const WebsiteReviewRequestScreenContent = () => (
   <ThemedView style={styles.container}>

@@ -1,9 +1,9 @@
+import styles from '@/stylesheets/email-support-stylesheet';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import styles from '../../Stylesheets/email-support-stylesheet';
 
 const EmailSupportContent = () => {
   const router = useRouter();

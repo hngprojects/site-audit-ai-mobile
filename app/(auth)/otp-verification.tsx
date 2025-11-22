@@ -1,4 +1,5 @@
 import { resendResetToken } from '@/actions/auth-actions';
+import styles from "@/stylesheets/otpVerificationStylesheet";
 import { useResetPasswordEmailStore } from "@/zustardStore/resetPasswordEmailStore";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -6,7 +7,6 @@ import { useState } from "react";
 import { ActivityIndicator, Alert, Keyboard, KeyboardAvoidingView, Platform, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { OtpInput } from "react-native-otp-entry";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import styles from "../../Stylesheets/otpVerificationStylesheet";
 
 const OTPVerification = () => {
   const router = useRouter();

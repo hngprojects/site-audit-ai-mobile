@@ -1,20 +1,20 @@
 import { slides } from "@/constants/onboardingSlide";
 import { storage, STORAGE_KEYS } from "@/lib/storage";
+import styles from "@/stylesheets/onboarding-stylesheet";
 import { Slide } from "@/type";
 import { RelativePathString, useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
 import {
-  Animated,
-  Dimensions,
-  FlatList,
-  Image,
-  Text,
-  TouchableOpacity,
-  View,
-  ViewToken
+    Animated,
+    Dimensions,
+    FlatList,
+    Image,
+    Text,
+    TouchableOpacity,
+    View,
+    ViewToken
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import styles from "../../Stylesheets/onboarding-stylesheet";
 
 
 

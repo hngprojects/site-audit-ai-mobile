@@ -1,12 +1,12 @@
 import LogoutModal from '@/components/profile/logout-modal';
 import { useAuthStore } from '@/store/auth-store';
+import styles from '@/stylesheets/profile-stylesheet';
 import type { User } from '@/type';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Image, Switch, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import styles from '../../Stylesheets/profile-stylesheet';
 
 interface ProfileContentProps {
   user: User | null;

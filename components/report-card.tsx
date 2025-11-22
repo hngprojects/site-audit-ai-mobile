@@ -1,3 +1,4 @@
+import styles, { reportColors } from "@/stylesheets/report-card-stylesheet";
 import { ReportItemProps, Status } from "@/type";
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import React from "react";
@@ -6,7 +7,6 @@ import {
     TouchableOpacity,
     View
 } from "react-native";
-import styles, { reportColors } from "../Stylesheets/report-card-stylesheet";
 
 
 
