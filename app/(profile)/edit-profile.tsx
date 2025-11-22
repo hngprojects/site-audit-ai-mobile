@@ -79,7 +79,7 @@ const EditProfileContent = () => {
       <ScrollView
         style={styles.scrollContainer}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 100 }}
+        contentContainerStyle={{ marginTop: 16, paddingBottom: 100 }}
       >
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>

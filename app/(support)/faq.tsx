@@ -22,7 +22,7 @@ const FAQContent = () => {
       <ScrollView
         style={styles.scrollContainer}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 100 }}
+        contentContainerStyle={{ marginTop: 16, paddingBottom: 100 }}
       >
         <View style={styles.content}>
           {FAQ_DATA.map((item, index) => (

@@ -30,30 +30,54 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 16,
-
   },
-  answerText: {
-    fontSize: 14,
-    lineHeight: 20,
-    color: '#1c1c1c',
-    fontFamily: 'RethinkSans-Regular',
-  },
-  contactSection: {
-    marginTop: 20,
-    alignItems: 'center',
-  },
-  confusedText: {
-    fontSize: 14,
-    fontWeight: '500',
+  title: {
+    fontSize: 24,
+    fontFamily: 'RethinkSans-Bold',
     color: '#1C1C1C',
-    fontFamily: 'RethinkSans-Regular',
+    textAlign: 'left',
+    marginBottom: 8,
   },
-  contactText: {
+  subtitle: {
     fontSize: 14,
-    fontWeight: '500',
-    color: '#FF5A3D',
     fontFamily: 'RethinkSans-Regular',
-    marginTop: 5,
+    color: '#666666',
+    marginBottom: 30,
+  },
+  inputContainer: {
+    marginBottom: 20,
+  },
+  label: {
+    fontSize: 16,
+    fontFamily: 'RethinkSans-Medium',
+    color: '#1C1C1C',
+    marginBottom: 8,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    fontFamily: 'RethinkSans-Regular',
+    color: '#1C1C1C',
+    backgroundColor: '#FAFAFA',
+  },
+  messageInput: {
+    height: 120,
+    textAlignVertical: 'top',
+  },
+  sendButton: {
+    backgroundColor: '#FF5A3D',
+    paddingVertical: 15,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  sendButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontFamily: 'RethinkSans-Bold',
   },
   loadingContainer: {
     flex: 1,
@@ -63,4 +87,3 @@ const styles = StyleSheet.create({
 });
 
 export default styles;
-

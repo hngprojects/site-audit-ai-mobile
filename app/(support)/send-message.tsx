@@ -3,12 +3,12 @@ import { ActivityIndicator, TouchableOpacity, ScrollView, Text, View, TextInput,
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import styles from '@/stylesheets/email-support-stylesheet';
+import styles from '../../stylesheets/send-message-stylesheet';
 
-const EmailSupportContent = () => {
+const SendMessageContent = () => {
   const router = useRouter();
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('user@gmail.com');
-  const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
 
   const isValidEmail = (email: string) => {
@@ -17,9 +17,14 @@ const EmailSupportContent = () => {
   };
 
   const handleSend = () => {
+    const trimmedName = name.trim();
     const trimmedEmail = email.trim();
-    const trimmedSubject = subject.trim();
     const trimmedMessage = message.trim();
+
+    if (!trimmedName) {
+      Alert.alert('Error', 'Please enter your full name');
+      return;
+    }
 
     if (!trimmedEmail) {
       Alert.alert('Error', 'Please enter your email address');
@@ -31,17 +36,12 @@ const EmailSupportContent = () => {
       return;
     }
 
-    if (!trimmedSubject) {
-      Alert.alert('Error', 'Please enter a subject');
-      return;
-    }
-
     if (!trimmedMessage) {
       Alert.alert('Error', 'Please enter your message');
       return;
     }
 
-    Alert.alert('Success', 'Your email has been sent successfully');
+    Alert.alert('Success', 'Your message has been sent successfully');
     router.back();
   };
 
@@ -51,7 +51,7 @@ const EmailSupportContent = () => {
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
           <Feather name="arrow-left" size={24} color="#1A2373" />
         </TouchableOpacity>
-        <Text style={styles.headerText}>Email Support</Text>
+        <Text style={styles.headerText}>Send Message</Text>
       </View>
       <ScrollView
         style={styles.scrollContainer}
@@ -59,11 +59,22 @@ const EmailSupportContent = () => {
         contentContainerStyle={{ marginTop: 16, paddingBottom: 100 }}
       >
         <View style={styles.content}>
-          {/* <Text style={styles.title}>Contact Us</Text>
-          <Text style={styles.subtitle}>Send us an email and we will respond within 24 hours</Text> */}
+          <Text style={styles.title}>Need Help?</Text>
+          <Text style={styles.subtitle}>We'd love to hear from you. Send us a message and we'll respond within 24 hours.</Text>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Your Email</Text>
+            <Text style={styles.label}>Name</Text>
+            <TextInput
+              style={styles.input}
+              value={name}
+              onChangeText={setName}
+              placeholder="Enter your full name"
+              placeholderTextColor="#999"
+            />
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Email</Text>
             <TextInput
               style={styles.input}
               value={email}
@@ -77,23 +88,12 @@ const EmailSupportContent = () => {
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Subject</Text>
-            <TextInput
-              style={styles.input}
-              value={subject}
-              onChangeText={setSubject}
-              placeholder="e.g Inquiry"
-              placeholderTextColor="#999"
-            />
-          </View>
-
-          <View style={styles.inputContainer}>
             <Text style={styles.label}>Message</Text>
             <TextInput
               style={[styles.input, styles.messageInput]}
               value={message}
               onChangeText={setMessage}
-              placeholder="Type your message here..."
+              placeholder="How can we help you?"
               placeholderTextColor="#999"
               multiline
               numberOfLines={6}
@@ -110,7 +110,7 @@ const EmailSupportContent = () => {
   );
 };
 
-export default function EmailSupport() {
+export default function SendMessage() {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
@@ -129,5 +129,5 @@ export default function EmailSupport() {
     );
   }
 
-  return <EmailSupportContent />;
+  return <SendMessageContent />;
 }

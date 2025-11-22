@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ActivityIndicator, TouchableOpacity, ScrollView, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
 import { Feather } from '@expo/vector-icons';
@@ -21,7 +22,7 @@ const DeleteAccountChoiceSelectionContent = () => {
   };
 
   return (
-    <ThemedView style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <ScrollView
         style={styles.scrollContainer}
         showsVerticalScrollIndicator={false}
@@ -30,14 +31,14 @@ const DeleteAccountChoiceSelectionContent = () => {
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={handleCancel} style={styles.backButton}>
-            <Feather name="arrow-left" size={24} color="#1c1c1c" />
+            <Feather name="arrow-left" size={24} color="#1A2373" />
           </TouchableOpacity>
           <ThemedText style={styles.title}>Delete Account</ThemedText>
         </View>
 
         {/* Warning Message */}
         <View style={styles.warningContainer}>
-        
+          
           <ThemedText style={styles.warningText}>
             Deleting your account is permanent and cannot be undone, all data and access to features will be erased. Help us improve by sharing why you're leaving, your feedback matters.
           </ThemedText>
@@ -74,18 +75,18 @@ const DeleteAccountChoiceSelectionContent = () => {
 
       {/* Bottom Buttons */}
       <View style={styles.bottomContainer}>
-        <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
-          <ThemedText style={styles.cancelButtonText}>Cancel</ThemedText>
+        <TouchableOpacity style={selectedReason ? styles.cancelButtonSelected : styles.cancelButtonUnselected} onPress={handleCancel}>
+          <ThemedText style={selectedReason ? styles.cancelButtonTextSelected : styles.cancelButtonTextUnselected}>Cancel</ThemedText>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.deleteButton, !selectedReason && styles.deleteButtonDisabled]}
+          style={selectedReason ? styles.deleteButtonSelected : styles.deleteButtonUnselected}
           onPress={handleDeleteAccount}
           disabled={!selectedReason}
         >
           <ThemedText style={styles.deleteButtonText}>Delete Account</ThemedText>
         </TouchableOpacity>
       </View>
-    </ThemedView>
+    </SafeAreaView>
   );
 };
 
@@ -102,12 +103,11 @@ export default function DeleteAccountChoiceSelection() {
 
   if (!isLoaded) {
     return (
-      <ThemedView style={styles.loadingContainer}>
+      <SafeAreaView style={styles.loadingContainer}>
         <ActivityIndicator size="large" />
-      </ThemedView>
+      </SafeAreaView>
     );
   }
 
   return <DeleteAccountChoiceSelectionContent />;
 }
-
