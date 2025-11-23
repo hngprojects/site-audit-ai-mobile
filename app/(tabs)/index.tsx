@@ -6,11 +6,10 @@ import Octicons from "@expo/vector-icons/Octicons";
 import { router } from "expo-router";
 import { useState } from "react";
 import { Image, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 
 export default function HomeScreen() {
-  const inset = useSafeAreaInsets();
   const [websiteUrl, setWebsiteUrl] = useState<string>('');
   const [urlAvailable , setUrlAvailable ] = useState<boolean>(true);
   
@@ -118,6 +117,6 @@ export default function HomeScreen() {
 
    
      
-    </SafeAreaView>
+      </SafeAreaView>
   );
 }

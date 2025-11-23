@@ -18,7 +18,7 @@ const LanguageContent = () => {
         </TouchableOpacity>
         <Text style={styles.headerText}>Language</Text>
       </View>
-      <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
+      <ScrollView contentContainerStyle={{ marginTop: 16, paddingBottom: 100 }}>
         <Text style={styles.title}>Select your preferred language</Text>
         {LANGUAGES.map((language) => (
           <TouchableOpacity

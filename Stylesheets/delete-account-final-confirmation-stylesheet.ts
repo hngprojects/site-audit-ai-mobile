@@ -10,81 +10,78 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  content: {
-    flex: 1,
-    paddingHorizontal: 24,
-    paddingTop: 60,
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-
   header: {
     width: '100%',
-    flexDirection: 'column',
+    flexDirection: 'row',
     alignItems: 'center',
-    gap: 80,
     paddingVertical: 6,
     paddingHorizontal: 16,
   },
   backButton: {
     marginRight: 16,
   },
-  logoContainer: {
-    marginBottom: 32,
+  titleContainer: {
+    flex: 1,
+    alignItems: 'center',
   },
-  logoText: {
-    fontSize: 32,
-    fontFamily: 'RethinkSans-Bold',
-    color: '#1A2373',
-  },
-  title: {
-    fontSize: 24,
+  headerTitle: {
+    fontSize: 20,
     fontFamily: 'RethinkSans-Bold',
     color: '#1c1c1c',
     textAlign: 'center',
-    marginBottom: 16,
-    fontWeight: 700,
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    gap: 8,
+    // justifyContent: 'center',
+    // alignItems: 'center',
+  },
+  title: {
+    fontSize: 18,
+    fontFamily: 'RethinkSans-Bold',
+    color: '#494949',
+    
   },
   description: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: 'RethinkSans-Regular',
     color: '#494949',
-    textAlign: 'center',
-    lineHeight: 20,
-    marginBottom: 48,
-    fontWeight: 500,
+    lineHeight: 24,
+  
   },
   buttonContainer: {
     width: '100%',
     gap: 16,
+    marginTop: 40,
   },
-  doneButton: {
-    height: 48,
-    backgroundColor: '#FCFCFC',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#FF5A3D',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  doneButtonText: {
-    fontSize: 16,
-    fontFamily: 'RethinkSans-Medium',
-    color: '#FF5A3D',
-  },
-  reactivateButton: {
+  yesButton: {
     height: 48,
     backgroundColor: '#FF5A3D',
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  reactivateButtonText: {
+  yesButtonText: {
     fontSize: 16,
     fontFamily: 'RethinkSans-Medium',
     color: 'white',
   },
+  noButton: {
+    height: 48,
+    backgroundColor: '#FCFCFC',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#C7C8C9',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noButtonText: {
+    fontSize: 16,
+    fontFamily: 'RethinkSans-Medium',
+    color: '#666666',
+  },
 });
 
 export default styles;
-

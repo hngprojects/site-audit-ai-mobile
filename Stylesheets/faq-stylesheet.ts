@@ -9,8 +9,7 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 16,
-    paddingTop: 60,
+    paddingVertical: 6,
     paddingHorizontal: 16,
   },
   backButton: {
@@ -30,9 +29,8 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingTop: 6,
     paddingHorizontal: 16,
-    
+
   },
   answerText: {
     fontSize: 14,
