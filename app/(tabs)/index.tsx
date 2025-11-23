@@ -11,8 +11,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
   const [websiteUrl, setWebsiteUrl] = useState<string>('');
-  const [urlAvailable , setUrlAvailable ] = useState<boolean>(true);
-  
+  const [urlAvailable, setUrlAvailable] = useState<boolean>(true);
+
 
 
   const [audits] = useState([
@@ -22,84 +22,77 @@ export default function HomeScreen() {
   ]);
 
   const RunAudit = () => {
-    if(websiteUrl === "")
-      return setUrlAvailable( false)
-      return router.push({
-        pathname: "/(main)/auditing-screen",
-        params: {
-          url: websiteUrl,
-        },
-      });
+    if (websiteUrl === "")
+      return setUrlAvailable(false)
+    return router.push({
+      pathname: "/(main)/auditing-screen",
+      params: {
+        url: websiteUrl,
+      },
+    });
   }
 
   return (
     <SafeAreaView
       style={styles.container}>
-     
-      <TouchableOpacity style={styles.notificationContainer}>
+
+      <TouchableOpacity style={styles.notificationContainer} onPress={() => router.push('/(main)/notifications')}>
         <Octicons name="bell" size={24} color="black" />
       </TouchableOpacity>
 
-      
-        <View style={styles.headingSection}>
-          <Text style={styles.title}>Improve your website with a quick scan</Text>
-          <Text style={styles.sub}>
-            Quick AI review with clear action steps
-          </Text>
-        </View>
 
-       
-        <View style={[styles.inputPlaceholder, {borderColor: !urlAvailable ? "#d32f2f" : "#bbbcbc",}]}>
-          <MaterialCommunityIcons 
-            name="web" size={24} 
-            color="#A0A0A0" 
-            style={styles.webIcon}
-          />
-          <TextInput
-            placeholder="Enter your website URL"
-            placeholderTextColor={"#A0A0A0"}
-            style={styles.placeholderText}
-            onChangeText={x => setWebsiteUrl(x)}
-          />
-        </View>
-        {!urlAvailable && (
-          <Text style={styles.invalidLink}>Invalid link. Please try again</Text>
-        )}
+      <View style={styles.headingSection}>
+        <Text style={styles.title}>Improve your website with a quick scan</Text>
+        <Text style={styles.sub}>
+          Quick AI review with clear action steps
+        </Text>
+      </View>
 
-      
 
-         <TouchableOpacity 
+      <View style={[styles.inputPlaceholder, { borderColor: !urlAvailable ? "#d32f2f" : "#C7C8C9", }]}>
+        <MaterialCommunityIcons
+          name="web" size={15}
+          color="#A0A0A0"
+          style={styles.webIcon}
+        />
+        <TextInput
+          placeholder="Enter your website URL"
+          placeholderTextColor={"#A0A0A0"}
+          style={styles.placeholderText}
+          onChangeText={x => setWebsiteUrl(x)}
+        />
+      </View>
+      {!urlAvailable && (
+        <Text style={styles.invalidLink}>Invalid link. Please try again</Text>
+      )}
+
+
+
+      <TouchableOpacity
         onPress={RunAudit}
         style={styles.runButton}
       >
-        <Image 
-          source={require("../../assets/images/Logo1.png")}
-          style={
-            styles.runButtonImage
-          }
-          resizeMode="contain"
-        />
         <Text style={styles.runButtonText}>Start Scan</Text>
       </TouchableOpacity>
 
-        
-        <Text style={styles.sectionTitle}>Recent audits</Text>
+
+      <Text style={styles.sectionTitle}>Recent audits</Text>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-       
+
         {audits.length === 0 ? (
           <>
-          <EmptyState />
+            <EmptyState />
 
-          <View style={styles.tipBox}>
-            <View style={styles.buldIcon}>
-              <MaterialCommunityIcons name="lightbulb-on-10" size={24} color="black" />
+            <View style={styles.tipBox}>
+              <View style={styles.buldIcon}>
+                <MaterialCommunityIcons name="lightbulb-on-10" size={24} color="black" />
+              </View>
+              <Text style={styles.tipText}>
+                Join 2000+ business owners who have improved their sales with Sitelytics
+              </Text>
             </View>
-            <Text style={styles.tipText}>
-              Join 2000+ business owners who have improved their sales with Sitelytics
-            </Text>
-          </View>
-        </>
+          </>
         ) : (
           audits.map((item, index) => (
             <AuditResultCard
@@ -112,11 +105,11 @@ export default function HomeScreen() {
           ))
         )}
 
-        <View style={{ height: 100 }} /> 
+        <View style={{ height: 100 }} />
       </ScrollView>
 
-   
-     
+
+
     </SafeAreaView>
   );
 }

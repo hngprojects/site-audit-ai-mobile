@@ -1,21 +1,21 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { FlatList, View, TouchableOpacity, Alert, Animated, TextInput, Image } from 'react-native';
-import { ThemedView } from '@/components/themed-view';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/themed-text';
-import styles from '@/stylesheets/notifications-screen-stylesheet';
+import styles from '@/stylesheets/notifications-stylesheet';
 import { getNotifications, markAsRead, deleteNotification } from '@/service/notifications';
 import type { Notification } from '@/service/notifications';
 import { Swipeable } from 'react-native-gesture-handler';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { Feather, MaterialIcons } from '@expo/vector-icons';
 
 const SkeletonCard = () => (
-  <View style={[styles.card, { opacity: 0.6, backgroundColor: '#f2f2f2' }]}>
+  <View style={[styles.card, styles.skeletonCard]}>
     <View style={styles.cardLeft}>
-      <View style={{ width: 180, height: 14, backgroundColor: '#e0e0e0', borderRadius: 6, marginBottom: 8 }} />
-      <View style={{ width: 220, height: 12, backgroundColor: '#e9e9e9', borderRadius: 6 }} />
+      <View style={[styles.skeletonText, { width: 180, height: 14 }]} />
+      <View style={[styles.skeletonMessage, { width: 220, height: 12 }]} />
     </View>
     <View style={styles.cardRight}>
-      <View style={{ width: 36, height: 12, backgroundColor: '#e0e0e0', borderRadius: 6 }} />
+      <View style={[styles.skeletonTime, { width: 36, height: 12 }]} />
     </View>
   </View>
 );
@@ -35,49 +35,22 @@ const NotificationItem = ({ item, onMarkRead, onDelete }: { item: Notification; 
     >
       <View style={styles.card}>
         <TouchableOpacity
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            flex: 1,
-            gap: 12,
-            paddingVertical: 10,
-          }}
+          style={styles.cardTouchable}
           activeOpacity={0.8}
           onPress={() => onMarkRead(item.id)}
         >
-          <View
-            style={{
-              padding: 12,
-              backgroundColor: '#edededff',
-              borderRadius: 100,
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
+          <View style={styles.itemIconContainer}>
             <Image
-              source={require('@/assets/images/bell.png')}
+              source={item.logoThumbnail}
               style={styles.itemIcon}
             />
           </View>
 
-          <View
-            style={{
-              flex: 1,
-              flexDirection: 'column',
-              justifyContent: 'center',
-            }}
-          >
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}
-            >
+          <View style={styles.cardContent}>
+            <View style={styles.titleRow}>
               <ThemedText
                 type="defaultSemiBold"
-                style={{ color: item.unread ? '#111' : '#9f9f9fff', flex: 1 }}
+                style={[styles.titleText, { color: item.unread ? '#111' : '#9f9f9fff' }]}
                 numberOfLines={1}
                 ellipsizeMode="tail"
               >
@@ -97,7 +70,8 @@ const NotificationItem = ({ item, onMarkRead, onDelete }: { item: Notification; 
             <ThemedText
               style={[
                 styles.message,
-                { marginTop: 6, color: item.unread ? '#444' : '#888' },
+                styles.messageText,
+                { color: item.unread ? '#444' : '#888' },
               ]}
               numberOfLines={2}
               ellipsizeMode="tail"
@@ -173,40 +147,40 @@ export default function NotificationsScreen() {
 
   if (isLoading) {
     return (
-      <ThemedView style={styles.container}>
+      <SafeAreaView style={styles.container}>
         <ThemedText  type="title">Notification</ThemedText>
-        <View style={{ paddingTop: 16 }}>
+        <View style={styles.loadingPadding}>
           <SkeletonCard />
           <View style={{ height: 8 }} />
           <SkeletonCard />
           <View style={{ height: 8 }} />
           <SkeletonCard />
         </View>
-      </ThemedView>
+      </SafeAreaView>
     );
   }
 
   return (
-    <ThemedView style={styles.container}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-        <TouchableOpacity  style={{ padding: 8 }}>
-           <MaterialIcons name="arrow-back" size={18} color="#595959ff" />
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.backButton}>
+            <Feather name="arrow-left" size={24} color="#1A2373" />
         </TouchableOpacity>
-        <ThemedText style={{color: '#111' ,fontSize:24}} type="title" >Notification</ThemedText>
-        <TouchableOpacity onPress={markAllRead} >
-          <ThemedText style={{ color: '#FF6A45' }}>Mark all as read</ThemedText>
+        <ThemedText style={styles.headerTitle} type="title" >Notification</ThemedText>
+        <TouchableOpacity style={styles.markAllButton} onPress={markAllRead} >
+          <ThemedText style={styles.markAllText}>Mark all as read</ThemedText>
         </TouchableOpacity>
       </View>
 
-      <View style={{ marginTop: 12 }}>
+      <View style={styles.searchMargin}>
         <View style={styles.searchContainer}>
           <MaterialIcons name="search" size={18} color="#9BA1A6" />
-          <TextInput value={search} onChangeText={setSearch} placeholder="Search" style={styles.searchInput} />
+          <TextInput value={search} onChangeText={setSearch} placeholder="Search" placeholderTextColor="#C7C8C9" style={styles.searchInput} />
         </View>
       </View>
 
       {error ? (
-        <View style={{ paddingTop: 16 }}>
+        <View style={styles.errorPadding}>
           <ThemedText>{error}</ThemedText>
           <TouchableOpacity onPress={load} style={{ marginTop: 12 }}>
             <ThemedText>Try again</ThemedText>
@@ -219,20 +193,11 @@ export default function NotificationsScreen() {
           ))}
           keyExtractor={(i) => i.id}
           renderItem={({ item }) => <NotificationItem item={item} onMarkRead={handleMarkRead} onDelete={handleDelete} />}
-          ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
-          contentContainerStyle={{ paddingTop: 16, paddingBottom: 32, flexGrow: 1 }}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
+          contentContainerStyle={styles.listContainer}
           ListEmptyComponent={() => (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: 24 }}>
-              <View
-                style={{
-                  padding: 12,
-                  paddingHorizontal: 16,
-                  backgroundColor: '#edededc1',
-                  borderRadius: 100,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}
-              >
+            <View style={styles.emptyContainer}>
+              <View style={styles.emptyIconContainer}>
                 <Image source={require('@/assets/images/bell.png')} style={styles.emptyIcon} />
               </View>
               <ThemedText type="subtitle" style={{ marginTop: 12 }}>No message yet</ThemedText>
@@ -240,6 +205,6 @@ export default function NotificationsScreen() {
           )}
         />
       )}
-    </ThemedView>
+    </SafeAreaView>
   );
 }

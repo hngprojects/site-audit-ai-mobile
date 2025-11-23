@@ -4,6 +4,7 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
 
 import { useAuthGuard } from '@/hooks/use-auth-guard';
@@ -46,22 +47,25 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack initialRouteName='splash'>
-        <Stack.Screen name="splash" options={{ headerShown: false }} />
-        <Stack.Screen name="(main)" options={{ headerShown: false }} />
-        <Stack.Screen name="(reports)" options={{ headerShown: false }} />
-        <Stack.Screen name="(profile)" options={{ headerShown: false }} />
-        <Stack.Screen name="(settings)" options={{ headerShown: false }} />
-        <Stack.Screen name="(support)" options={{ headerShown: false }} />
-        <Stack.Screen name="(general)" options={{ headerShown: false }} />
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="(account)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-      </Stack>
-      <StatusBar style="dark" />
-    </ThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <Stack initialRouteName='splash'>
+          <Stack.Screen name="splash" options={{ headerShown: false }} />
+          <Stack.Screen name="(main)" options={{ headerShown: false }} />
+          <Stack.Screen name="(reports)" options={{ headerShown: false }} />
+          <Stack.Screen name="(profile)" options={{ headerShown: false }} />
+          <Stack.Screen name="(settings)" options={{ headerShown: false }} />
+          <Stack.Screen name="(support)" options={{ headerShown: false }} />
+          <Stack.Screen name="(general)" options={{ headerShown: false }} />
+          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+          <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="(account)" options={{ headerShown: false }} />
+          <Stack.Screen name="(notifications)" options={{ headerShown: false }} />
+          <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+        </Stack>
+        <StatusBar style="dark" />
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }
