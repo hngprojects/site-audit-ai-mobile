@@ -2,9 +2,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { FlatList, View, TouchableOpacity, Alert, Animated, TextInput, Image } from 'react-native';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
-import styles from '@/Stylesheets/notifications-screen-stylesheet';
-import { getNotifications, markAsRead, deleteNotification } from '@/Service/notifications';
-import type { Notification } from '@/Service/notifications';
+import styles from '@/stylesheets/notifications-screen-stylesheet';
+import { getNotifications, markAsRead, deleteNotification } from '@/service/notifications';
+import type { Notification } from '@/service/notifications';
 import { Swipeable } from 'react-native-gesture-handler';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 

@@ -1,5 +1,3 @@
-import { getAllCountries } from '@/Service/httpsRequest';
-import styles from '../Stylesheets/LanguageScreenStylesheet';
 import { Country } from '@/type';
 import Feather from '@expo/vector-icons/Feather';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
@@ -8,6 +6,8 @@ import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, Image, Keyboard, KeyboardAvoidingView, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { getAllCountries } from '../service/httpsRequest';
+import styles from '../stylesheets/language-screen-stylesheet';
 
 
 const Index = () => {
@@ -128,7 +128,7 @@ const Index = () => {
           </View>
 
             <TouchableOpacity
-              onPress={() => router.replace('/(onboarding)' as any)}
+              onPress={() => router.replace("./signUp")}
               style={styles.continueButton}>
               <Text style={styles.btnText}>
                 Continue

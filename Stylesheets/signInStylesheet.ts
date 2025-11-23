@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
         marginTop: 12
     },
     passwordTextInput: {
-        fontSize: 20,
+        fontSize: 18,
     },
     signUpButton: {
         width: '100%',

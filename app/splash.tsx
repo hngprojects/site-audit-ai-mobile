@@ -1,3 +1,4 @@
+import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { useRouter } from 'expo-router';
 import React, { useEffect } from 'react';
 import { Image, ImageBackground, View } from 'react-native';
@@ -6,14 +7,21 @@ const Splash = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      router.replace('/'); 
+    const timer = setTimeout(async () => {
+      // Check if onboarding has been completed
+      const onboardingCompleted = await storage.getItem<boolean>(STORAGE_KEYS.ONBOARDING_COMPLETED);
 
-       return () => clearTimeout(timer);
+      if (onboardingCompleted) {
+        // Onboarding already completed, go directly to homepage
+        router.replace('./(tabs)/');
+      } else {
+        // First time, show onboarding
+        router.replace('./(onboarding)');
+      }
     }, 3000);
 
     return () => clearTimeout(timer); 
-  }, []);
+  }, [router]);
 
   return (
     <View style={{ flex: 1 }}>
