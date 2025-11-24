@@ -3,6 +3,8 @@ import { StyleSheet } from "react-native";
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        paddingHorizontal: "5%",
+        marginTop: '10%',
         backgroundColor: "#fff",
     },
     header: {
@@ -115,7 +117,7 @@ const styles = StyleSheet.create({
         padding: 10
     },
     textInput: {
-        fontSize: 20,     
+        fontSize: 20,
         padding: 10
     },
     countryList: {
@@ -141,7 +143,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         backgroundColor: "#D32f2f",
         marginTop: 50,
-        padding: 10, 
+        padding: 10,
         justifyContent: "center",
         alignItems: 'center',
         paddingVertical: 8
@@ -154,4 +156,3 @@ const styles = StyleSheet.create({
 })
 
 export default styles;
-

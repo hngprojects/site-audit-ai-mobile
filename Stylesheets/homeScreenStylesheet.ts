@@ -4,7 +4,8 @@ export default StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    paddingHorizontal: "5%",
+    paddingHorizontal: 16,
+    paddingTop: 20,
   },
 
   notificationContainer: {
@@ -14,10 +15,10 @@ export default StyleSheet.create({
   },
 
   title: {
-    fontSize: 22,
+    fontSize: 28,
     fontFamily: "RethinkSans-Bold",
     fontWeight: "700",
-    color: "#000",
+    color: "#1C1C1c",
     marginBottom: 6,
     textAlign: "center",
   },
@@ -26,7 +27,7 @@ export default StyleSheet.create({
     alignItems: "center"
    },
   sub: {
-    color: "#555",
+    color: "#494949",
     fontSize: 14,
     marginBottom: 38,
     marginTop: 5,
@@ -34,12 +35,15 @@ export default StyleSheet.create({
   },
 
   inputPlaceholder: {
-    backgroundColor: "#F7F7F7",
-    paddingVertical: 5,
+    backgroundColor: "#FEFFFF",
+    paddingVertical: 14,
     paddingHorizontal: 16,
     borderRadius: 12,
-    marginBottom: 20,
-    borderWidth: 2,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "#C7C8C9",
+    fontFamily: "RethinkSans-Regular",
+    fontSize: 16,
     marginTop: 5,
     flexDirection: "row",
     alignItems: "center",
@@ -50,7 +54,7 @@ export default StyleSheet.create({
 
   placeholderText: {
     color: "#000",
-    fontSize: 15,
+    fontSize: 16,
   },
 
   invalidLink: {
@@ -94,9 +98,9 @@ export default StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 30,
-    backgroundColor: "#F04438",
+    backgroundColor: "#FF5A3D",
     paddingVertical: 14,
-    paddingHorizontal: 24,
+    paddingHorizontal: 16,
     borderRadius: 10,
     shadowColor: "#000",
     shadowOpacity: 0.15,
@@ -112,7 +116,7 @@ export default StyleSheet.create({
   runButtonText: {
     color: "#fff",
     fontWeight: "600",
-    fontSize: 15,
+    fontSize: 16,
      fontFamily: "RethinkSans-SemiBold"
   },
 });

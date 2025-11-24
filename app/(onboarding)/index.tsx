@@ -16,8 +16,6 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-
-
 const { width } = Dimensions.get("window");
 
 
@@ -54,19 +52,19 @@ const Onboarding = () => {
     } else {
       // Mark onboarding as completed and navigate to homepage
       await storage.setItem(STORAGE_KEYS.ONBOARDING_COMPLETED, true);
-      router.replace('./(tabs)/' as RelativePathString); 
+      router.replace('./(tabs)/' as RelativePathString);
     }
   };
 
   return (
     <View style={{...styles.container, paddingTop: inset.top, paddingBottom: inset.bottom - 15}}>
-      
+
       <TouchableOpacity
       onPress={async () => {
         // Mark onboarding as completed when skipped and navigate to homepage
         await storage.setItem(STORAGE_KEYS.ONBOARDING_COMPLETED, true);
         router.replace('./(tabs)/' as RelativePathString);
-      }} 
+      }}
         style={styles.skipButton}
        >
         <Text style={styles.skipText}>Skip</Text>
@@ -87,7 +85,7 @@ const Onboarding = () => {
         viewabilityConfig={viewabilityConfig}
         renderItem={({ item }) => (
           <View style={[styles.slide, { width }]}>
-            
+             
             <Image
               source={item.image}
               style={styles.image}
@@ -135,4 +133,3 @@ const Onboarding = () => {
 }
 
 export default Onboarding;
-

@@ -10,9 +10,6 @@ import { getAllCountries } from '../service/httpsRequest';
 import styles from '../stylesheets/language-screen-stylesheet';
 
 
-
-
-
 const Index = () => {
   const router = useRouter();
   const inset = useSafeAreaInsets();
@@ -130,7 +127,7 @@ const Index = () => {
             )}
           </View>
 
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => router.replace("./signUp")}
               style={styles.continueButton}>
               <Text style={styles.btnText}>

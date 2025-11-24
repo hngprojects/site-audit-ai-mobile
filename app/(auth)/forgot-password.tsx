@@ -51,8 +51,8 @@ const ForgotPassword = () => {
     }
 
   return (
-    <View 
-        style={{paddingTop: inset.top, 
+    <View
+        style={{paddingTop: inset.top,
             paddingBottom: inset.bottom,
             backgroundColor: "#fff",
             flex: 1,
@@ -62,7 +62,7 @@ const ForgotPassword = () => {
         {!verificationEmail && (
         <>
         <View style= {styles.headerSection}>
-            <TouchableOpacity 
+            <TouchableOpacity
             onPress={router.back}
             style={styles.backarrow}>
                  <Ionicons name="arrow-back" size={24} color="black" />
@@ -71,17 +71,17 @@ const ForgotPassword = () => {
             <Text style={styles.headerText}>
                 Forgot Password
             </Text>
-            
+
         </View>
         <Text style={{...styles.createAccountTitle}}>
-            Enter your email and we&apos;ll send you a mail to reset your password.
+            Enter your email and we&#39;ll send you a mail to reset your password.
         </Text>
-      
-      
+
+
         <Text style={{...styles.textInputLabel}}>
             Email
         </Text>
-      
+
         <TextInput
             placeholder="user@gmail.com"
             style={[
@@ -104,13 +104,13 @@ const ForgotPassword = () => {
         )}
 
             {loading ? (
-                <ActivityIndicator 
-                    size="large" 
-                    color="#ff5a3d" 
-                    style={{marginTop: 20}} 
+                <ActivityIndicator
+                    size="large"
+                    color="#ff5a3d"
+                    style={{marginTop: 20}}
                 />
             ) : (
-                <TouchableOpacity 
+                <TouchableOpacity
                     onPress={sendingResetCode}
                     style={styles.continueButton}>
                         <Text style={styles.continueText}>
@@ -132,12 +132,12 @@ const ForgotPassword = () => {
                     Check your email
                  </Text>
                  <Text style={styles.subText}>
-                    We&apos;ve sent a password code to your email 
-                    address, pls check your inbox
+                   We&#39;ve sent a password code to your email
+                   address, pls check your inbox
                  </Text>
 
-                
-                    <TouchableOpacity 
+
+                    <TouchableOpacity
                         onPress={() => router.push('/(auth)/otp-verification')}
                         style={[styles.continueButton, Platform.OS === 'ios' ? {marginTop: 220 } : {marginTop: 140 }]}
                     >
@@ -147,13 +147,10 @@ const ForgotPassword = () => {
                     </TouchableOpacity>
             </View>
 
-            
         )}
 
-      
     </View>
   )
 }
 
 export default ForgotPassword
-
