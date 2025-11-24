@@ -7,7 +7,6 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from "expo-router";
 import React, { useEffect } from "react";
 import {
-  ActivityIndicator,
   Alert,
   FlatList,
   Text,
@@ -18,6 +17,19 @@ import {
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+const SkeletonCard = () => (
+  <View style={styles.skeletonCard}>
+    <View style={styles.skeletonLeft}>
+      <View style={[styles.skeletonText, { width: 200, height: 16, marginBottom: 12 }]} />
+      <View style={[styles.skeletonText, { width: 150, height: 14, marginBottom: 8 }]} />
+      <View style={[styles.skeletonText, { width: 120, height: 12 }]} />
+    </View>
+    <View style={styles.skeletonRight}>
+      <View style={[styles.skeletonText, { width: 100, height: 14 }]} />
+    </View>
+  </View>
+);
 
 interface SwipeableRowProps {
   item: ReportItemProps;
@@ -137,7 +149,15 @@ const ReportsScreen: React.FC = () => {
         
 
         {isLoading ? (
-          <ActivityIndicator size="large" color={"#F04438"} style={{ flex: 1, justifyContent: "center", alignItems: "center" }} />
+          <View style={styles.listWrap}>
+            <SkeletonCard />
+            <View style={styles.separator} />
+            <SkeletonCard />
+            <View style={styles.separator} />
+            <SkeletonCard />
+            <View style={styles.separator} />
+            <SkeletonCard />
+          </View>
         ) : (
           <FlatList
             data={filteredData}
