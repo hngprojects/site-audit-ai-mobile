@@ -35,7 +35,7 @@ const ContactSupportContent = () => {
       <ScrollView
         style={styles.scrollContainer}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 100 }}
+        contentContainerStyle={{ marginTop: 16, paddingBottom: 100 }}
       >
         <View style={styles.content}>
           <Text style={styles.title}>How can we help?</Text>
@@ -44,8 +44,14 @@ const ContactSupportContent = () => {
               key={index}
               style={styles.supportItem}
               onPress={() => {
-                if (item.title === 'Email Support') {
+                if (item.title === 'Live Chat') {
+                  router.push('/(support)/live-chat-support');
+                } else if (item.title === 'Email Support') {
                   router.push('/(support)/email-support');
+                } else if (item.title === 'Phone Support') {
+                  router.push('/(support)/phone-support');
+                } else if (item.title === 'Send a Message') {
+                  router.push('/(support)/send-message');
                 }
               }}
             >

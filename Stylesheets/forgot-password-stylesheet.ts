@@ -14,7 +14,7 @@ const styles = StyleSheet.create({
         marginTop: 15
     },
     textInput: {
-        fontSize: 20,     
+        fontSize: 20,
         padding: 10,
         borderWidth: 1,
         borderColor: "#babec6",
@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         backgroundColor: "#ff5a3d",
         marginTop: 35,
-        padding: 10, 
+        padding: 10,
         justifyContent: "center",
         alignItems: 'center',
         paddingVertical: 8
@@ -80,8 +80,8 @@ const styles = StyleSheet.create({
         shadowColor: "#e64e4e34",
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 1,
-        shadowRadius: 40, 
-        elevation: 20,   
+        shadowRadius: 40,
+        elevation: 20,
     },
     Icon: {
         justifyContent: 'center',
@@ -109,8 +109,7 @@ const styles = StyleSheet.create({
         fontSize: 14,
         marginTop: 8,
     }
-    
+
   })
 
 export default styles;
-

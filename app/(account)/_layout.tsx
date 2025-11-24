@@ -6,6 +6,7 @@ export default function AccountLayout() {
       <Stack.Screen name="delete-account-screen" options={{ headerShown: false }} />
       <Stack.Screen name="delete-account-verification" options={{ headerShown: false }} />
       <Stack.Screen name="delete-account-choice-selection" options={{ headerShown: false }} />
+      <Stack.Screen name="delete-account-final-confirmation" options={{ headerShown: false }} />
       <Stack.Screen name="deletion-confirmation-screen" options={{ headerShown: false }} />
     </Stack>
   );

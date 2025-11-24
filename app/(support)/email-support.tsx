@@ -7,14 +7,40 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 const EmailSupportContent = () => {
   const router = useRouter();
+  const [email, setEmail] = useState('user@gmail.com');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
 
+  const isValidEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const handleSend = () => {
-    if (!subject.trim() || !message.trim()) {
-      Alert.alert('Error', 'Please fill in all fields');
+    const trimmedEmail = email.trim();
+    const trimmedSubject = subject.trim();
+    const trimmedMessage = message.trim();
+
+    if (!trimmedEmail) {
+      Alert.alert('Error', 'Please enter your email address');
       return;
     }
+
+    if (!isValidEmail(trimmedEmail)) {
+      Alert.alert('Error', 'Please enter a valid email address');
+      return;
+    }
+
+    if (!trimmedSubject) {
+      Alert.alert('Error', 'Please enter a subject');
+      return;
+    }
+
+    if (!trimmedMessage) {
+      Alert.alert('Error', 'Please enter your message');
+      return;
+    }
+
     Alert.alert('Success', 'Your email has been sent successfully');
     router.back();
   };
@@ -30,11 +56,25 @@ const EmailSupportContent = () => {
       <ScrollView
         style={styles.scrollContainer}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 100 }}
+        contentContainerStyle={{ marginTop: 16, paddingBottom: 100 }}
       >
         <View style={styles.content}>
-          <Text style={styles.title}>Contact Us</Text>
-          <Text style={styles.subtitle}>Send us an email and we will respond within 24 hours</Text>
+          {/* <Text style={styles.title}>Contact Us</Text>
+          <Text style={styles.subtitle}>Send us an email and we will respond within 24 hours</Text> */}
+
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Your Email</Text>
+            <TextInput
+              style={styles.input}
+              value={email}
+              onChangeText={setEmail}
+              placeholder="user@gmail.com"
+              placeholderTextColor="#999"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+          </View>
 
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Subject</Text>
@@ -42,7 +82,7 @@ const EmailSupportContent = () => {
               style={styles.input}
               value={subject}
               onChangeText={setSubject}
-              placeholder="Enter subject"
+              placeholder="e.g Inquiry"
               placeholderTextColor="#999"
             />
           </View>
@@ -53,7 +93,7 @@ const EmailSupportContent = () => {
               style={[styles.input, styles.messageInput]}
               value={message}
               onChangeText={setMessage}
-              placeholder="Enter your message"
+              placeholder="Type your message here..."
               placeholderTextColor="#999"
               multiline
               numberOfLines={6}
@@ -62,7 +102,7 @@ const EmailSupportContent = () => {
           </View>
 
           <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
-            <Text style={styles.sendButtonText}>Send Email</Text>
+            <Text style={styles.sendButtonText}>Send Message</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

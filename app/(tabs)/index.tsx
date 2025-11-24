@@ -1,7 +1,6 @@
 import AuditResultCard from "@/components/auditResultCard";
 import EmptyState from "@/components/homeScreenEmptyState";
 import styles from "@/stylesheets/homeScreenStylesheet";
-import { validateWebsiteUrl } from "@/utils/url-validation";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Octicons from "@expo/vector-icons/Octicons";
 import { router } from "expo-router";
@@ -13,7 +12,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function HomeScreen() {
   const [websiteUrl, setWebsiteUrl] = useState<string>('');
   const [urlAvailable, setUrlAvailable] = useState<boolean>(true);
-  const [errorMessage, setErrorMessage] = useState<string>('');
+
+
 
   const [audits] = useState([
     { url: "http://www.figma.com", status: "Passed" },
@@ -30,29 +30,22 @@ export default function HomeScreen() {
   };
 
   const RunAudit = () => {
-    const validation = validateWebsiteUrl(websiteUrl);
-    
-    if (!validation.isValid) {
-      setUrlAvailable(false);
-      setErrorMessage(validation.error);
-      return;
+    if (websiteUrl === "") {
+      return setUrlAvailable(false)
     }
-
-    setUrlAvailable(true);
-    setErrorMessage('');
-    
     return router.push({
       pathname: "/(main)/auditing-screen",
       params: {
-        url: websiteUrl.trim(),
+        url: websiteUrl,
       },
     });
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      style={styles.container}>
 
-      <TouchableOpacity style={styles.notificationContainer}>
+      <TouchableOpacity style={styles.notificationContainer} onPress={() => router.push('/(main)/notifications')}>
         <Octicons name="bell" size={24} color="black" />
       </TouchableOpacity>
 
@@ -65,9 +58,9 @@ export default function HomeScreen() {
       </View>
 
 
-      <View style={[styles.inputPlaceholder, { borderColor: !urlAvailable ? "#d32f2f" : "#bbbcbc", }]}>
+      <View style={[styles.inputPlaceholder, { borderColor: !urlAvailable ? "#d32f2f" : "#C7C8C9", }]}>
         <MaterialCommunityIcons
-          name="web" size={24}
+          name="web" size={15}
           color="#A0A0A0"
           style={styles.webIcon}
         />
@@ -75,14 +68,14 @@ export default function HomeScreen() {
           placeholder="Enter your website URL"
           placeholderTextColor={"#A0A0A0"}
           style={styles.placeholderText}
-          onChangeText={handleUrlChange}
-          value={websiteUrl.toLocaleLowerCase()}
-          keyboardType="url"
+          onChangeText={x => setWebsiteUrl(x)}
         />
       </View>
-      {!urlAvailable && errorMessage && (
-        <Text style={styles.invalidLink}>{errorMessage}</Text>
+      {!urlAvailable && (
+        <Text style={styles.invalidLink}>Invalid link. Please try again</Text>
       )}
+
+
 
       <TouchableOpacity
         onPress={RunAudit}
@@ -122,6 +115,8 @@ export default function HomeScreen() {
 
         <View style={{ height: 100 }} />
       </ScrollView>
+
+
 
     </SafeAreaView>
   );

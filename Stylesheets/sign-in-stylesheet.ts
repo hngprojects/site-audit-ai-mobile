@@ -120,13 +120,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   SocialSIgninButton: {
-      
+
   },
   Google: {
 
   },
   AppleSocialSIgninButton: {
-    
+
   },
 });
 
