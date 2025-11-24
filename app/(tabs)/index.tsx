@@ -1,6 +1,7 @@
 import AuditResultCard from "@/components/auditResultCard";
 import EmptyState from "@/components/homeScreenEmptyState";
 import styles from "@/stylesheets/homeScreenStylesheet";
+import { validateWebsiteUrl } from "@/utils/url-validation";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Octicons from "@expo/vector-icons/Octicons";
 import { router } from "expo-router";
@@ -12,8 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function HomeScreen() {
   const [websiteUrl, setWebsiteUrl] = useState<string>('');
   const [urlAvailable, setUrlAvailable] = useState<boolean>(true);
-
-
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
   const [audits] = useState([
     { url: "http://www.figma.com", status: "Passed" },
@@ -30,13 +30,21 @@ export default function HomeScreen() {
   };
 
   const RunAudit = () => {
-    if (websiteUrl === "") {
-      return setUrlAvailable(false)
+    const validation = validateWebsiteUrl(websiteUrl);
+    
+    if (!validation.isValid) {
+      setUrlAvailable(false);
+      setErrorMessage(validation.error);
+      return;
     }
-    return router.push({
+    
+    setUrlAvailable(true);
+    setErrorMessage('');
+    
+    router.push({
       pathname: "/(main)/auditing-screen",
       params: {
-        url: websiteUrl,
+        url: websiteUrl.trim(),
       },
     });
   }
@@ -68,11 +76,15 @@ export default function HomeScreen() {
           placeholder="Enter your website URL"
           placeholderTextColor={"#A0A0A0"}
           style={styles.placeholderText}
-          onChangeText={x => setWebsiteUrl(x)}
+          value={websiteUrl.toLocaleLowerCase()}
+          onChangeText={handleUrlChange}
+          autoCapitalize="none"
+          autoCorrect={false}
+          keyboardType="url"
         />
       </View>
-      {!urlAvailable && (
-        <Text style={styles.invalidLink}>Invalid link. Please try again</Text>
+      {!urlAvailable && errorMessage && (
+        <Text style={styles.invalidLink}>{errorMessage}</Text>
       )}
 
 
