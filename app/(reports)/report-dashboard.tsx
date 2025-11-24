@@ -12,6 +12,7 @@ import {
 } from "react-native";
 
 import IssueCard from "@/components/issue-card";
+import { useSelectedIssuesStore } from "@/store/audit-summary-selected-issue-store";
 import { Status } from "@/type";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Feather from '@expo/vector-icons/Feather';
@@ -22,9 +23,19 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 
 
 
+
 export default function ReportDashboard() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [modalTextInput, setModalTextInput] = useState<string>('')
+  const [emptyModalTextInput, setEmptyModalTextInput] = useState<boolean>(false)
+
+  const { addIssue } = useSelectedIssuesStore();
+
+  const { issues } = useSelectedIssuesStore();
+
+
+  
 
 const params = useLocalSearchParams();
 
@@ -35,14 +46,83 @@ const scanDate = Array.isArray(params.scanDate) ? params.scanDate[0] : params.sc
 
 
 
+
+const hireAPro = () => {
+
+
+  try {
+   
+    if (issues.length < 1){
+      return alert ("Please select the issues you want our professionals to assist you with ")
+    }
+   
+    
+    //navigate to  fix/hire professional
+    router.push("/(hireRequest)/hire-request");
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+
   const router = useRouter();
 
 
 
   const statusColor = (s: Status) =>
-    s === "low" ? reportColors.scoreLow :
-    s === "high" ? reportColors.scoreHigh :
+    s === "Critical" ? reportColors.scoreLow :
+    s === "Good" ? reportColors.scoreHigh :
     reportColors.scoreMedium;
+  
+
+  const modalContinueButton = () => {
+    if (modalTextInput.trim() === "") {
+      setEmptyModalTextInput(true);
+      return;
+    }
+
+    alert("We've sent you an email");
+    setShowModal(false);
+  };
+
+
+
+
+    const ISSUE_LIST = [
+  {
+    id: "Loading-speed",
+    title: "Loading speed",
+    score: String(Math.floor(Math.random() * 71) + 30),
+    description:
+      "Your website takes longer than average to load, which can affect user experience and SEO.",
+  },
+  {
+    id: "Mobile-friendly",
+    title: "Mobile Friendly",
+    score: String(Math.floor(Math.random() * 71) + 30),
+    description:
+      "Your website takes longer than average to load, which can affect user experience and SEO.",
+  },
+  {
+    id: "Visibility",
+    title: "Visibility",
+    score: String(Math.floor(Math.random() * 71) + 30),
+    description:
+      "Your website takes longer than average to load, which can affect user experience and SEO.",
+  },
+];
+
+
+// Function to add all issues to the store
+   
+    const addAllToSiteIssueStore = () => {
+      ISSUE_LIST.forEach((issue) => {
+        addIssue(issue);
+      });
+    }
+
+
+
 
 
   useEffect(() => {
@@ -53,6 +133,18 @@ const scanDate = Array.isArray(params.scanDate) ? params.scanDate[0] : params.sc
     return () => clearTimeout(timer);
   }, []);
 
+
+  // for modal to come-up automatically
+
+  useEffect(() => {
+  const modalTimer = setTimeout(() => {
+    setShowModal(true);
+  }, 7000); 
+
+  return () => clearTimeout(modalTimer);
+}, []);
+
+
   if (!isLoaded) {
     return (
       <View style={styles.loadingContainer}>
@@ -62,7 +154,7 @@ const scanDate = Array.isArray(params.scanDate) ? params.scanDate[0] : params.sc
   }
 
   return (
-    <View style={styles.screenContainer}>
+    <View style={[styles.screenContainer]}>
       <ScrollView showsVerticalScrollIndicator={false}>
 
         <View style={{flexDirection: 'row', alignItems: 'center', gap: 20, marginBottom: 20,  paddingHorizontal: 20, paddingTop: 10, marginTop: 35,}}>
@@ -109,55 +201,62 @@ const scanDate = Array.isArray(params.scanDate) ? params.scanDate[0] : params.sc
         </View>
 
         
-        <View style={styles.card}>
+        <View style={{paddingHorizontal: 25, marginVertical: 5, marginTop: 15}}>
           <Text style={[styles.scoreText, { color: statusColor(status as Status) }]}>{score}</Text>
           <Text style={{...styles.cardLabel, color: "#000"}}>Website Score</Text>
-          <Text style={{...styles.cardLabel, color: "#dfdfdfff"}}>Scan Date: {scanDate}</Text>
+          <Text style={{...styles.cardLabel, color: "#dfdfdfff", marginTop: 5}}>Scan Date: {scanDate}</Text>
           <Text style={{color: "#000", fontFamily: "RethinkSans-Medium", fontSize: 13, marginTop: 20, }}>
-            Your website performs wewll but has several issues worth fixing
+            {status === "low" ? "Your website is performing poorly. Immediate improvements are needed to enhance user experience and SEO." : 
+            status === "high" ? "Great job! Your website is performing well. Keep up the good work to maintain and further enhance user experience and SEO. Fix the issues below to make it even better."  : 
+            "Your website has an average performance. There is room for improvement to boost user experience and SEO." }
             </Text>
         </View>
 
-        <View>
-          <Text style={{marginLeft: "auto", marginTop: 20, marginBottom: 20, marginRight: 20, color: "blue"}}>Mark All</Text>
-        </View>
+        <TouchableOpacity onPress={addAllToSiteIssueStore}>
+          <Text 
+            style={{
+              marginLeft: "auto", 
+              marginTop: 20, 
+              marginBottom: 20, 
+              marginRight: 20, 
+              color: "blue"
+            }}
+          >
+            Mark All
+          </Text>
+        </TouchableOpacity>
 
         <View style={{paddingHorizontal: "5%",}}>
 
-        <IssueCard 
-          title="Slow loading speed"
-          score={score}
-          status={status}
-          description="Your website takes longer than average to load, which can affect user experience and SEO."
-          noIssuesLabel="No issues with loading speed."
-        />
-        <IssueCard 
-          title="Not Mobile Friendly"
-          score={score}
-          status={status}
-          description="Your website takes longer than average to load, which can affect user experience and SEO."
-          noIssuesLabel="No issues with loading speed."
-        />
-        <IssueCard 
-          title="Visibility"
-          score={score}
-          status={status}
-          description="Your website takes longer than average to load, which can affect user experience and SEO."
-          noIssuesLabel="No issues with loading speed."
-        />
-        <IssueCard 
-          title="Slow loading speed"
-          score={score}
-          status={status}
-          description="Your website takes longer than average to load, which can affect user experience and SEO."
-          noIssuesLabel="No issues with loading speed."
-        />
-          
+          {ISSUE_LIST.map((issue) => (
+            <IssueCard
+              key={issue.id}
+              id={issue.id}
+              title={issue.title}
+              score={issue.score}
+              description={issue.description}
+              status={status}
+              onPressDetails={() =>
+                router.push({
+                  pathname: "/[id]", 
+                  params: {
+                    id: issue.id,
+                    title: issue.title,
+                    score: issue.score,
+                    description: issue.description,
+                    status: status,
+                  },
+                })
+              }
+            />
+          ))}
+
+       
         </View>
 
         <View>
           <Text
-          style={{textAlign: "center", marginTop: 12, marginBottom: 10, fontSize: 12, fontFamily: "RethinkSans-Medium", color: "#656566ff",}}
+          style={{textAlign: "center", marginTop: 18, fontSize: 14, fontFamily: "RethinkSans-Medium", color: "#656566ff",}}
           >
             Get your sales up with a free review from an expert
           </Text>
@@ -167,7 +266,7 @@ const scanDate = Array.isArray(params.scanDate) ? params.scanDate[0] : params.sc
         
         <TouchableOpacity
           style={styles.continueBtn}
-          onPress={() => setShowModal(true)}
+          onPress={hireAPro} 
         >
           <Text style={styles.continueText}>Continue</Text>
         </TouchableOpacity>
@@ -180,6 +279,14 @@ const scanDate = Array.isArray(params.scanDate) ? params.scanDate[0] : params.sc
       <Modal transparent visible={showModal} animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.modalBox}>
+
+            <TouchableOpacity 
+              onPress={() => setShowModal(false)}
+              style={{ position: "absolute",  right: 5 , margin: 10, paddingBottom: 15}}
+            >
+              <Ionicons name="close" size={30} color="#e24017ff" />
+            </TouchableOpacity>
+
             <Text style={styles.modalTitle}>Your website can be better</Text>
 
             <Text style={styles.modalSubtitle}>
@@ -189,22 +296,37 @@ const scanDate = Array.isArray(params.scanDate) ? params.scanDate[0] : params.sc
          <View>
             <TextInput
             placeholder="Enter Email"
+            onChangeText={(x) => {
+              setModalTextInput(x);
+              if (emptyModalTextInput && x !== "") setEmptyModalTextInput(false);
+            }}
             placeholderTextColor={"#dbdbdbff"}
             style={{
               color: "#000",
               borderWidth: 1.5,
-              borderColor: "#E5E7EB",
+             borderColor: emptyModalTextInput ? "#D72D2D" : "#E5E7EB",
               borderRadius: 5,
               padding: 10,
-              marginBottom: 20,
             }}
             />
 
          </View>
+         {emptyModalTextInput && (
+          <Text style={{
+            fontFamily: "RethinkSans-Regular",
+            fontSize: 13,
+            color: "#D72D2D",
+            
+          }}>
+            Pls ensure you enter a valid email address
+          </Text>
+         )}
+
+         <View style={{marginBottom: 20}}/>
 
             <TouchableOpacity
               style={styles.modalButton}
-              onPress={() => setShowModal(false)}
+              onPress={modalContinueButton}
             >
               <Text style={styles.modalButtonText}>Got It</Text>
             </TouchableOpacity>

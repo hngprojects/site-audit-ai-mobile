@@ -31,9 +31,14 @@ export default StyleSheet.create({
     flex: 1,
     paddingHorizontal: 8,
   },
+  cardTitlesection: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
 
   issueTitle: {
-    fontFamily: "RethinkSans",
+    fontFamily: "RethinkSans-SemiBold",
     fontSize: 14,
     fontWeight: "700",
     color: "#111827",
@@ -41,21 +46,21 @@ export default StyleSheet.create({
 
   issueScore: {
     marginTop: 6,
-    fontFamily: "RethinkSans",
+    fontFamily: "RethinkSans-Medium",
     fontSize: 12,
     color: "#6B7280",
   },
 
   issueDesc: {
     marginTop: 8,
-    fontFamily: "RethinkSans",
+    fontFamily: "RethinkSans-Regular",
     fontSize: 13,
     color: "#374151",
   },
 
   viewDetails: {
     marginTop: 10,
-    fontFamily: "RethinkSans",
+    fontFamily: "RethinkSans-Regular",
     fontSize: 13,
     color: "#3F5BD9",
     fontWeight: "600",
@@ -75,7 +80,7 @@ export default StyleSheet.create({
   },
 
   badgeText: {
-    fontFamily: "RethinkSans",
+    fontFamily: "RethinkSans-Medium",
     fontSize: 12,
     fontWeight: "700",
   },
@@ -85,15 +90,30 @@ export default StyleSheet.create({
     justifyContent: "space-between",
     marginTop: 10
   },
-  viewDetailsText: {
-    fontFamily: "RethinkSans-Medium",
-    color: "#3F5BD9",
-    fontSize: 13,
-    fontWeight: "600",
-  },
   viewDetailsArrow: {
     color: "#3F5BD9",
     marginLeft: 10,
   },
-
+  statusPill: {
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: 20,
+    
+  },
+  statusText: {
+    fontWeight: "600",
+    fontFamily: "RethinkSans-Bold",
+    fontSize: 14,
+  },
+  viewDetailContainer : {
+    flexDirection: "row",
+    gap: 1,
+    marginTop: 12,
+    alignItems: "center"
+  },
+  viewDetailsText: {
+    fontFamily: "RethinkSans-Medium",
+    color: "#3F5BD9",
+    fontSize: 15,
+  },
 });

@@ -1,14 +1,14 @@
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
+import { useAuditInfoStore } from '@/store/audit-website-details-store';
 import styles from '@/stylesheets/auditing-screen-stylesheet';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect } from 'react';
-import { ActivityIndicator } from 'react-native';
+import { ActivityIndicator, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const AuditingScreen = () => {
   const router = useRouter();
   const params = useLocalSearchParams();
+  const { setAuditInfo } = useAuditInfoStore();
 
 
 
@@ -20,9 +20,9 @@ const AuditingScreen = () => {
 
   //simulating scan status based on score
   const getStatusFromScore = (score: number) => {
-  if (score >= 30 && score <= 50) return "low";
-  if (score >= 51 && score <= 69) return "medium";
-  return "high"; 
+  if (score >= 30 && score <= 49) return "Critical";
+  if (score >= 50 && score <= 69) return "Warning";
+  return "Good"; 
 };
 
 //simulating current date the scan was issued
@@ -45,45 +45,72 @@ const scanDate = getFormattedDate();
 
 
   useEffect(() => {
-    setTimeout(() => {
-      // Simulate navigation to report dashboard after scan is complete
-       //router.replace('../(reports)/report-dashboard');
-      router.replace({
-        pathname: "../(reports)/report-dashboard",
-          params: {
-            domain,
-            status,
-            score,
-            scanDate,
-        },
+  const timer = setTimeout(() => {
+    
+    setAuditInfo({
+      domain,
+      status,
+      score,
+      scanDate,
     });
 
-    }, 5000);
-  }, []);
+  
+    router.replace({
+      pathname: "../(reports)/report-dashboard",
+      params: {
+        domain,
+        status,
+        score,
+        scanDate,
+      },
+    });
+  }, 5000);
+
+  return () => clearTimeout(timer); 
+}, [router,domain,status,score,scanDate,]);
 
 
   return (
     <SafeAreaView style={styles.container}>
-      <ThemedView style={{ flex: 1 }}>
-        <ThemedView style={styles.header}>
-          <ThemedText type="title">Scanning Website...</ThemedText>
-          <ThemedText>{domain}</ThemedText>
-        </ThemedView>
-        <ThemedView style={styles.loadingContainer}>
+      <View style={{ flex: 1 }}>
+        <View style={styles.header}>
+          <Text style={{
+            fontFamily: "RethinkSans-Bold",
+            fontSize: 30,
+            color: "#000"
+          }}>
+            Scanning Website...
+          </Text>
+          <Text style={{
+            fontFamily: "RethinkSans-SemiBold",
+            fontSize: 14,
+            marginTop: 11,
+            color: "#000"
+          }}>
+            {domain}
+          </Text>
+        </View>
+        <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#ff5a3d" />
-        </ThemedView>
-        <ThemedView style={styles.content}>
+        </View>
+        <View style={styles.content}>
           {/* <Image source={require('@/assets/images/auditing-screen-image.png')} style={styles.image} /> */}
-          <ThemedText>Hang tight, Takes about 30–60 seconds</ThemedText>
-          <ThemedView style={styles.progress}>
+          <Text style={{
+            color: "#000",
+            fontFamily: "RethinkSans-Medium",
+            fontSize: 14
+          }}>
+            Hang tight, Takes about 30&ndash;60 seconds
+          </Text>
+          <View style={styles.progress}>
             {/* implement progress bar here */}
-            <ThemedText>0%</ThemedText>
-          </ThemedView>
-          <ThemedView style={styles.footer}>
+            <Text>0%</Text>
+          </View>
+          <View style={styles.footer}>
             {/* implement process messages hers */}
-          </ThemedView>
-        </ThemedView>
-      </ThemedView>
+          </View>
+        </View>
+      </View>
     </SafeAreaView>
   )
 }
