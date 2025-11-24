@@ -1,12 +1,13 @@
 import AuditResultCard from "@/components/auditResultCard";
 import EmptyState from "@/components/homeScreenEmptyState";
+import { useSitesStore } from "@/store/sites-store";
 import styles from "@/stylesheets/homeScreenStylesheet";
 import { validateWebsiteUrl } from "@/utils/url-validation";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Octicons from "@expo/vector-icons/Octicons";
 import { router } from "expo-router";
-import { useState } from "react";
-import { ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { useEffect, useState } from "react";
+import { ActivityIndicator, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 
@@ -14,12 +15,12 @@ export default function HomeScreen() {
   const [websiteUrl, setWebsiteUrl] = useState<string>('');
   const [urlAvailable, setUrlAvailable] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string>('');
+  
+  const { sites, isLoading, createSite, fetchSites } = useSitesStore();
 
-  const [audits] = useState([
-    { url: "http://www.figma.com", status: "Passed" },
-    { url: "http://www.figma.com", status: "Average" },
-    { url: "http://www.figma.com", status: "Average" },
-  ]);
+  useEffect(() => {
+    fetchSites();
+  }, [fetchSites]);
 
   const handleUrlChange = (text: string) => {
     setWebsiteUrl(text);
@@ -29,7 +30,7 @@ export default function HomeScreen() {
     }
   };
 
-  const RunAudit = () => {
+  const RunAudit = async () => {
     const validation = validateWebsiteUrl(websiteUrl);
     
     if (!validation.isValid) {
@@ -40,14 +41,40 @@ export default function HomeScreen() {
     
     setUrlAvailable(true);
     setErrorMessage('');
-    
-    router.push({
-      pathname: "/(main)/auditing-screen",
-      params: {
-        url: websiteUrl.trim(),
-      },
-    });
+
+    try {
+      const trimmedUrl = websiteUrl.trim();
+      const newSite = await createSite(trimmedUrl);
+      
+      setWebsiteUrl('');
+      
+      router.push({
+        pathname: "/(main)/auditing-screen",
+        params: {
+          url: trimmedUrl,
+          siteId: newSite.id,
+        },
+      });
+    } catch (error) {
+      setUrlAvailable(false);
+      setErrorMessage(error instanceof Error ? error.message : 'Failed to create site. Please try again.');
+    }
   }
+
+  const formatTimeAgo = (dateString?: string): string => {
+    if (!dateString) return '0';
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
+    return diffInHours.toString();
+  };
+
+  const getStatusFromScore = (score?: number): "Passed" | "Average" | "Failed" => {
+    if (!score) return "Average";
+    if (score >= 80) return "Passed";
+    if (score >= 50) return "Average";
+    return "Failed";
+  };
 
   return (
     <SafeAreaView
@@ -92,15 +119,23 @@ export default function HomeScreen() {
       <TouchableOpacity
         onPress={RunAudit}
         style={styles.runButton}
+        disabled={isLoading}
       >
-        <Text style={styles.runButtonText}>Start Scan</Text>
+        {isLoading ? (
+          <ActivityIndicator size="small" color="#fff" />
+        ) : (
+          <Text style={styles.runButtonText}>Start Scan</Text>
+        )}
       </TouchableOpacity>
 
       <Text style={styles.sectionTitle}>Recent audits</Text>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-
-        {audits.length === 0 ? (
+        {isLoading ? (
+          <View style={{ paddingVertical: 40, alignItems: 'center' }}>
+            <ActivityIndicator size="large" color="#F04438" />
+          </View>
+        ) : sites.length === 0 ? (
           <>
             <EmptyState />
 
@@ -114,15 +149,17 @@ export default function HomeScreen() {
             </View>
           </>
         ) : (
-          audits.map((item, index) => (
-            <AuditResultCard
-              key={index}
-              url={item.url}
-              status={item.status as any}
-              score="70"
-              time="5"
-            />
-          ))
+          sites
+            .filter((site) => !site.deleted_at)
+            .map((site) => (
+              <AuditResultCard
+                key={site.id}
+                url={site.url}
+                status={getStatusFromScore(site.score)}
+                score={site.score?.toString() || "0"}
+                time={formatTimeAgo(site.created_at)}
+              />
+            ))
         )}
 
         <View style={{ height: 100 }} />
