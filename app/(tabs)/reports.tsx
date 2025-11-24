@@ -2,17 +2,20 @@ import ReportCard from "@/components/report-card";
 import styles from "@/stylesheets/report-screen-stylesheet";
 import { ReportItemProps } from "@/type";
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Animated,
+  Alert,
   FlatList,
   Text,
   TextInput,
+  TouchableOpacity,
   View
 } from "react-native";
-import { GestureHandlerRootView, PanGestureHandler, State } from "react-native-gesture-handler";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const INITIAL_DATA: ReportItemProps[] = [
@@ -46,87 +49,28 @@ interface SwipeableRowProps {
 }
 
 const SwipeableRow: React.FC<SwipeableRowProps> = ({ item, onDelete, onPress }) => {
-  const translateX = useRef(new Animated.Value(0)).current;
-  const [swipeThreshold] = useState(-120);
-
-  const onGestureEvent = Animated.event(
-    [{ nativeEvent: { translationX: translateX } }],
-    { useNativeDriver: true }
+  const renderRightActions = (_progress: any, _dragX: any) => (
+    <TouchableOpacity style={styles.deleteAction} onPress={() => onDelete()}>
+      <MaterialIcons name="delete" size={22} color="#fff" />
+    </TouchableOpacity>
   );
 
-  const onHandlerStateChange = (event: any) => {
-    if (event.nativeEvent.oldState === State.ACTIVE) {
-      const { translationX, velocityX } = event.nativeEvent;
-
-      if (translationX < swipeThreshold || velocityX < -500) {
-        Animated.timing(translateX, {
-          toValue: -200,
-          duration: 200,
-          useNativeDriver: true,
-        }).start(() => {
-          onDelete();
-        });
-      } else {
-        Animated.spring(translateX, {
-          toValue: 0,
-          useNativeDriver: true,
-          tension: 50,
-          friction: 7,
-        }).start();
-      }
-    }
-  };
-
-  const deleteIconOpacity = translateX.interpolate({
-    inputRange: [-200, -80, 0],
-    outputRange: [1, 0.5, 0],
-    extrapolate: 'clamp',
-  });
-
-  const deleteIconScale = translateX.interpolate({
-    inputRange: [-200, -80, 0],
-    outputRange: [1, 0.8, 0.5],
-    extrapolate: 'clamp',
-  });
-
   return (
-    <View style={styles.swipeableContainer}>
-      <View style={styles.deleteAction}>
-        <Animated.View
-          style={[
-            styles.deleteIconContainer,
-            {
-              opacity: deleteIconOpacity,
-              transform: [{ scale: deleteIconScale }],
-            },
-          ]}
-        >
-          <Ionicons name="trash" size={24} color="#FFFFFF" />
-        </Animated.View>
+    <ReanimatedSwipeable
+      renderRightActions={renderRightActions}
+      friction={2}
+      overshootRight={false}
+    >
+      <View style={styles.swipeableContent}>
+        <ReportCard
+          domain={item.domain}
+          score={item.score}
+          status={item.status}
+          scanDate={item.scanDate}
+          onPress={onPress}
+        />
       </View>
-      <PanGestureHandler
-        onGestureEvent={onGestureEvent}
-        onHandlerStateChange={onHandlerStateChange}
-        activeOffsetX={[-10, 10]}
-      >
-        <Animated.View
-          style={[
-            styles.swipeableContent,
-            {
-              transform: [{ translateX }],
-            },
-          ]}
-        >
-          <ReportCard
-            domain={item.domain}
-            score={item.score}
-            status={item.status}
-            scanDate={item.scanDate}
-            onPress={onPress}
-          />
-        </Animated.View>
-      </PanGestureHandler>
-    </View>
+    </ReanimatedSwipeable>
   );
 };
 
@@ -143,7 +87,12 @@ const ReportsScreen: React.FC = () => {
   ) || data;
 
   const handleDelete = (domain: string) => {
-    setData(prevData => prevData.filter(item => item.domain !== domain));
+    Alert.alert('Delete', 'Are you sure you want to delete this report?', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Delete', style: 'destructive', onPress: () => {
+        setData(prevData => prevData.filter(item => item.domain !== domain));
+      } },
+    ]);
   };
 
 
@@ -195,16 +144,17 @@ const ReportsScreen: React.FC = () => {
                 item={item}
                 onDelete={() => handleDelete(item.domain)}
                 onPress={() => router.push({
-                      pathname: "../(reports)/report-dashboard", 
-                        params: {
-                        domain: item.domain,
-                        score: String(item.score),
-                        status: item.status,
-                        scanDate: item.scanDate
-                      }
+                  pathname: "../(reports)/report-dashboard", 
+                  params: {
+                    domain: item.domain,
+                    score: String(item.score),
+                    status: item.status,
+                    scanDate: item.scanDate
+                  }
                 })}
               />
             )}
+            ItemSeparatorComponent={() => <View style={styles.separator} />}
             ListFooterComponent={<View style={styles.footerSpacer} />}
           />
         )}
