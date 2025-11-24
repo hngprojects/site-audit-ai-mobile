@@ -163,7 +163,7 @@ export default function HomeScreen() {
           </>
         ) : (
           sites
-            .filter((site) => !site.deleted_at)
+            .filter((site) => site.status !== 'deleted')
             .map((site) => (
               <AuditResultCard
                 key={site.id}

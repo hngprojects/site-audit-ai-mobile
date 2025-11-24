@@ -105,7 +105,7 @@ const ReportsScreen: React.FC = () => {
   };
 
   const reportData = sites
-    .filter((site) => !site.deleted_at)
+    .filter((site) => site.status !== 'deleted')
     .map(mapSiteToReportItem);
 
   const filteredData = reportData.filter(item =>
@@ -115,13 +115,15 @@ const ReportsScreen: React.FC = () => {
   const handleDelete = (siteId: string, domain: string) => {
     Alert.alert('Delete', 'Are you sure you want to delete this report?', [
       { text: 'Cancel', style: 'cancel' },
-      { text: 'Delete', style: 'destructive', onPress: async () => {
-        try {
-          await deleteSite(siteId);
-        } catch (error) {
-          Alert.alert('Error', error instanceof Error ? error.message : 'Failed to delete report');
+      { 
+        text: 'Delete', 
+        style: 'destructive', 
+        onPress: () => {
+          deleteSite(siteId).catch((error) => {
+            Alert.alert('Error', error instanceof Error ? error.message : 'Failed to delete report');
+          });
         }
-      } },
+      },
     ]);
   };
 

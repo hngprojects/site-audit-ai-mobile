@@ -140,13 +140,13 @@ export const sitesService = {
     }
   },
 
-  async deleteSite(siteId: string, token: string): Promise<void> {
+  async deleteSite(siteId: string, token: string): Promise<Site> {
     if (!siteId) {
       throw new Error('Site ID is required');
     }
 
     try {
-      await apiClient.patch(
+      const response = await apiClient.patch<SiteResponse>(
         `/api/v1/sites/${siteId}`,
         {},
         {
@@ -155,6 +155,12 @@ export const sitesService = {
           },
         }
       );
+      const responseData = response.data;
+      
+      if (Array.isArray(responseData.data)) {
+        return responseData.data[0];
+      }
+      return responseData.data as Site;
     } catch (error) {
       if (isAxiosError(error)) {
         const errorData = error.response?.data || {};

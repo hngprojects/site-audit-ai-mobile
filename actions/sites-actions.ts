@@ -26,7 +26,7 @@ export const getSiteDetails = async (siteId: string): Promise<Site> => {
   return await sitesService.getSiteDetails(siteId, token);
 };
 
-export const deleteSite = async (siteId: string): Promise<void> => {
+export const deleteSite = async (siteId: string): Promise<Site> => {
   const token = useAuthStore.getState().token;
   if (!token) {
     throw new Error('Authentication required. Please sign in.');

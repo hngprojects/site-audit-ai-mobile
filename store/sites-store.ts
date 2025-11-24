@@ -81,20 +81,26 @@ export const useSitesStore = create<SitesStore>((set, get) => ({
   },
 
   deleteSite: async (siteId: string) => {
-    set({ isLoading: true, error: null });
+    const state = get();
+    const siteToDelete = state.sites.find(s => s.id === siteId);
+    
+    set((state) => ({
+      sites: state.sites.filter((site) => site.id !== siteId),
+    }));
+
     try {
       await sitesActions.deleteSite(siteId);
-      set((state) => ({
-        sites: state.sites.filter((site) => site.id !== siteId),
-        isLoading: false,
-        error: null,
-      }));
     } catch (error) {
+      if (siteToDelete) {
+        set((state) => ({
+          sites: [...state.sites, siteToDelete].sort((a, b) => 
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          ),
+        }));
+      }
       set({
-        isLoading: false,
         error: error instanceof Error ? error.message : 'Failed to delete site',
       });
-      throw error;
     }
   },
 
