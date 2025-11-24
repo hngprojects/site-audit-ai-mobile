@@ -1,10 +1,11 @@
 import ReportCard from "@/components/report-card";
+import { useSitesStore } from "@/store/sites-store";
 import styles from "@/stylesheets/report-screen-stylesheet";
 import { ReportItemProps } from "@/type";
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { MaterialIcons } from '@expo/vector-icons';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -17,30 +18,6 @@ import {
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
-const INITIAL_DATA: ReportItemProps[] = [
-  {
-    domain: "www.fashionsense.com",
-    score: 50,
-    status: "low",
-    scanDate: "Nov 5, 2025",
-    onPress: () => {},
-  },
-  {
-    domain: "www.techgate.com",
-    score: 86,
-    status: "high",
-    scanDate: "Nov 3, 2025",
-     onPress: () => {},
-  },
-  {
-    domain: "www.cosmos.com",
-    score: 40,
-    status: "low",
-    scanDate: "Oct 30, 2025",
-     onPress: () => {},
-  },
-];
 
 interface SwipeableRowProps {
   item: ReportItemProps;
@@ -77,34 +54,62 @@ const SwipeableRow: React.FC<SwipeableRowProps> = ({ item, onDelete, onPress }) 
 const ReportsScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
   const [search, setSearch] = React.useState("");
-  const [loading, setLoading] = React.useState(false);
-  const [data, setData] = useState<ReportItemProps[]>(INITIAL_DATA);
-
   const router = useRouter();
+  
+  const { sites, isLoading, fetchSites, deleteSite } = useSitesStore();
 
-  const filteredData = data.filter(item =>
+  useEffect(() => {
+    fetchSites();
+  }, [fetchSites]);
+
+  const formatDate = (dateString?: string): string => {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric', 
+      year: 'numeric' 
+    });
+  };
+
+  const getStatusFromScore = (score?: number): "low" | "medium" | "high" => {
+    if (!score) return "medium";
+    if (score >= 80) return "high";
+    if (score >= 50) return "medium";
+    return "low";
+  };
+
+  const mapSiteToReportItem = (site: typeof sites[0]): ReportItemProps => {
+    const domain = site.url.replace(/^https?:\/\//, '').replace(/^www\./, '');
+    return {
+      domain,
+      score: site.score || 0,
+      status: getStatusFromScore(site.score),
+      scanDate: formatDate(site.created_at),
+      onPress: () => {},
+    };
+  };
+
+  const reportData: ReportItemProps[] = sites
+    .filter((site) => !site.deleted_at)
+    .map(mapSiteToReportItem);
+
+  const filteredData = reportData.filter(item =>
     item.domain.toLowerCase().includes(search.toLowerCase())
-  ) || data;
+  );
 
-  const handleDelete = (domain: string) => {
+  const handleDelete = (siteId: string, domain: string) => {
     Alert.alert('Delete', 'Are you sure you want to delete this report?', [
       { text: 'Cancel', style: 'cancel' },
-      { text: 'Delete', style: 'destructive', onPress: () => {
-        setData(prevData => prevData.filter(item => item.domain !== domain));
+      { text: 'Delete', style: 'destructive', onPress: async () => {
+        try {
+          await deleteSite(siteId);
+        } catch (error) {
+          Alert.alert('Error', error instanceof Error ? error.message : 'Failed to delete report');
+        }
       } },
     ]);
   };
-
-
-  useEffect(() => {
-  setLoading(true); 
-
-  const timer = setTimeout(() => {
-    setLoading(false);  
-  }, 2000);
-
-  return () => clearTimeout(timer);
-}, []);
 
 
   return (
@@ -131,31 +136,51 @@ const ReportsScreen: React.FC = () => {
         </View>
         
 
-        {loading ? (
+        {isLoading ? (
           <ActivityIndicator size="large" color={"#F04438"} style={{ flex: 1, justifyContent: "center", alignItems: "center" }} />
         ) : (
           <FlatList
             data={filteredData}
-            keyExtractor={(item) => item.domain}
+            keyExtractor={(item, index) => {
+              const site = sites.find(s => {
+                const domain = s.url.replace(/^https?:\/\//, '').replace(/^www\./, '');
+                return domain === item.domain;
+              });
+              return site?.id || `report-${index}`;
+            }}
             contentContainerStyle={styles.listWrap}
             showsVerticalScrollIndicator={false}
-            renderItem={({ item }) => (
-              <SwipeableRow
-                item={item}
-                onDelete={() => handleDelete(item.domain)}
-                onPress={() => router.push({
-                  pathname: "../(reports)/report-dashboard", 
-                  params: {
-                    domain: item.domain,
-                    score: String(item.score),
-                    status: item.status,
-                    scanDate: item.scanDate
-                  }
-                })}
-              />
-            )}
+            renderItem={({ item, index }) => {
+              const site = sites.find(s => {
+                const domain = s.url.replace(/^https?:\/\//, '').replace(/^www\./, '');
+                return domain === item.domain;
+              });
+              const siteId = site?.id || '';
+              
+              return (
+                <SwipeableRow
+                  item={item}
+                  onDelete={() => handleDelete(siteId, item.domain)}
+                  onPress={() => router.push({
+                    pathname: "../(reports)/report-dashboard", 
+                    params: {
+                      domain: item.domain,
+                      score: String(item.score),
+                      status: item.status,
+                      scanDate: item.scanDate,
+                      siteId: siteId,
+                    }
+                  })}
+                />
+              );
+            }}
             ItemSeparatorComponent={() => <View style={styles.separator} />}
             ListFooterComponent={<View style={styles.footerSpacer} />}
+            ListEmptyComponent={
+              <View style={{ paddingVertical: 40, alignItems: 'center' }}>
+                <Text style={{ color: '#9CA3AF', fontSize: 14 }}>No reports found</Text>
+              </View>
+            }
           />
         )}
       </View>
