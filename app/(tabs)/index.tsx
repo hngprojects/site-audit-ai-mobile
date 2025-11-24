@@ -22,8 +22,9 @@ export default function HomeScreen() {
   ]);
 
   const RunAudit = () => {
-    if (websiteUrl === "")
+    if (websiteUrl === "") {
       return setUrlAvailable(false)
+    }
     return router.push({
       pathname: "/(main)/auditing-screen",
       params: {
