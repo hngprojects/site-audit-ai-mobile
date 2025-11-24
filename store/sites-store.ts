@@ -1,5 +1,6 @@
 import * as sitesActions from '@/actions/sites-actions';
 import type { Site } from '@/lib/sites-service';
+import type { WebsiteMetadata } from '@/utils/website-metadata';
 import { create } from 'zustand';
 
 interface SitesState {
@@ -10,7 +11,7 @@ interface SitesState {
 
 interface SitesStore extends SitesState {
   fetchSites: () => Promise<void>;
-  createSite: (url: string) => Promise<Site>;
+  createSite: (url: string, metadata?: WebsiteMetadata) => Promise<Site>;
   getSiteDetails: (siteId: string) => Promise<Site>;
   deleteSite: (siteId: string) => Promise<void>;
   clearError: () => void;
@@ -42,10 +43,10 @@ export const useSitesStore = create<SitesStore>((set, get) => ({
     }
   },
 
-  createSite: async (url: string) => {
+  createSite: async (url: string, metadata?: WebsiteMetadata) => {
     set({ isLoading: true, error: null });
     try {
-      const newSite = await sitesActions.createSite(url);
+      const newSite = await sitesActions.createSite(url, metadata);
       set((state) => ({
         sites: [newSite, ...state.sites],
         isLoading: false,

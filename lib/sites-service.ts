@@ -2,11 +2,14 @@ import { apiClient, formatErrorMessage, isAxiosError } from '@/lib/api-client';
 
 export interface Site {
   id: string;
-  url: string;
-  status?: string;
-  score?: number;
-  created_at?: string;
-  updated_at?: string;
+  root_url: string;
+  display_name?: string | null;
+  favicon_url?: string | null;
+  status: string;
+  total_scans?: number;
+  last_scanned_at?: string | null;
+  created_at: string;
+  updated_at: string;
   deleted_at?: string | null;
 }
 
@@ -16,7 +19,10 @@ export interface SiteResponse {
 }
 
 export interface CreateSiteRequest {
-  url: string;
+  root_url: string;
+  display_name?: string;
+  favicon_url?: string;
+  status?: string;
 }
 
 export const sitesService = {
@@ -31,6 +37,7 @@ export const sitesService = {
         }
       );
       const responseData = response.data;
+      console.log(responseData);
       
       if (Array.isArray(responseData.data)) {
         return responseData.data;
@@ -49,15 +56,32 @@ export const sitesService = {
     }
   },
 
-  async createSite(url: string, token: string): Promise<Site> {
+  async createSite(
+    url: string,
+    token: string,
+    metadata?: { display_name?: string; favicon_url?: string }
+  ): Promise<Site> {
     if (!url || url.trim() === '') {
       throw new Error('URL is required');
     }
 
     try {
+      const payload: CreateSiteRequest = {
+        root_url: url.trim(),
+        status: 'active',
+      };
+
+      if (metadata?.display_name) {
+        payload.display_name = metadata.display_name;
+      }
+
+      if (metadata?.favicon_url) {
+        payload.favicon_url = metadata.favicon_url;
+      }
+
       const response = await apiClient.post<SiteResponse>(
         '/api/v1/sites',
-        { url: url.trim() } as CreateSiteRequest,
+        payload,
         {
           headers: {
             Authorization: `Bearer ${token}`,

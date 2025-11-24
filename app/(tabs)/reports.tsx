@@ -91,18 +91,20 @@ const ReportsScreen: React.FC = () => {
     return "low";
   };
 
-  const mapSiteToReportItem = (site: typeof sites[0]): ReportItemProps => {
-    const domain = site.url.replace(/^https?:\/\//, '').replace(/^www\./, '');
+  const mapSiteToReportItem = (site: typeof sites[0]) => {
+    const url = site.root_url || '';
+    const domain = url.replace(/^https?:\/\//, '').replace(/^www\./, '') || 'N/A';
     return {
+      siteId: site.id,
       domain,
-      score: site.score || 0,
-      status: getStatusFromScore(site.score),
+      score: 0,
+      status: getStatusFromScore(undefined),
       scanDate: formatDate(site.created_at),
       onPress: () => {},
     };
   };
 
-  const reportData: ReportItemProps[] = sites
+  const reportData = sites
     .filter((site) => !site.deleted_at)
     .map(mapSiteToReportItem);
 
@@ -161,26 +163,14 @@ const ReportsScreen: React.FC = () => {
         ) : (
           <FlatList
             data={filteredData}
-            keyExtractor={(item, index) => {
-              const site = sites.find(s => {
-                const domain = s.url.replace(/^https?:\/\//, '').replace(/^www\./, '');
-                return domain === item.domain;
-              });
-              return site?.id || `report-${index}`;
-            }}
+            keyExtractor={(item) => item.siteId}
             contentContainerStyle={styles.listWrap}
             showsVerticalScrollIndicator={false}
-            renderItem={({ item, index }) => {
-              const site = sites.find(s => {
-                const domain = s.url.replace(/^https?:\/\//, '').replace(/^www\./, '');
-                return domain === item.domain;
-              });
-              const siteId = site?.id || '';
-              
+            renderItem={({ item }) => {
               return (
                 <SwipeableRow
                   item={item}
-                  onDelete={() => handleDelete(siteId, item.domain)}
+                  onDelete={() => handleDelete(item.siteId, item.domain)}
                   onPress={() => router.push({
                     pathname: "../(reports)/report-dashboard", 
                     params: {
@@ -188,7 +178,7 @@ const ReportsScreen: React.FC = () => {
                       score: String(item.score),
                       status: item.status,
                       scanDate: item.scanDate,
-                      siteId: siteId,
+                      siteId: item.siteId,
                     }
                   })}
                 />

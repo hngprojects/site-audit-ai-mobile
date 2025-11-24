@@ -3,6 +3,7 @@ import EmptyState from "@/components/homeScreenEmptyState";
 import { useSitesStore } from "@/store/sites-store";
 import styles from "@/stylesheets/homeScreenStylesheet";
 import { validateWebsiteUrl } from "@/utils/url-validation";
+import { fetchWebsiteMetadata } from "@/utils/website-metadata";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Octicons from "@expo/vector-icons/Octicons";
 import { router } from "expo-router";
@@ -15,6 +16,7 @@ export default function HomeScreen() {
   const [websiteUrl, setWebsiteUrl] = useState<string>('');
   const [urlAvailable, setUrlAvailable] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string>('');
+  const [isCreating, setIsCreating] = useState<boolean>(false);
   
   const { sites, isLoading, createSite, fetchSites } = useSitesStore();
 
@@ -41,10 +43,19 @@ export default function HomeScreen() {
     
     setUrlAvailable(true);
     setErrorMessage('');
+    setIsCreating(true);
 
     try {
       const trimmedUrl = websiteUrl.trim();
-      const newSite = await createSite(trimmedUrl);
+      
+      let metadata;
+      try {
+        metadata = await fetchWebsiteMetadata(trimmedUrl);
+      } catch (error) {
+        console.warn('Failed to fetch website metadata, continuing without it:', error);
+      }
+      
+      const newSite = await createSite(trimmedUrl, metadata);
       
       setWebsiteUrl('');
       
@@ -58,6 +69,8 @@ export default function HomeScreen() {
     } catch (error) {
       setUrlAvailable(false);
       setErrorMessage(error instanceof Error ? error.message : 'Failed to create site. Please try again.');
+    } finally {
+      setIsCreating(false);
     }
   }
 
@@ -103,7 +116,7 @@ export default function HomeScreen() {
           placeholder="Enter your website URL"
           placeholderTextColor={"#A0A0A0"}
           style={styles.placeholderText}
-          value={websiteUrl.toLocaleLowerCase()}
+          value={websiteUrl ? websiteUrl.toLowerCase() : ''}
           onChangeText={handleUrlChange}
           autoCapitalize="none"
           autoCorrect={false}
@@ -119,9 +132,9 @@ export default function HomeScreen() {
       <TouchableOpacity
         onPress={RunAudit}
         style={styles.runButton}
-        disabled={isLoading}
+        disabled={isCreating}
       >
-        {isLoading ? (
+        {isCreating ? (
           <ActivityIndicator size="small" color="#fff" />
         ) : (
           <Text style={styles.runButtonText}>Start Scan</Text>
@@ -154,9 +167,9 @@ export default function HomeScreen() {
             .map((site) => (
               <AuditResultCard
                 key={site.id}
-                url={site.url}
-                status={getStatusFromScore(site.score)}
-                score={site.score?.toString() || "0"}
+                url={site.root_url}
+                status={getStatusFromScore(undefined)}
+                score="0"
                 time={formatTimeAgo(site.created_at)}
               />
             ))
