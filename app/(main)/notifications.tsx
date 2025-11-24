@@ -1,13 +1,13 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { FlatList, View, TouchableOpacity, Alert, Animated, TextInput, Image } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/themed-text';
-import styles from '@/stylesheets/notifications-stylesheet';
-import { getNotifications, markAsRead, deleteNotification } from '@/service/notifications';
 import type { Notification } from '@/service/notifications';
-import { Swipeable } from 'react-native-gesture-handler';
+import { deleteNotification, getNotifications, markAsRead } from '@/service/notifications';
+import styles from '@/stylesheets/notifications-stylesheet';
 import { Feather, MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Alert, FlatList, Image, TextInput, TouchableOpacity, View } from 'react-native';
+import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const SkeletonCard = () => (
   <View style={[styles.card, styles.skeletonCard]}>
@@ -22,14 +22,14 @@ const SkeletonCard = () => (
 );
 
 const NotificationItem = ({ item, onMarkRead, onDelete }: { item: Notification; onMarkRead: (id: string) => void; onDelete: (id: string) => void }) => {
-  const renderRightActions = (_progress: Animated.AnimatedInterpolation<number>, _dragX: Animated.AnimatedInterpolation<number>) => (
+  const renderRightActions = (_progress: any, _dragX: any) => (
     <TouchableOpacity style={styles.rightAction} onPress={() => onDelete(item.id)}>
       <MaterialIcons name="delete" size={22} color="#fff" />
     </TouchableOpacity>
   );
 
   return (
-    <Swipeable
+    <ReanimatedSwipeable
       renderRightActions={renderRightActions}
       friction={2}
       overshootRight={false}
@@ -82,7 +82,7 @@ const NotificationItem = ({ item, onMarkRead, onDelete }: { item: Notification; 
           </View>
         </TouchableOpacity>
       </View>
-    </Swipeable>
+    </ReanimatedSwipeable>
   );
 };
 

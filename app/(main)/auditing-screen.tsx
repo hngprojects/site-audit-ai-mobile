@@ -47,7 +47,7 @@ const AuditingScreen = () => {
           <Text style={styles.headerUrl}>{websiteUrl}</Text>
         </View>
         <View style={styles.loadingContainer}>
-          <View style={styles.activityIndicatorWrapper}>
+          <View style={[styles.activityIndicatorWrapper, styles.activityIndicator]}>
             <ActivityIndicator size="large" color="#ff5a3d" />
           </View>
         </View>
