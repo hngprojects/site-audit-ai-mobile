@@ -7,6 +7,7 @@ import { getNotifications, markAsRead, deleteNotification } from '@/service/noti
 import type { Notification } from '@/service/notifications';
 import { Swipeable } from 'react-native-gesture-handler';
 import { Feather, MaterialIcons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 
 const SkeletonCard = () => (
   <View style={[styles.card, styles.skeletonCard]}>
@@ -86,6 +87,8 @@ const NotificationItem = ({ item, onMarkRead, onDelete }: { item: Notification; 
 };
 
 export default function NotificationsScreen() {
+  const router = useRouter();
+
   const [isLoading, setIsLoading] = useState(true);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -163,7 +166,7 @@ export default function NotificationsScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton}>
+        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
             <Feather name="arrow-left" size={24} color="#1A2373" />
         </TouchableOpacity>
         <ThemedText style={styles.headerTitle} type="title" >Notification</ThemedText>
