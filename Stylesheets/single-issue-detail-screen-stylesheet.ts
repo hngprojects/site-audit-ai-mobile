@@ -149,6 +149,130 @@ const style = StyleSheet.create({
     textAlign: "center",
     fontFamily: "RethinkSans-Bold",
   },
+  cardSection: {
+     marginTop: 20,
+    marginHorizontal: 20,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    borderRadius: 12,
+    padding: 20,
+    backgroundColor: "transparent",
+  },
+  cardTitle: {
+    fontFamily: "RethinkSans-Bold",
+        fontSize: 17,
+        color: "#000",
+        marginBottom: 10,
+  },
+  cardDescription: {
+    fontFamily: "RethinkSans-Medium",
+    color: "#000",
+    marginBottom: 10
+  },
+  usabilitySection: {
+    flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: 15,
+  },
+  usabilityText: {
+    fontFamily: "RethinkSans-SemiBold",
+      fontSize: 17,
+      color: "#000",
+      marginTop: 5
+  },
+  progressBarBackground: {
+  height: 12,
+  borderRadius: 6,
+  width: "100%",
+  overflow: "hidden",
+  marginTop: 5,
+},
+
+progressBarForeground: {
+  height: "100%",
+  borderRadius: 6,
+},
+miniscoreBackground: {
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: 6,
+},
+miniscoreText: {
+    fontFamily: "RethinkSans-Bold",
+    fontSize: 14,
+},
+whatThisWillDoTitle: {
+    fontFamily: "RethinkSans-Bold",
+        fontSize: 14,
+        marginBottom: 8,
+        marginTop: 20,
+        color: "#000",
+},
+whatThisWillDoText: {
+    fontFamily: "RethinkSans-Regular",
+    fontSize: 13,
+    color: "#656565",
+    marginBottom: 20,
+    lineHeight: 20,
+},
+problemsTitle: {
+    fontFamily: "RethinkSans-Bold",
+        fontSize: 15,
+        marginBottom: 8,
+        color: "#000",
+},
+problemDetailsContainer: {
+     gap: 12, 
+     marginBottom: 20,
+},
+problemDetailInnerContainer: {
+    flexDirection: "row", 
+    alignItems: "flex-start", 
+    gap: 8
+},
+warningIconBackground: {
+    width: 25,
+    height: 25,
+    borderRadius: 15,
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: -5
+},
+problemText: {
+    fontFamily: "RethinkSans-Regular",
+    fontSize: 13,
+    color: "#656565",
+    flex: 1,
+    lineHeight: 20,
+},
+suggestionTitle: {
+    fontFamily: "RethinkSans-Bold",
+    fontSize: 15,
+    marginBottom: 8,
+    color: "#000",
+},
+suggestionText: {
+    fontFamily: "RethinkSans-Regular",
+    fontSize: 13,
+    color: "#656565",
+    marginBottom: 25,
+    lineHeight: 20,
+},
+continueButton: {
+    backgroundColor: "#FF5722",
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: "center",
+    marginTop: 5,
+    marginBottom: 10,
+},
+continueButtonText: {
+     color: "#fff",
+     fontFamily: "RethinkSans-Bold",
+     fontSize: 15,
+},
+
 });
 
 export default style;

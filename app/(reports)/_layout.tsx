@@ -6,6 +6,7 @@ export default function ReportsLayout() {
       <Stack.Screen name="report-screen" />
       <Stack.Screen name="website-review-request-screen" />
       <Stack.Screen name="report-dashboard" />
+      <Stack.Screen name="SingleIssueDetailScreen" />
     </Stack>
   );
 }

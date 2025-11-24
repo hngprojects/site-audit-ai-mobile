@@ -82,7 +82,7 @@ export interface ReportItemProps {
   onPress: () => void;
 }
 
-export type Status = "low" | "high" | "medium";
+export type Status = "Critical" | "Good" | "Warning";
 
 export interface reportDashboardProps {
   domain: string;
@@ -93,7 +93,7 @@ export interface reportDashboardProps {
 
 
 export type IssueCardProps = {
-  id?: string;
+  id: string;
   title?: string;
   score?: string;
   status?: string
