@@ -1,123 +1,185 @@
 import AuditResultCard from "@/components/auditResultCard";
 import EmptyState from "@/components/homeScreenEmptyState";
+import { useSitesStore } from "@/store/sites-store";
 import styles from "@/stylesheets/homeScreenStylesheet";
+import { validateWebsiteUrl } from "@/utils/url-validation";
+import { fetchWebsiteMetadata } from "@/utils/website-metadata";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Octicons from "@expo/vector-icons/Octicons";
 import { router } from "expo-router";
-import { useState } from "react";
-import { Image, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { useEffect, useState } from "react";
+import { ActivityIndicator, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 
 export default function HomeScreen() {
-  const inset = useSafeAreaInsets();
   const [websiteUrl, setWebsiteUrl] = useState<string>('');
-  const [urlAvailable , setUrlAvailable ] = useState<boolean>(true);
+  const [urlAvailable, setUrlAvailable] = useState<boolean>(true);
+  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [isCreating, setIsCreating] = useState<boolean>(false);
   
+  const { sites, isLoading, createSite, fetchSites } = useSitesStore();
 
+  useEffect(() => {
+    fetchSites();
+  }, [fetchSites]);
 
-  const [audits] = useState([
-    { url: "http://www.figma.com", status: "Passed" },
-    { url: "http://www.figma.com", status: "Average" },
-    { url: "http://www.figma.com", status: "Average" },
-  ]);
+  const handleUrlChange = (text: string) => {
+    setWebsiteUrl(text);
+    if (!urlAvailable || errorMessage) {
+      setUrlAvailable(true);
+      setErrorMessage('');
+    }
+  };
 
-  const RunAudit = () => {
-    if(websiteUrl === "")
-      return setUrlAvailable( false)
-      return router.push({
+  const RunAudit = async () => {
+    const validation = validateWebsiteUrl(websiteUrl);
+    
+    if (!validation.isValid) {
+      setUrlAvailable(false);
+      setErrorMessage(validation.error);
+      return;
+    }
+    
+    setUrlAvailable(true);
+    setErrorMessage('');
+    setIsCreating(true);
+
+    try {
+      const trimmedUrl = websiteUrl.trim();
+      
+      let metadata;
+      try {
+        metadata = await fetchWebsiteMetadata(trimmedUrl);
+      } catch (error) {
+        console.warn('Failed to fetch website metadata, continuing without it:', error);
+      }
+      
+      const newSite = await createSite(trimmedUrl, metadata);
+      
+      setWebsiteUrl('');
+      
+      router.push({
         pathname: "/(main)/auditing-screen",
         params: {
-          url: websiteUrl,
+          url: trimmedUrl,
+          siteId: newSite.id,
         },
       });
+    } catch (error) {
+      setUrlAvailable(false);
+      setErrorMessage(error instanceof Error ? error.message : 'Failed to create site. Please try again.');
+    } finally {
+      setIsCreating(false);
+    }
   }
+
+  const formatTimeAgo = (dateString?: string): string => {
+    if (!dateString) return '0';
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
+    return diffInHours.toString();
+  };
+
+  const getStatusFromScore = (score?: number): "Passed" | "Average" | "Failed" => {
+    if (!score) return "Average";
+    if (score >= 80) return "Passed";
+    if (score >= 50) return "Average";
+    return "Failed";
+  };
 
   return (
     <SafeAreaView
       style={styles.container}>
-     
-      <TouchableOpacity style={styles.notificationContainer}>
+
+      <TouchableOpacity style={styles.notificationContainer} onPress={() => router.push('/(main)/notifications')}>
         <Octicons name="bell" size={24} color="black" />
       </TouchableOpacity>
 
-      
-        <View style={styles.headingSection}>
-          <Text style={styles.title}>Improve your website with a quick scan</Text>
-          <Text style={styles.sub}>
-            Quick AI review with clear action steps
-          </Text>
-        </View>
 
-       
-        <View style={[styles.inputPlaceholder, {borderColor: !urlAvailable ? "#d32f2f" : "#bbbcbc",}]}>
-          <MaterialCommunityIcons 
-            name="web" size={24} 
-            color="#A0A0A0" 
-            style={styles.webIcon}
-          />
-          <TextInput
-            placeholder="Enter your website URL"
-            placeholderTextColor={"#A0A0A0"}
-            style={styles.placeholderText}
-            onChangeText={x => setWebsiteUrl(x)}
-          />
-        </View>
-        {!urlAvailable && (
-          <Text style={styles.invalidLink}>Invalid link. Please try again</Text>
-        )}
+      <View style={styles.headingSection}>
+        <Text style={styles.title}>Improve your website with a quick scan</Text>
+        <Text style={styles.sub}>
+          Quick AI review with clear action steps
+        </Text>
+      </View>
 
-      
 
-         <TouchableOpacity 
+      <View style={[styles.inputPlaceholder, { borderColor: !urlAvailable ? "#d32f2f" : "#C7C8C9", }]}>
+        <MaterialCommunityIcons
+          name="web" size={15}
+          color="#A0A0A0"
+          style={styles.webIcon}
+        />
+        <TextInput
+          placeholder="Enter your website URL"
+          placeholderTextColor={"#A0A0A0"}
+          style={styles.placeholderText}
+          value={websiteUrl ? websiteUrl.toLowerCase() : ''}
+          onChangeText={handleUrlChange}
+          autoCapitalize="none"
+          autoCorrect={false}
+          keyboardType="url"
+        />
+      </View>
+      {!urlAvailable && errorMessage && (
+        <Text style={styles.invalidLink}>{errorMessage}</Text>
+      )}
+
+
+
+      <TouchableOpacity
         onPress={RunAudit}
         style={styles.runButton}
+        disabled={isCreating}
       >
-        <Image 
-          source={require("../../assets/images/Logo1.png")}
-          style={
-            styles.runButtonImage
-          }
-          resizeMode="contain"
-        />
-        <Text style={styles.runButtonText}>Start Scan</Text>
+        {isCreating ? (
+          <ActivityIndicator size="small" color="#fff" />
+        ) : (
+          <Text style={styles.runButtonText}>Start Scan</Text>
+        )}
       </TouchableOpacity>
 
-        
-        <Text style={styles.sectionTitle}>Recent audits</Text>
+      <Text style={styles.sectionTitle}>Recent audits</Text>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-       
-        {audits.length === 0 ? (
-          <>
-          <EmptyState />
-
-          <View style={styles.tipBox}>
-            <View style={styles.buldIcon}>
-              <MaterialCommunityIcons name="lightbulb-on-10" size={24} color="black" />
-            </View>
-            <Text style={styles.tipText}>
-              Join 2000+ business owners who have improved their sales with Sitelytics
-            </Text>
+        {isLoading ? (
+          <View style={{ paddingVertical: 40, alignItems: 'center' }}>
+            <ActivityIndicator size="large" color="#F04438" />
           </View>
-        </>
+        ) : sites.length === 0 ? (
+          <>
+            <EmptyState />
+
+            <View style={styles.tipBox}>
+              <View style={styles.buldIcon}>
+                <MaterialCommunityIcons name="lightbulb-on-10" size={24} color="black" />
+              </View>
+              <Text style={styles.tipText}>
+                Join 2000+ business owners who have improved their sales with Sitelytics
+              </Text>
+            </View>
+          </>
         ) : (
-          audits.map((item, index) => (
-            <AuditResultCard
-              key={index}
-              url={item.url}
-              status={item.status as any}
-              score="70"
-              time="5"
-            />
-          ))
+          sites
+            .filter((site) => site.status !== 'deleted')
+            .map((site) => (
+              <AuditResultCard
+                key={site.id}
+                url={site.root_url}
+                status={getStatusFromScore(undefined)}
+                score="0"
+                time={formatTimeAgo(site.created_at)}
+              />
+            ))
         )}
 
-        <View style={{ height: 100 }} /> 
+        <View style={{ height: 100 }} />
       </ScrollView>
 
-   
-     
+
+
     </SafeAreaView>
   );
 }

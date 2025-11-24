@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
     color: "#000",
     fontFamily: "RethinkSans-SemiBold",
     fontSize: 17,
-    
+
   },
   textInput: {
     fontSize: 20,
@@ -139,4 +139,3 @@ const styles = StyleSheet.create({
 });
 
 export default styles;
-

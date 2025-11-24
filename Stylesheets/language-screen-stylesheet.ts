@@ -3,14 +3,15 @@ import { StyleSheet } from "react-native";
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        paddingHorizontal: "5%",
+        marginTop: '10%',
         backgroundColor: "#fff",
     },
     header: {
         width: '100%',
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 16,
-        paddingTop: 60,
+        paddingVertical: 6,
         paddingHorizontal: 16,
     },
     backButton: {
@@ -33,7 +34,6 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontFamily: 'RethinkSans-Bold',
         color: '#1C1C1C',
-        marginTop: 6,
         marginBottom: 20,
         paddingHorizontal: 16,
     },
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
         padding: 10
     },
     textInput: {
-        fontSize: 20,     
+        fontSize: 20,
         padding: 10
     },
     countryList: {
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         backgroundColor: "#D32f2f",
         marginTop: 50,
-        padding: 10, 
+        padding: 10,
         justifyContent: "center",
         alignItems: 'center',
         paddingVertical: 8
@@ -156,4 +156,3 @@ const styles = StyleSheet.create({
 })
 
 export default styles;
-

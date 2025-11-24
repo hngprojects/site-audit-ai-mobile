@@ -1,9 +1,16 @@
 import { useAuditInfoStore } from '@/store/audit-website-details-store';
 import styles from '@/stylesheets/auditing-screen-stylesheet';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useEffect } from 'react';
-import { ActivityIndicator, Text, View } from 'react-native';
+
+
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+
+import React, { useEffect, useRef, useState } from 'react';
+import { Animated, Text, View } from 'react-native';
+
+
+
 
 const AuditingScreen = () => {
   const router = useRouter();
@@ -70,44 +77,68 @@ const scanDate = getFormattedDate();
 }, [router,domain,status,score,scanDate,]);
 
 
+  const { url } = useLocalSearchParams<{ url: string }>();
+  const websiteUrl = url || '';
+  const [progress, setProgress] = useState(0);
+  const animatedWidth = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          return 100;
+        }
+        const increment = Math.random() * 5 + 1;
+        return Math.min(prev + increment, 100);
+      });
+    }, 500);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    Animated.timing(animatedWidth, {
+      toValue: progress,
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
+  }, [progress, animatedWidth]);
+
+  const progressBarWidth = animatedWidth.interpolate({
+    inputRange: [0, 100],
+    outputRange: ['0%', '100%'],
+  });
+
+
+
+
+
+
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={{ flex: 1 }}>
         <View style={styles.header}>
-          <Text style={{
-            fontFamily: "RethinkSans-Bold",
-            fontSize: 30,
-            color: "#000"
-          }}>
-            Scanning Website...
-          </Text>
-          <Text style={{
-            fontFamily: "RethinkSans-SemiBold",
-            fontSize: 14,
-            marginTop: 11,
-            color: "#000"
-          }}>
-            {domain}
-          </Text>
+          <Text style={styles.headerTitle}>Scanning Website...</Text>
+          <Text style={styles.headerUrl}>{websiteUrl}</Text>
         </View>
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#ff5a3d" />
-        </View>
+       
         <View style={styles.content}>
-          {/* <Image source={require('@/assets/images/auditing-screen-image.png')} style={styles.image} /> */}
-          <Text style={{
-            color: "#000",
-            fontFamily: "RethinkSans-Medium",
-            fontSize: 14
-          }}>
-            Hang tight, Takes about 30&ndash;60 seconds
-          </Text>
+          <Text style={styles.contentText}>Hang tight, Takes about 30–60 seconds</Text>
           <View style={styles.progress}>
-            {/* implement progress bar here */}
-            <Text>0%</Text>
+            <View style={styles.progressBarContainer}>
+              <Animated.View
+                style={[
+                  styles.progressBarFill,
+                  { width: progressBarWidth },
+                ]}
+              />
+            </View>
+            <Text style={styles.progressText}>{Math.round(progress)}%</Text>
           </View>
           <View style={styles.footer}>
-            {/* implement process messages hers */}
+            <Text style={styles.footerText}>Process messages here</Text>
           </View>
         </View>
       </View>

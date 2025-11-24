@@ -271,13 +271,13 @@ const SignUp = () => {
             resizeMode="contain"
           />
           <Text style={styles.tipText}>
-            Join 2000+ business owners who&apos;ve improved their sales with Sitelytics.
+            Join 2000+ business owners who&#39;ve improved their sales with Sitelytics.
           </Text>
         </View>
       </KeyboardAvoidingView>
 
       <View style={styles.signInButtonContainer}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.signInButton}
           onPress={() => router.push('/(auth)/sign-in')}
         >

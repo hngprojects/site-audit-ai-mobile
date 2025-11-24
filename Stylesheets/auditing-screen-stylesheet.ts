@@ -70,6 +70,48 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     alignItems: 'center',
   },
+  activityIndicatorWrapper: {
+  justifyContent: "center",
+  alignItems: "center",
+},
+
+activityIndicator: {
+  width: 70,
+  height: 70,
+  backgroundColor: "#ffffff",
+  borderRadius: 50,
+  justifyContent: "center",
+  alignItems: "center",
+  elevation: 4, 
+  shadowColor: "#000",
+  shadowOpacity: 0.15,
+  shadowOffset: { width: 0, height: 2 },
+  shadowRadius: 4,
+},
+
+progressBarContainer: {
+  width: "100%",
+  height: 8,
+  backgroundColor: "#E4E7EB",
+  borderRadius: 10,
+  overflow: "hidden",
+  marginTop: 12,
+},
+
+progressBarFill: {
+  height: "100%",
+  backgroundColor: "#ff5a3d",
+  borderRadius: 10,
+},
+
+footerText: {
+  textAlign: "center",
+  fontSize: 13,
+  color: "#8a8a8a",
+  marginTop: 15,
+  fontFamily: "RethinkSans-Medium",
+},
+
 });
 
 export default styles;

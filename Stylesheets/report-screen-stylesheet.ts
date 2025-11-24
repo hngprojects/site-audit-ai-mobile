@@ -62,4 +62,26 @@ export default StyleSheet.create({
     height: 90,
     width,
   },
+  swipeableContainer: {
+    position: 'relative',
+    marginBottom: 12,
+  },
+  swipeableContent: {
+    backgroundColor: '#FFFFFF',
+  },
+  deleteAction: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    bottom: 0,
+    width: 80,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F04438',
+    borderRadius: 12,
+  },
+  deleteIconContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });

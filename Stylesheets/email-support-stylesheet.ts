@@ -9,8 +9,7 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 16,
-    paddingTop: 60,
+    paddingVertical: 6,
     paddingHorizontal: 16,
   },
   backButton: {
@@ -30,7 +29,6 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingTop: 6,
     paddingHorizontal: 16,
   },
   title: {
@@ -72,7 +70,7 @@ const styles = StyleSheet.create({
   sendButton: {
     backgroundColor: '#FF5A3D',
     paddingVertical: 15,
-    borderRadius: 8,
+    borderRadius: 12,
     alignItems: 'center',
     marginTop: 20,
   },

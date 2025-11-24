@@ -2,7 +2,7 @@ import AuthModal from '@/components/auth/auth-modal';
 import ProfileContent from '@/components/profile/profile-content';
 import ProfileEmptyState from '@/components/profile/profile-empty-state';
 import ProfileHeader from '@/components/profile/profile-header';
-import ProfileSkeleton from '@/components/profile/profile-skeleton';
+// import ProfileSkeleton from '@/components/profile/profile-skeleton';
 import { useAuth } from '@/hooks/use-auth';
 import styles from '@/stylesheets/profile-stylesheet';
 import { useFocusEffect } from '@react-navigation/native';
@@ -37,7 +37,7 @@ const Profile = () => {
   };
 
   if (!isInitialized) {
-    return <ProfileSkeleton />;
+    return null;
   }
 
   return (
