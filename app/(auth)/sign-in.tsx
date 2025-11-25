@@ -1,10 +1,11 @@
 import { LoadingButton } from '@/components/ui/loading-button';
 import { useAuth } from '@/hooks/use-auth';
+import { biometricService } from '@/lib/biometric-service';
 import styles from '@/stylesheets/sign-in-stylesheet';
 import Feather from '@expo/vector-icons/Feather';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Alert, Image, KeyboardAvoidingView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const SignIn = () => {
@@ -15,6 +16,80 @@ const SignIn = () => {
   const [password, setPassword] = useState<string>('');
   const [secureTextEntry, setSecureTextEntry] = useState<boolean>(true);
   const [localError, setLocalError] = useState<string | null>(null);
+  const [biometricAvailable, setBiometricAvailable] = useState<boolean>(false);
+  const [biometricEnabled, setBiometricEnabled] = useState<boolean>(false);
+
+  const handleBiometricLogin = async () => {
+    try {
+      const credentials = await biometricService.getCredentials();
+      if (!credentials) {
+        // No credentials saved, silently return - user can sign in manually
+        return;
+      }
+
+      // Authenticate with biometrics
+      const result = await biometricService.authenticate(
+        Platform.OS === 'ios' 
+          ? 'Use Face ID to sign in' 
+          : 'Use your fingerprint to sign in'
+      );
+
+      if (result.success) {
+        // Biometric authentication successful, sign in with saved credentials
+        try {
+          await signIn(credentials.email, credentials.password);
+        } catch {
+          // If login fails, credentials might be invalid, remove them
+          await biometricService.removeCredentials();
+          Alert.alert(
+            'Biometric Login Failed',
+            'Saved credentials are invalid. Please sign in manually.',
+            [{ text: 'OK' }]
+          );
+        }
+      } else if (result.error === 'user_cancel') {
+        // User cancelled biometric prompt - silently allow manual login
+        return;
+      } else if (result.error === 'user_fallback') {
+        // User chose to use passcode - silently allow manual login
+        return;
+      } else {
+        // Other errors - only show alert for unexpected failures
+        console.error('Biometric authentication error:', result.error);
+      }
+    } catch (error) {
+      console.error('Biometric login error:', error);
+      // Only show alert for unexpected errors
+    }
+  };
+
+  // Check biometric availability and auto-trigger if enabled
+  useEffect(() => {
+    const checkAndTriggerBiometric = async () => {
+      try {
+        const available = await biometricService.isAvailable();
+        const enabled = await biometricService.isEnabled();
+        setBiometricAvailable(available);
+        setBiometricEnabled(enabled);
+
+        // If biometric is enabled and available, automatically trigger authentication
+        if (available && enabled) {
+          const credentials = await biometricService.getCredentials();
+          if (credentials) {
+            // Small delay to ensure UI is ready, then auto-trigger biometric
+            setTimeout(() => {
+              handleBiometricLogin();
+            }, 300);
+          }
+        }
+      } catch (error) {
+        console.error('Error checking biometric:', error);
+      }
+    };
+
+    checkAndTriggerBiometric();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -56,10 +131,17 @@ const SignIn = () => {
 
     try {
       await signIn(email.trim(), password);
+      // Save credentials for biometric login if biometric is enabled
+      if (biometricEnabled && biometricAvailable) {
+        await biometricService.saveCredentials({
+          email: email.trim(),
+          password: password,
+        });
+      }
       // Navigation is handled by useEffect when isAuthenticated changes
-    } catch (err) {
+    } catch (error) {
       // Error is handled by the store and shown via Alert
-      console.error('Sign in error:', err);
+      console.error('Sign in error:', error);
     }
   };
 

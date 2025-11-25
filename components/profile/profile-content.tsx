@@ -1,13 +1,14 @@
 import LogoutModal from '@/components/profile/logout-modal';
+import { biometricService } from '@/lib/biometric-service';
 import { useAuthStore } from '@/store/auth-store';
 import styles from '@/stylesheets/profile-stylesheet';
+import type { User } from '@/type';
 import { getFullImageUrl } from '@/utils/image-url';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
-import { Image, Switch, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Alert, Image, Platform, Switch, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import type { User } from '@/type';
 
 interface ProfileContentProps {
   user: User | null;
@@ -16,10 +17,30 @@ interface ProfileContentProps {
 const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
   const router = useRouter();
   const { signOut } = useAuthStore();
-  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+  const [biometricEnabled, setBiometricEnabled] = useState(false);
+  const [biometricAvailable, setBiometricAvailable] = useState(false);
+  const [loadingBiometric, setLoadingBiometric] = useState(true);
   const [pushNotificationsEnabled, setPushNotificationsEnabled] = useState(true);
   const [emailReportsEnabled, setEmailReportsEnabled] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
+
+  // Load biometric status
+  useEffect(() => {
+    const loadBiometricStatus = async () => {
+      try {
+        const available = await biometricService.isAvailable();
+        const enabled = await biometricService.isEnabled();
+        setBiometricAvailable(available);
+        setBiometricEnabled(enabled);
+      } catch (error) {
+        console.error('Error loading biometric status:', error);
+      } finally {
+        setLoadingBiometric(false);
+      }
+    };
+
+    loadBiometricStatus();
+  }, []);
 
   const handleLogoutPress = () => {
     setLogoutModalVisible(true);
@@ -37,6 +58,67 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
 
   const handleLogoutCancel = () => {
     setLogoutModalVisible(false);
+  };
+
+  const handleBiometricToggle = async (value: boolean) => {
+    if (!biometricAvailable) {
+      Alert.alert(
+        'Biometrics Not Available',
+        Platform.OS === 'ios'
+          ? 'Face ID is not available on this device. Please set up Face ID in your device settings.'
+          : 'Fingerprint authentication is not available on this device. Please set up fingerprint in your device settings.',
+        [{ text: 'OK' }]
+      );
+      return;
+    }
+
+    try {
+      if (value) {
+        // Enable biometrics - authenticate first to ensure it works
+        const result = await biometricService.authenticate(
+          Platform.OS === 'ios'
+            ? 'Enable Face ID login'
+            : 'Enable fingerprint login'
+        );
+
+        if (result.success) {
+          await biometricService.enable();
+          setBiometricEnabled(true);
+          Alert.alert(
+            'Biometrics Enabled',
+            Platform.OS === 'ios'
+              ? 'Face ID login has been enabled. Your credentials will be saved securely.'
+              : 'Fingerprint login has been enabled. Your credentials will be saved securely.',
+            [{ text: 'OK' }]
+          );
+        } else if (result.error === 'user_cancel') {
+          // User cancelled, do nothing
+          return;
+        } else {
+          Alert.alert(
+            'Authentication Failed',
+            'Biometric authentication failed. Please try again.',
+            [{ text: 'OK' }]
+          );
+        }
+      } else {
+        // Disable biometrics
+        await biometricService.disable();
+        setBiometricEnabled(false);
+        Alert.alert(
+          'Biometrics Disabled',
+          'Biometric login has been disabled and saved credentials have been removed.',
+          [{ text: 'OK' }]
+        );
+      }
+    } catch (error) {
+      console.error('Error toggling biometric:', error);
+      Alert.alert(
+        'Error',
+        'Failed to update biometric settings. Please try again.',
+        [{ text: 'OK' }]
+      );
+    }
   };
 
   return (
@@ -104,18 +186,26 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
             </View>
             <Feather name="chevron-right" size={16} color="#1A2373" />
           </TouchableOpacity>
-          <View style={styles.settingsItem}>
-            <View style={styles.settingsItemLeft}>
-              <Feather name="shield" size={20} color="#1A2373" />
-              <Text style={styles.settingsItemText}>Two-factor Authentication</Text>
+          {biometricAvailable && (
+            <View style={styles.settingsItem}>
+              <View style={styles.settingsItemLeft}>
+                <Feather name="shield" size={20} color="#1A2373" />
+                <Text style={styles.settingsItemText}>
+                  Biometrics
+                </Text>
+              </View>
+              {loadingBiometric ? (
+                <View style={{ width: 51, height: 31 }} />
+              ) : (
+                <Switch
+                  value={biometricEnabled}
+                  onValueChange={handleBiometricToggle}
+                  trackColor={{ false: '#767577', true: '#FF5A3D' }}
+                  thumbColor="#ffffff"
+                />
+              )}
             </View>
-            <Switch
-              value={twoFactorEnabled}
-              onValueChange={setTwoFactorEnabled}
-              trackColor={{ false: '#767577', true: '#FF5A3D' }}
-              thumbColor="#ffffff"
-            />
-          </View>
+          )}
           <TouchableOpacity style={styles.settingsItem} onPress={() => router.push('/(profile)/privacy-policy')}>
             <View style={styles.settingsItemLeft}>
               <Feather name="file-text" size={20} color="#1A2373" />
