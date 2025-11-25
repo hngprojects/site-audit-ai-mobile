@@ -187,17 +187,20 @@ const hireAPro = () => {
           <Text style={{...styles.domainText, alignItems: "center", color: "blue",  fontSize: 10,}}>{domain}</Text>
          </View>
 
-         <View style={{
-          flexDirection: "row",
-          alignItems: "center",
-          gap: 10,
-          padding: 3,
-          paddingHorizontal: 10,
-          alignContent: "center",
-         }}>
-          <AntDesign name="reload" size={15} color="red" />
-          <Text style={{color: "red", alignItems: "center", ...styles.domainText, fontSize: 13}}>Re-run audit</Text>
-         </View>
+         <TouchableOpacity
+           style={{
+             flexDirection: "row",
+             alignItems: "center",
+             gap: 10,
+             padding: 3,
+             paddingHorizontal: 10,
+             alignContent: "center",
+           }}
+           onPress={() => router.push({ pathname: '/(main)/auditing-screen', params: { url: domain } })}
+         >
+           <AntDesign name="reload" size={15} color="red" />
+           <Text style={{color: "red", alignItems: "center", ...styles.domainText, fontSize: 13}}>Re-run audit</Text>
+         </TouchableOpacity>
         </View>
 
         

@@ -4,10 +4,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: "#fff",
     gap: 4,
+    marginBottom: 30,
+    marginTop: 30,
 
   },
   loadingContainer: {
@@ -16,9 +18,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   content: {
+    flex: 1,
     alignItems: 'center',
     paddingHorizontal: 20,
     backgroundColor: "#fff",
+    justifyContent: 'center',
+  
     
   },
   title: {
@@ -29,11 +34,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   message: {
-    fontSize: 14,
-    fontFamily: 'RethinkSans-Regular',
+    fontSize: 16,
+    fontFamily: 'RethinkSans-Medium',
     color: '#494949',
     textAlign: 'center',
-    lineHeight: 24,
+    lineHeight: 20,
     marginBottom: 20,
   },
   email: {
@@ -42,7 +47,7 @@ const styles = StyleSheet.create({
   checkmarkContainerOuter: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 40,
+    marginBottom: 24,
     height: 120,
     width: 120,
     backgroundColor: 'rgba(102, 161, 122, 0.3)',
@@ -66,6 +71,19 @@ const styles = StyleSheet.create({
     marginHorizontal: -20,
   },
   doneButtonText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontFamily: 'RethinkSans-Medium',
+  },
+  button: {
+    backgroundColor: '#FF5A3D',
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    width: '100%',
+    // marginHorizontal: -20,
+  },
+  buttonText: {
     color: '#FFFFFF',
     fontSize: 14,
     fontFamily: 'RethinkSans-Bold',

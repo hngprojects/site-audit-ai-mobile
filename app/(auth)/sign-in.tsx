@@ -2,13 +2,14 @@ import { LoadingButton } from '@/components/ui/loading-button';
 import { useAuth } from '@/hooks/use-auth';
 import styles from '@/stylesheets/sign-in-stylesheet';
 import Feather from '@expo/vector-icons/Feather';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Alert, Image, KeyboardAvoidingView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const SignIn = () => {
   const router = useRouter();
+  const params = useLocalSearchParams();
   const { signIn, isLoading, error, clearError, isAuthenticated } = useAuth();
 
   const [email, setEmail] = useState<string>('');
@@ -18,9 +19,9 @@ const SignIn = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.replace('/(tabs)');
+      router.replace((params.redirect as any) || '/(tabs)');
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, router, params.redirect]);
 
   // Show error alerts
   useEffect(() => {
