@@ -30,3 +30,7 @@ export const resendResetToken = async (email: string): Promise<void> => {
   return await authService.resendResetToken(email);
 };
 
+export const signInWithGoogle = async (): Promise<AuthResponse> => {
+  return await authService.signInWithGoogle();
+};
+

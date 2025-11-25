@@ -1,4 +1,5 @@
 import { apiClient, formatErrorMessage, isAxiosError } from '@/lib/api-client';
+import { googleAuthService } from '@/lib/google-auth-service';
 import type { AuthResponse, SignInCredentials, SignUpCredentials } from '@/type';
 
 export const MIN_PASSWORD_LENGTH = 6;
@@ -249,6 +250,56 @@ export const authService = {
         throw error;
       }
       throw new Error('Failed to reset password. Please try again.');
+    }
+  },
+
+  async signInWithGoogle(): Promise<AuthResponse> {
+    try {
+      // Get id_token from Google
+      const idToken = await googleAuthService.signIn();
+      const platform = googleAuthService.getPlatform();
+
+      // Send id_token to backend
+      const response = await apiClient.post('/api/v1/auth/oauth/google', {
+        id_token: idToken,
+        platform: platform,
+      });
+
+      const responseData = response.data;
+      
+      // Extract token from response.data.access_token
+      const token = responseData.data?.access_token;
+      const apiUser = responseData.data?.user;
+      
+      if (!apiUser || !token) {
+        throw new Error('Invalid response from server');
+      }
+      
+      // Construct full name from first_name and last_name, fallback to username
+      const fullName = apiUser.first_name && apiUser.last_name
+        ? `${apiUser.first_name} ${apiUser.last_name}`.trim()
+        : apiUser.first_name || apiUser.last_name || apiUser.username || '';
+      
+      const user = {
+        id: apiUser.id,
+        email: apiUser.email,
+        fullName,
+        createdAt: apiUser.created_at || new Date().toISOString(),
+        phoneNumber: apiUser.phone_number || undefined,
+        profileImage: apiUser.profile_picture_url || undefined,
+      };
+      
+      return { user, token };
+    } catch (error) {
+      if (isAxiosError(error)) {
+        const errorData = error.response?.data || {};
+        const errorMessage = formatErrorMessage(errorData);
+        throw new Error(errorMessage);
+      }
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Failed to sign in with Google. Please try again.');
     }
   },
 };
