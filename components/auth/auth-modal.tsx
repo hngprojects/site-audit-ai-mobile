@@ -1,15 +1,17 @@
+import { useAuth } from '@/hooks/use-auth';
 import styles from '@/stylesheets/profile-stylesheet';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-    Animated,
-    Image,
-    Keyboard,
-    Modal,
-    Text,
-    TouchableOpacity,
-    TouchableWithoutFeedback,
-    View,
+  ActivityIndicator,
+  Animated,
+  Image,
+  Keyboard,
+  Modal,
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -22,6 +24,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose }) => {
   const [slideAnim] = useState(new Animated.Value(0));
   const router = useRouter();
   const inset = useSafeAreaInsets();
+  const { signInWithGoogle, isLoading, isAuthenticated } = useAuth();
 
   useEffect(() => {
     if (visible) {
@@ -40,9 +43,21 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose }) => {
     }
   }, [visible, slideAnim]);
 
-  const handleGoogleLogin = () => {
-    console.log('Google login pressed');
-    onClose();
+  // Close modal when user successfully authenticates
+  useEffect(() => {
+    if (isAuthenticated && visible) {
+      onClose();
+    }
+  }, [isAuthenticated, visible, onClose]);
+
+  const handleGoogleLogin = async () => {
+    try {
+      await signInWithGoogle();
+      // Modal will close automatically when isAuthenticated becomes true
+    } catch (error) {
+      // Error is handled by the store and shown via Alert
+      console.error('Google sign-in error:', error);
+    }
   };
 
   const handleAppleLogin = () => {
@@ -103,13 +118,18 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose }) => {
 
               <View style={styles.buttonsContainer}>
                 <TouchableOpacity
-                  style={styles.socialButton}
+                  style={[styles.socialButton, isLoading && { opacity: 0.6 }]}
                   onPress={handleGoogleLogin}
+                  disabled={isLoading}
                 >
-                  <Image
-                    source={require('../../assets/images/google.png')}
-                    style={styles.socialIcon}
-                  />
+                  {isLoading ? (
+                    <ActivityIndicator size="small" color="#1c1c1c" style={{ marginRight: 12 }} />
+                  ) : (
+                    <Image
+                      source={require('../../assets/images/google.png')}
+                      style={styles.socialIcon}
+                    />
+                  )}
                   <Text style={styles.socialButtonText}>Continue with Google</Text>
                 </TouchableOpacity>
 

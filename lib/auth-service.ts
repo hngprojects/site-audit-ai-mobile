@@ -1,4 +1,5 @@
 import { apiClient, formatErrorMessage, isAxiosError } from '@/lib/api-client';
+import { googleAuthService } from '@/lib/google-auth-service';
 import type { AuthResponse, SignInCredentials, SignUpCredentials } from '@/type';
 
 export const MIN_PASSWORD_LENGTH = 6;
@@ -15,20 +16,26 @@ export const authService = {
       const response = await apiClient.post('/api/v1/auth/login', { email, password });
       const responseData = response.data;
       
-      const token = responseData.data?.access_token || responseData.data?.token || responseData.access_token || responseData.token;
-      const apiUser = responseData.data?.user || responseData.user;
+      // Extract token from response.data.access_token
+      const token = responseData.data?.access_token;
+      const apiUser = responseData.data?.user;
       
       if (!apiUser || !token) {
         throw new Error('Invalid response from server');
       }
       
+      // Construct full name from first_name and last_name, fallback to username
+      const fullName = apiUser.first_name && apiUser.last_name
+        ? `${apiUser.first_name} ${apiUser.last_name}`.trim()
+        : apiUser.first_name || apiUser.last_name || apiUser.username || '';
+      
       const user = {
         id: apiUser.id,
         email: apiUser.email,
-        fullName: apiUser.first_name && apiUser.last_name 
-          ? `${apiUser.first_name} ${apiUser.last_name}`.trim()
-          : apiUser.fullName || apiUser.username || '',
-        createdAt: apiUser.created_at || apiUser.createdAt || new Date().toISOString(),
+        fullName,
+        createdAt: apiUser.created_at || new Date().toISOString(),
+        phoneNumber: apiUser.phone_number || undefined,
+        profileImage: apiUser.profile_picture_url || undefined,
       };
       
       return { user, token };
@@ -69,22 +76,27 @@ export const authService = {
       });
       
       const responseData = response.data;
-      console.log(responseData);
       
-      const token = responseData.data?.access_token || responseData.data?.token || responseData.access_token || responseData.token;
-      const apiUser = responseData.data?.user || responseData.user;
+      // Extract token from response.data.access_token
+      const token = responseData.data?.access_token;
+      const apiUser = responseData.data?.user;
       
       if (!apiUser || !token) {
         throw new Error('Invalid response from server');
       }
       
+      // Construct full name from first_name and last_name, fallback to username
+      const fullName = apiUser.first_name && apiUser.last_name
+        ? `${apiUser.first_name} ${apiUser.last_name}`.trim()
+        : apiUser.first_name || apiUser.last_name || apiUser.username || '';
+      
       const user = {
         id: apiUser.id,
         email: apiUser.email,
-        fullName: apiUser.first_name && apiUser.last_name 
-          ? `${apiUser.first_name} ${apiUser.last_name}`.trim()
-          : apiUser.fullName || apiUser.username || '',
-        createdAt: apiUser.created_at || apiUser.createdAt || new Date().toISOString(),
+        fullName,
+        createdAt: apiUser.created_at || new Date().toISOString(),
+        phoneNumber: apiUser.phone_number || undefined,
+        profileImage: apiUser.profile_picture_url || undefined,
       };
       
       return { user, token };
@@ -199,6 +211,95 @@ export const authService = {
         throw error;
       }
       throw new Error('Failed to resend reset token. Please try again.');
+    }
+  },
+
+  async resetPassword(
+    currentPassword: string,
+    newPassword: string,
+    token: string
+  ): Promise<void> {
+    if (!currentPassword || !newPassword) {
+      throw new Error('Current password and new password are required');
+    }
+
+    if (newPassword.length < MIN_PASSWORD_LENGTH) {
+      throw new Error(`Password must be at least ${MIN_PASSWORD_LENGTH} characters`);
+    }
+
+    try {
+      await apiClient.post(
+        '/api/v1/auth/reset-password',
+        {
+          current_password: currentPassword,
+          new_password: newPassword,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+    } catch (error) {
+      if (isAxiosError(error)) {
+        const errorData = error.response?.data || {};
+        const errorMessage = formatErrorMessage(errorData);
+        throw new Error(errorMessage);
+      }
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Failed to reset password. Please try again.');
+    }
+  },
+
+  async signInWithGoogle(): Promise<AuthResponse> {
+    try {
+      // Get id_token from Google
+      const idToken = await googleAuthService.signIn();
+      const platform = googleAuthService.getPlatform();
+
+      // Send id_token to backend
+      const response = await apiClient.post('/api/v1/auth/oauth/google', {
+        id_token: idToken,
+        platform: platform,
+      });
+
+      const responseData = response.data;
+      
+      // Extract token from response.data.access_token
+      const token = responseData.data?.access_token;
+      const apiUser = responseData.data?.user;
+      
+      if (!apiUser || !token) {
+        throw new Error('Invalid response from server');
+      }
+      
+      // Construct full name from first_name and last_name, fallback to username
+      const fullName = apiUser.first_name && apiUser.last_name
+        ? `${apiUser.first_name} ${apiUser.last_name}`.trim()
+        : apiUser.first_name || apiUser.last_name || apiUser.username || '';
+      
+      const user = {
+        id: apiUser.id,
+        email: apiUser.email,
+        fullName,
+        createdAt: apiUser.created_at || new Date().toISOString(),
+        phoneNumber: apiUser.phone_number || undefined,
+        profileImage: apiUser.profile_picture_url || undefined,
+      };
+      
+      return { user, token };
+    } catch (error) {
+      if (isAxiosError(error)) {
+        const errorData = error.response?.data || {};
+        const errorMessage = formatErrorMessage(errorData);
+        throw new Error(errorMessage);
+      }
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Failed to sign in with Google. Please try again.');
     }
   },
 };

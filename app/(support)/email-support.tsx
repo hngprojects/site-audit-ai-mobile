@@ -1,4 +1,5 @@
 import styles from '@/stylesheets/email-support-stylesheet';
+import { supportService } from '@/lib/support-service';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -10,13 +11,14 @@ const EmailSupportContent = () => {
   const [email, setEmail] = useState('user@gmail.com');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const isValidEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
 
-  const handleSend = () => {
+  const handleSend = async () => {
     const trimmedEmail = email.trim();
     const trimmedSubject = subject.trim();
     const trimmedMessage = message.trim();
@@ -41,8 +43,21 @@ const EmailSupportContent = () => {
       return;
     }
 
-    Alert.alert('Success', 'Your email has been sent successfully');
-    router.back();
+    setIsLoading(true);
+    try {
+      await supportService.sendEmail({
+        email: trimmedEmail,
+        subject: trimmedSubject,
+        message: trimmedMessage,
+      });
+      Alert.alert('Success', 'Your email has been sent successfully', [
+        { text: 'OK', onPress: () => router.back() },
+      ]);
+    } catch (error) {
+      Alert.alert('Error', error instanceof Error ? error.message : 'Failed to send email. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -101,8 +116,16 @@ const EmailSupportContent = () => {
             />
           </View>
 
-          <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
-            <Text style={styles.sendButtonText}>Send Message</Text>
+          <TouchableOpacity 
+            style={[styles.sendButton, isLoading && styles.sendButtonDisabled]} 
+            onPress={handleSend}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Text style={styles.sendButtonText}>Send Message</Text>
+            )}
           </TouchableOpacity>
         </View>
       </ScrollView>

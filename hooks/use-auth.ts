@@ -16,6 +16,7 @@ export const useAuth = () => {
     isInitialized,
     error,
     signIn,
+    signInWithGoogle,
     signUp,
     signOut,
     initialize,
@@ -53,6 +54,7 @@ export const useAuth = () => {
 
     // Actions
     signIn,
+    signInWithGoogle,
     signUp: (email: string, password: string) => signUp(email, password),
     signOut,
     clearError,

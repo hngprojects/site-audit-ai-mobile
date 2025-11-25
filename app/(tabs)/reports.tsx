@@ -1,7 +1,6 @@
-import ReportCard from "@/components/report-card";
 import { useSitesStore } from "@/store/sites-store";
 import styles from "@/stylesheets/report-screen-stylesheet";
-import { ReportItemProps } from "@/type";
+import { ReportItemProps, Status } from "@/type";
 import { MaterialIcons } from '@expo/vector-icons';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from "expo-router";
@@ -33,31 +32,61 @@ const SkeletonCard = () => (
 
 interface SwipeableRowProps {
   item: ReportItemProps;
+  url: string;
   onDelete: () => void;
+  onEdit: () => void;
   onPress: () => void;
 }
 
-const SwipeableRow: React.FC<SwipeableRowProps> = ({ item, onDelete, onPress }) => {
+const SwipeableRow: React.FC<SwipeableRowProps> = ({ item, url, onDelete, onEdit, onPress }) => {
+  const swipeableRef = React.useRef<React.ComponentRef<typeof ReanimatedSwipeable>>(null);
+
   const renderRightActions = (_progress: any, _dragX: any) => (
-    <TouchableOpacity style={styles.deleteAction} onPress={() => onDelete()}>
-      <MaterialIcons name="delete" size={22} color="#fff" />
-    </TouchableOpacity>
+    <View style={styles.rightActions}>
+      <TouchableOpacity style={styles.editAction} onPress={() => {
+        swipeableRef.current?.close();
+        onEdit();
+      }}>
+        <MaterialIcons name="edit" size={20} color="#fff" />
+        <Text style={styles.actionText}>Edit</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.deleteAction} onPress={() => {
+        swipeableRef.current?.close();
+        onDelete();
+      }}>
+        <MaterialIcons name="delete" size={20} color="#494949" />
+        <Text style={styles.actionText}>Delete</Text>
+      </TouchableOpacity>
+    </View>
   );
+
+  const handleMenuPress = () => {
+    swipeableRef.current?.openRight();
+  };
 
   return (
     <ReanimatedSwipeable
+      ref={swipeableRef}
       renderRightActions={renderRightActions}
       friction={2}
       overshootRight={false}
     >
       <View style={styles.swipeableContent}>
-        <ReportCard
-          domain={item.domain}
-          score={item.score}
-          status={item.status}
-          scanDate={item.scanDate}
-          onPress={onPress}
-        />
+        <TouchableOpacity style={styles.reportCard} onPress={onPress} activeOpacity={0.7}>
+          <View style={styles.cardContent}>
+            <View style={styles.cardLeft}>
+              <Text style={styles.urlText} numberOfLines={1}>{url}</Text>
+              <Text style={styles.scanDateText}>{item.scanDate}</Text>
+            </View>
+            <TouchableOpacity 
+              style={styles.menuButton}
+              onPress={handleMenuPress}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <MaterialIcons name="more-vert" size={24} color="#6B7280" />
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
       </View>
     </ReanimatedSwipeable>
   );
@@ -84,11 +113,11 @@ const ReportsScreen: React.FC = () => {
     });
   };
 
-  const getStatusFromScore = (score?: number): "low" | "medium" | "high" => {
-    if (!score) return "medium";
-    if (score >= 80) return "high";
-    if (score >= 50) return "medium";
-    return "low";
+  const getStatusFromScore = (score?: number): Status => {
+    if (!score) return "Warning";
+    if (score >= 80) return "Good";
+    if (score >= 50) return "Warning";
+    return "Critical";
   };
 
   const mapSiteToReportItem = (site: typeof sites[0]) => {
@@ -96,6 +125,7 @@ const ReportsScreen: React.FC = () => {
     const domain = url.replace(/^https?:\/\//, '').replace(/^www\./, '') || 'N/A';
     return {
       siteId: site.id,
+      url: site.root_url || '',
       domain,
       score: 0,
       status: getStatusFromScore(undefined),
@@ -125,6 +155,11 @@ const ReportsScreen: React.FC = () => {
         }
       },
     ]);
+  };
+
+  const handleEdit = (item: typeof filteredData[0]) => {
+    // TODO: Implement edit functionality
+    Alert.alert('Edit', `Edit functionality for ${item.domain} will be implemented soon.`);
   };
 
 
@@ -172,7 +207,9 @@ const ReportsScreen: React.FC = () => {
               return (
                 <SwipeableRow
                   item={item}
+                  url={item.url}
                   onDelete={() => handleDelete(item.siteId, item.domain)}
+                  onEdit={() => handleEdit(item)}
                   onPress={() => router.push({
                     pathname: "../(reports)/report-dashboard", 
                     params: {
@@ -195,6 +232,16 @@ const ReportsScreen: React.FC = () => {
             }
           />
         )}
+
+        <View style={[styles.bottomButtonContainer, { paddingBottom: Math.max(insets.bottom, 20) }]}>
+          <TouchableOpacity 
+            style={styles.startNewScanButton}
+            onPress={() => router.push('/(tabs)/')}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.startNewScanText}>Start New Scan</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </GestureHandlerRootView>
   );

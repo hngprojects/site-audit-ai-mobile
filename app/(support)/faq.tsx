@@ -17,7 +17,10 @@ const FAQContent = () => {
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
           <Feather name="arrow-left" size={24} color="#1A2373" />
         </TouchableOpacity>
-        <Text style={styles.headerText}>FAQ</Text>
+        <View style={styles.headerTextContainer}>
+          <Text style={styles.headerText}>FAQ</Text>
+        </View>
+        <View style={styles.backButtonPlaceholder} />
       </View>
       <ScrollView
         style={styles.scrollContainer}
@@ -40,7 +43,7 @@ const FAQContent = () => {
         </View>
         <View style={styles.contactSection}>
           <Text style={styles.confusedText}>Still Confused?</Text>
-          <Text style={styles.contactText}>Contact Us</Text>
+          <Text style={styles.contactText} onPress={() => router.push('/send-message')}>Contact Us</Text>
         </View>
       </ScrollView>
     </SafeAreaView>

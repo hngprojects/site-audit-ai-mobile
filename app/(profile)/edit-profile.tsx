@@ -1,17 +1,67 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Feather } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { profileService } from '@/lib/profile-service';
+import { useAuthStore } from '@/store/auth-store';
 import styles from '@/stylesheets/edit-profile-stylesheet';
+import { getFullImageUrl } from '@/utils/image-url';
+import { Feather } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
+import * as ImagePicker from 'expo-image-picker';
+import { useRouter } from 'expo-router';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, Alert, Image, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const EditProfileContent = () => {
   const router = useRouter();
-  const [fullName, setFullName] = useState('Damian Amadi');
-  const [email, setEmail] = useState('Damianamadi@gmail.com');
-  const [phoneNumber, setPhoneNumber] = useState('+1 234 567 8900');
+  const { user, token } = useAuthStore();
+  const [fullName, setFullName] = useState(user?.fullName || '');
+  const [email, setEmail] = useState(user?.email || '');
+  const [phoneNumber, setPhoneNumber] = useState(user?.phoneNumber || '');
+  const [profileImage, setProfileImage] = useState<string | null>(user?.profileImage || null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [errors, setErrors] = useState<{fullName?: string; email?: string; phoneNumber?: string}>({});
+  const hasInitialized = useRef(false);
+
+  // Load fresh profile data when screen is focused
+  useFocusEffect(
+    useCallback(() => {
+      const loadProfile = async () => {
+        if (token) {
+          try {
+            const profile = await profileService.getProfile(token);
+            useAuthStore.setState({ user: profile });
+            setFullName(profile.fullName || '');
+            setEmail(profile.email || '');
+            setPhoneNumber(profile.phoneNumber || '');
+            setProfileImage(profile.profileImage || null);
+            hasInitialized.current = true;
+          } catch {
+            // If API call fails, use existing user data if available
+            const currentUser = useAuthStore.getState().user;
+            if (!hasInitialized.current && currentUser) {
+              setFullName(currentUser.fullName || '');
+              setEmail(currentUser.email || '');
+              setPhoneNumber(currentUser.phoneNumber || '');
+              setProfileImage(currentUser.profileImage || null);
+              hasInitialized.current = true;
+            }
+          }
+        } else {
+          // Fallback to user data if no token
+          const currentUser = useAuthStore.getState().user;
+          if (!hasInitialized.current && currentUser) {
+            setFullName(currentUser.fullName || '');
+            setEmail(currentUser.email || '');
+            setPhoneNumber(currentUser.phoneNumber || '');
+            setProfileImage(currentUser.profileImage || null);
+            hasInitialized.current = true;
+          }
+        }
+      };
+
+      loadProfile();
+    }, [token])
+  );
 
   const validateForm = () => {
     const newErrors: {fullName?: string; email?: string; phoneNumber?: string} = {};
@@ -28,9 +78,7 @@ const EditProfileContent = () => {
       newErrors.email = 'Incorrect email format';
     }
 
-    if (!phoneNumber.trim()) {
-      newErrors.phoneNumber = 'Phone number is required';
-    } else if (!/^\+?[\d\s\-\(\)]+$/.test(phoneNumber)) {
+    if (phoneNumber && phoneNumber.trim() && !/^\+?[\d\s\-\(\)]+$/.test(phoneNumber)) {
       newErrors.phoneNumber = 'Please enter a valid phone number';
     }
 
@@ -39,20 +87,52 @@ const EditProfileContent = () => {
   };
 
   const handleSave = async () => {
-    if (!validateForm()) return;
+    if (!validateForm() || !token) return;
 
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      const updateData: {
+        first_name?: string;
+        last_name?: string;
+        email?: string;
+        phone_number?: string;
+      } = {};
+
+      if (fullName !== user?.fullName) {
+        const nameParts = fullName.trim().split(' ');
+        if (nameParts.length > 0) {
+          updateData.first_name = nameParts[0];
+          updateData.last_name = nameParts.slice(1).join(' ') || undefined;
+        }
+      }
+      if (email !== user?.email) {
+        updateData.email = email.trim();
+      }
+      if (phoneNumber !== user?.phoneNumber) {
+        updateData.phone_number = phoneNumber.trim() || undefined;
+      }
+
+      const updatedUser = await profileService.updateProfile(updateData, token);
+      
+      // Update Zustand store with the latest user data
+      useAuthStore.setState({ user: updatedUser });
+      
+      // Update local state to reflect changes
+      setFullName(updatedUser.fullName);
+      setEmail(updatedUser.email);
+      setPhoneNumber(updatedUser.phoneNumber || '');
+      setProfileImage(updatedUser.profileImage || null);
 
       Alert.alert(
         'Success',
-        'Profile has been changed successfully',
+        'Profile has been updated successfully',
         [{ text: 'OK', onPress: () => router.back() }]
       );
-    } catch {
-      Alert.alert('Error', 'Failed to update profile. Please try again.');
+    } catch (error) {
+      Alert.alert(
+        'Error',
+        error instanceof Error ? error.message : 'Failed to update profile. Please try again.'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -62,13 +142,107 @@ const EditProfileContent = () => {
     router.back();
   };
 
+  const requestPermissions = async () => {
+    if (Platform.OS !== 'web') {
+      const { status: cameraStatus } = await ImagePicker.requestCameraPermissionsAsync();
+      const { status: mediaLibraryStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      
+      if (cameraStatus !== 'granted' || mediaLibraryStatus !== 'granted') {
+        Alert.alert(
+          'Permissions Required',
+          'Camera and media library permissions are required to change your profile photo.'
+        );
+        return false;
+      }
+    }
+    return true;
+  };
+
+  const handleTakePhoto = async () => {
+    const hasPermission = await requestPermissions();
+    if (!hasPermission || !token) return;
+
+    try {
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        const asset = result.assets[0];
+        if (asset.fileSize && asset.fileSize > 3 * 1024 * 1024) {
+          Alert.alert('Error', 'Image size must be less than 3MB. Please choose a smaller image.');
+          return;
+        }
+        await uploadImage(asset.uri);
+      }
+    } catch {
+      Alert.alert('Error', 'Failed to take photo. Please try again.');
+    }
+  };
+
+  const handleChooseFromGallery = async () => {
+    const hasPermission = await requestPermissions();
+    if (!hasPermission || !token) return;
+
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        const asset = result.assets[0];
+        if (asset.fileSize && asset.fileSize > 3 * 1024 * 1024) {
+          Alert.alert('Error', 'Image size must be less than 3MB. Please choose a smaller image.');
+          return;
+        }
+        await uploadImage(asset.uri);
+      }
+    } catch {
+      Alert.alert('Error', 'Failed to select image. Please try again.');
+    }
+  };
+
+  const uploadImage = async (imageUri: string) => {
+    if (!token) return;
+
+    setIsUploadingImage(true);
+    try {
+      const imageUrl = await profileService.uploadProfileImage(imageUri, token);
+      setProfileImage(imageUrl);
+      
+      const currentUser = useAuthStore.getState().user;
+      if (currentUser) {
+        const updatedUser = {
+          ...currentUser,
+          profileImage: imageUrl,
+        };
+        useAuthStore.setState({ user: updatedUser });
+      }
+
+      Alert.alert('Success', 'Profile photo updated successfully');
+    } catch (error) {
+      Alert.alert(
+        'Error',
+        error instanceof Error ? error.message : 'Failed to upload image. Please try again.'
+      );
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
+
   const handleChangePhoto = () => {
     Alert.alert(
       'Change Profile Photo',
       'Choose an option',
       [
-        { text: 'Take Photo', onPress: () => console.log('Take photo') },
-        { text: 'Choose from Gallery', onPress: () => console.log('Choose from gallery') },
+        { text: 'Take Photo', onPress: handleTakePhoto },
+        { text: 'Choose from Gallery', onPress: handleChooseFromGallery },
         { text: 'Cancel', style: 'cancel' }
       ]
     );
@@ -92,13 +266,50 @@ const EditProfileContent = () => {
           {/* Profile Image Section */}
           <View style={styles.profileImageSection}>
             <View style={styles.profileImageContainer}>
-              <View style={styles.profileImage} />
-              <TouchableOpacity style={styles.editImageButton} onPress={handleChangePhoto}>
+              {profileImage && profileImage.trim() ? (
+                <Image
+                  source={{ uri: getFullImageUrl(profileImage) || '' }}
+                  style={styles.profileImage}
+                  resizeMode="cover"
+                  onError={() => {
+                    setProfileImage(null);
+                  }}
+                />
+              ) : (
+                <View style={styles.profileImagePlaceholder}>
+                  <Text style={styles.profileImageInitials}>
+                    {fullName && fullName.trim()
+                      ? fullName
+                          .trim()
+                          .split(' ')
+                          .filter(n => n.length > 0)
+                          .map(n => n[0])
+                          .join('')
+                          .toUpperCase()
+                          .slice(0, 2)
+                      : email && email.trim()
+                      ? email[0].toUpperCase()
+                      : 'U'}
+                  </Text>
+                </View>
+              )}
+              {isUploadingImage && (
+                <View style={styles.imageUploadOverlay}>
+                  <ActivityIndicator size="small" color="#fff" />
+                </View>
+              )}
+              <TouchableOpacity
+                style={styles.editImageButton}
+                onPress={handleChangePhoto}
+                disabled={isUploadingImage}
+              >
                 <Feather name="camera" size={18} color="white" />
               </TouchableOpacity>
             </View>
-            <TouchableOpacity onPress={handleChangePhoto}>
-              <Text style={styles.changePhotoText}>Change Photo</Text>
+            <TouchableOpacity onPress={handleChangePhoto} disabled={isUploadingImage}>
+              <Text style={styles.changePhotoText}>
+                {isUploadingImage ? 'Uploading...' : 'Change Photo'}
+              </Text>
             </TouchableOpacity>
           </View>
 
@@ -145,7 +356,7 @@ const EditProfileContent = () => {
                   setPhoneNumber(text);
                   if (errors.phoneNumber) setErrors({...errors, phoneNumber: undefined});
                 }}
-                placeholder="Enter your phone number"
+                placeholder="Enter your phone number (optional)"
                 placeholderTextColor="#B9B9B9"
                 keyboardType="phone-pad"
               />
@@ -156,15 +367,21 @@ const EditProfileContent = () => {
           {/* Buttons */}
           <View style={styles.buttonContainer}>
             <TouchableOpacity
-              style={styles.saveButton}
+              style={[styles.saveButton, (isLoading || isUploadingImage) && styles.saveButtonDisabled]}
               onPress={handleSave}
-              disabled={isLoading}
+              disabled={isLoading || isUploadingImage}
             >
-              <Text style={styles.saveButtonText}>
-                {isLoading ? 'Saving...' : 'Save Changes'}
-              </Text>
+              {isLoading ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <Text style={styles.saveButtonText}>Save Changes</Text>
+              )}
             </TouchableOpacity>
-            <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={handleCancel}
+              disabled={isLoading || isUploadingImage}
+            >
               <Text style={styles.cancelButtonText}>Cancel</Text>
             </TouchableOpacity>
           </View>
@@ -188,11 +405,10 @@ export default function EditProfile() {
   if (!isLoaded) {
     return (
       <View style={styles.loadingContainer}>
-        <Text>Loading...</Text>
+        <ActivityIndicator size="large" color="#ff5a3d" />
       </View>
     );
   }
 
   return <EditProfileContent />;
 }
-

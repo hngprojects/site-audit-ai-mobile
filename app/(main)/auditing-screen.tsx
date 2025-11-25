@@ -1,80 +1,69 @@
 import { useAuditInfoStore } from '@/store/audit-website-details-store';
 import styles from '@/stylesheets/auditing-screen-stylesheet';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-
-
-import { SafeAreaView } from 'react-native-safe-area-context';
-
-
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Text, View } from 'react-native';
-
-
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 const AuditingScreen = () => {
   const router = useRouter();
   const params = useLocalSearchParams();
   const { setAuditInfo } = useAuditInfoStore();
-
-
-
   const domain = Array.isArray(params.url) ? params.url[0] : params.url;
-
-
   //simulating random score between 30 and 100 as scan score
   const randomScore = Math.floor(Math.random() * (100 - 30 + 1)) + 30;
 
   //simulating scan status based on score
   const getStatusFromScore = (score: number) => {
-  if (score >= 30 && score <= 49) return "Critical";
-  if (score >= 50 && score <= 69) return "Warning";
-  return "Good"; 
-};
-
-//simulating current date the scan was issued
-const getFormattedDate = () => {
-  const now = new Date();
-  const options: Intl.DateTimeFormatOptions = {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
+    if (score >= 30 && score <= 49) return "Critical";
+    if (score >= 50 && score <= 69) return "Warning";
+    return "Good";
   };
-  return now.toLocaleDateString("en-US", options);
-};
+
+  //simulating current date the scan was issued
+  const getFormattedDate = () => {
+    const now = new Date();
+    const options: Intl.DateTimeFormatOptions = {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    };
+    return now.toLocaleDateString("en-US", options);
+  };
 
 
-const score = randomScore.toString();
-const status = getStatusFromScore(randomScore);
+  const score = randomScore.toString();
+  const status = getStatusFromScore(randomScore);
 
-const scanDate = getFormattedDate();
+  const scanDate = getFormattedDate();
 
 
 
-  useEffect(() => {
-  const timer = setTimeout(() => {
-    
-    setAuditInfo({
-      domain,
-      status,
-      score,
-      scanDate,
-    });
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
 
-  
-    router.replace({
-      pathname: "../(reports)/report-dashboard",
-      params: {
-        domain,
-        status,
-        score,
-        scanDate,
-      },
-    });
-  }, 5000);
+  //     setAuditInfo({
+  //       domain,
+  //       status,
+  //       score,
+  //       scanDate,
+  //     });
 
-  return () => clearTimeout(timer); 
-}, [router,domain,status,score,scanDate,setAuditInfo]);
+
+  //     router.replace({
+  //       pathname: "../(reports)/report-dashboard",
+  //       params: {
+  //         domain,
+  //         status,
+  //         score,
+  //         scanDate,
+  //       },
+  //     });
+  //   }, 5000);
+
+  //   return () => clearTimeout(timer);
+  // }, [router, domain, status, score, scanDate,]);
 
 
   const { url } = useLocalSearchParams<{ url: string }>();
@@ -93,7 +82,21 @@ const scanDate = getFormattedDate();
         return Math.min(prev + increment, 100);
       });
     }, 500);
-
+    setAuditInfo({
+      domain,
+      status,
+      score,
+      scanDate,
+    });
+    router.replace({
+      pathname: "../(reports)/report-dashboard",
+      params: {
+        domain,
+        status,
+        score,
+        scanDate,
+      },
+    });
     return () => clearInterval(interval);
   }, []);
 
@@ -111,11 +114,6 @@ const scanDate = getFormattedDate();
   });
 
 
-
-
-
-
-
   return (
     <SafeAreaView style={styles.container}>
       <View style={{ flex: 1 }}>
@@ -123,7 +121,7 @@ const scanDate = getFormattedDate();
           <Text style={styles.headerTitle}>Scanning Website...</Text>
           <Text style={styles.headerUrl}>{websiteUrl}</Text>
         </View>
-       
+
         <View style={styles.content}>
           <Text style={styles.contentText}>Hang tight, Takes about 30–60 seconds</Text>
           <View style={styles.progress}>

@@ -1,7 +1,6 @@
 import { PropsWithChildren, useEffect } from 'react';
-import { StyleSheet, TouchableOpacity, LayoutAnimation, UIManager, Platform } from 'react-native';
+import { LayoutAnimation, Platform, StyleSheet, Text, TouchableOpacity, UIManager } from 'react-native';
 
-import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
@@ -29,14 +28,14 @@ export function Collapsible({ children, title, isLast, isFirst, isOpen, onToggle
   }, [isOpen]);
 
   return (
-    <ThemedView>
+    <ThemedView lightColor="#fff" darkColor="#fff">
       <TouchableOpacity
         style={[styles.heading, isFirst && styles.firstHeading, isLast && styles.lastHeading, isOpen && styles.headingOpen]}
         onPress={onToggle}
         activeOpacity={0.8}>
 
 
-        <ThemedText type="defaultSemiBold">{title}</ThemedText>
+        <Text style={styles.titleText}>{title}</Text>
         <IconSymbol
           name={isOpen ? "chevron.up" : "chevron.down"}
           size={18}
@@ -44,7 +43,7 @@ export function Collapsible({ children, title, isLast, isFirst, isOpen, onToggle
           color={theme === 'light' ? Colors.light.icon : Colors.dark.icon}
         />
       </TouchableOpacity>
-      {isOpen && <ThemedView style={[styles.content, styles.contentOpen]}>{children}</ThemedView>}
+      {isOpen && <ThemedView style={[styles.content, styles.contentOpen]} lightColor="#fff" darkColor="#fff">{children}</ThemedView>}
     </ThemedView>
   );
 }
@@ -59,6 +58,13 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderColor: '#BBBCBC',
     paddingHorizontal: 15,
+  },
+  titleText: {
+    fontSize: 16,
+    lineHeight: 24,
+    color: '#1c1c1c',
+    fontFamily: 'RethinkSans-SemiBold',
+    flex: 1,
   },
   headingOpen: {
     borderBottomWidth: 0,
