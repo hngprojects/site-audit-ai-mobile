@@ -1,29 +1,73 @@
 import styles from '@/stylesheets/hire-request-stylesheet';
-import { useNavigation } from 'expo-router';
-import React, { useEffect } from 'react';
-import { Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import AuthModal from '@/components/auth/auth-modal';
+import { useAuditInfoStore } from '@/store/audit-website-details-store';
+import { useAuthStore } from '@/store/auth-store';
+import { Feather } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const HireRequest = () => {
-    const inset = useSafeAreaInsets();
-    const navigation = useNavigation();
-    
-    useEffect(() => {
-    navigation.setOptions({
-        headerShown: false
-    });
-}, [navigation]);
+    const router = useRouter();
+    const { isAuthenticated } = useAuthStore();
+    const { auditInfo } = useAuditInfoStore();
+    const [modalVisible, setModalVisible] = useState(false);
 
+    const handleReviewPress = () => {
+        if (isAuthenticated) {
+            router.push('/(hireRequest)/request-form');
+        } else {
+            setModalVisible(true);
+        }
+    };
+
+    const handleReRunScan = () => {
+        router.push({ pathname: '/(main)/auditing-screen', params: { url: auditInfo.domain } });
+    };
 
   return (
-    <View style={{...styles.container,
-        paddingTop: inset.top,
-        paddingBottom: inset.bottom
-    }}>
-      <Text style={styles.title}>
-        This is the hire request screen.
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+          <Feather name="arrow-left" size={24} color="#1A2373" />
+        </TouchableOpacity>
+        <Text style={styles.headerText}>Website Review</Text>
+      </View>
+      <View style={styles.content}>
+        <Image
+            source={require('../../assets/images/review.png')}
+            style={styles.reviewHeaderPicture}
+        />
+        <Text style={styles.mainTitle}>
+          Get Personalized Human Insights for <Text style={styles.freeText}>FREE</Text>
         </Text>
-    </View>
+        <View style={styles.description}>
+          <Text style={styles.descriptionText}>
+
+          All the issues can feel like a lot. Let a real person take a quick look and guide you—simple, calm, and free.
+          
+        </Text>
+        <Text style={styles.descriptionText2}>
+            We’ll pair you with professionals who checks your website and explains things in a simple way at no cost.
+        </Text>
+        <Image
+            source={require('../../assets/images/review-picture.png')}
+            style={styles.reviewPicture}
+        />
+        </View>
+        
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.primaryButton} onPress={handleReviewPress}>
+            <Text style={styles.primaryButtonText}>Review My Website</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.secondaryButton} onPress={handleReRunScan}>
+            <Text style={styles.secondaryButtonText}>Re-Run Scan</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+      <AuthModal visible={modalVisible} onClose={() => setModalVisible(false)} />
+    </SafeAreaView>
   )
 }
 

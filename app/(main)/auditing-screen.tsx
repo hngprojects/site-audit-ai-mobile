@@ -82,7 +82,21 @@ const AuditingScreen = () => {
         return Math.min(prev + increment, 100);
       });
     }, 500);
-
+    setAuditInfo({
+      domain,
+      status,
+      score,
+      scanDate,
+    });
+    router.replace({
+      pathname: "../(reports)/report-dashboard",
+      params: {
+        domain,
+        status,
+        score,
+        scanDate,
+      },
+    });
     return () => clearInterval(interval);
   }, []);
 
