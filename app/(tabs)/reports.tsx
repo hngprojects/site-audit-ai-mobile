@@ -1,6 +1,6 @@
 import { useSitesStore } from "@/store/sites-store";
 import styles from "@/stylesheets/report-screen-stylesheet";
-import { ReportItemProps } from "@/type";
+import { ReportItemProps, Status } from "@/type";
 import { MaterialIcons } from '@expo/vector-icons';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from "expo-router";
@@ -39,7 +39,7 @@ interface SwipeableRowProps {
 }
 
 const SwipeableRow: React.FC<SwipeableRowProps> = ({ item, url, onDelete, onEdit, onPress }) => {
-  const swipeableRef = React.useRef<ReanimatedSwipeable>(null);
+  const swipeableRef = React.useRef<React.ComponentRef<typeof ReanimatedSwipeable>>(null);
 
   const renderRightActions = (_progress: any, _dragX: any) => (
     <View style={styles.rightActions}>
@@ -113,11 +113,11 @@ const ReportsScreen: React.FC = () => {
     });
   };
 
-  const getStatusFromScore = (score?: number): "low" | "medium" | "high" => {
-    if (!score) return "medium";
-    if (score >= 80) return "high";
-    if (score >= 50) return "medium";
-    return "low";
+  const getStatusFromScore = (score?: number): Status => {
+    if (!score) return "Warning";
+    if (score >= 80) return "Good";
+    if (score >= 50) return "Warning";
+    return "Critical";
   };
 
   const mapSiteToReportItem = (site: typeof sites[0]) => {
