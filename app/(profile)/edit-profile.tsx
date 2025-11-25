@@ -1,10 +1,12 @@
 import { profileService } from '@/lib/profile-service';
 import { useAuthStore } from '@/store/auth-store';
 import styles from '@/stylesheets/edit-profile-stylesheet';
+import { getFullImageUrl } from '@/utils/image-url';
 import { Feather } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Image, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -18,37 +20,48 @@ const EditProfileContent = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [errors, setErrors] = useState<{fullName?: string; email?: string; phoneNumber?: string}>({});
+  const hasInitialized = useRef(false);
 
-  useEffect(() => {
-    const loadProfile = async () => {
-      if (token) {
-        try {
-          const profile = await profileService.getProfile(token);
-          useAuthStore.setState({ user: profile });
-          setFullName(profile.fullName || '');
-          setEmail(profile.email || '');
-          setPhoneNumber(profile.phoneNumber || '');
-          setProfileImage(profile.profileImage || null);
-        } catch {
-          if (user) {
-            setFullName(user.fullName || '');
-            setEmail(user.email || '');
-            setPhoneNumber(user.phoneNumber || '');
-            setProfileImage(user.profileImage || null);
+  // Load fresh profile data when screen is focused
+  useFocusEffect(
+    useCallback(() => {
+      const loadProfile = async () => {
+        if (token) {
+          try {
+            const profile = await profileService.getProfile(token);
+            useAuthStore.setState({ user: profile });
+            setFullName(profile.fullName || '');
+            setEmail(profile.email || '');
+            setPhoneNumber(profile.phoneNumber || '');
+            setProfileImage(profile.profileImage || null);
+            hasInitialized.current = true;
+          } catch {
+            // If API call fails, use existing user data if available
+            const currentUser = useAuthStore.getState().user;
+            if (!hasInitialized.current && currentUser) {
+              setFullName(currentUser.fullName || '');
+              setEmail(currentUser.email || '');
+              setPhoneNumber(currentUser.phoneNumber || '');
+              setProfileImage(currentUser.profileImage || null);
+              hasInitialized.current = true;
+            }
+          }
+        } else {
+          // Fallback to user data if no token
+          const currentUser = useAuthStore.getState().user;
+          if (!hasInitialized.current && currentUser) {
+            setFullName(currentUser.fullName || '');
+            setEmail(currentUser.email || '');
+            setPhoneNumber(currentUser.phoneNumber || '');
+            setProfileImage(currentUser.profileImage || null);
+            hasInitialized.current = true;
           }
         }
-      } else if (user) {
-        console.log(user);
-        
-        setFullName(user.fullName || '');
-        setEmail(user.email || '');
-        setPhoneNumber(user.phoneNumber || '');
-        setProfileImage(user.profileImage || null);
-      }
-    };
+      };
 
-    loadProfile();
-  }, [token, user]);
+      loadProfile();
+    }, [token])
+  );
 
   const validateForm = () => {
     const newErrors: {fullName?: string; email?: string; phoneNumber?: string} = {};
@@ -255,7 +268,7 @@ const EditProfileContent = () => {
             <View style={styles.profileImageContainer}>
               {profileImage && profileImage.trim() ? (
                 <Image
-                  source={{ uri: profileImage }}
+                  source={{ uri: getFullImageUrl(profileImage) || '' }}
                   style={styles.profileImage}
                   resizeMode="cover"
                   onError={() => {

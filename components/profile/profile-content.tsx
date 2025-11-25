@@ -1,10 +1,11 @@
 import LogoutModal from '@/components/profile/logout-modal';
 import { useAuthStore } from '@/store/auth-store';
 import styles from '@/stylesheets/profile-stylesheet';
+import { getFullImageUrl } from '@/utils/image-url';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Switch, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Switch, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { User } from '@/type';
 
@@ -43,7 +44,30 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
       <View style={styles.profilePictureContainer}>
         <View style={styles.profileInfoContainer}>
           <View style={styles.avatarContainer}>
-            <View style={styles.avatarPlaceholder} />
+            {user?.profileImage && user.profileImage.trim() ? (
+              <Image
+                source={{ uri: getFullImageUrl(user.profileImage) || '' }}
+                style={styles.avatarImage}
+                resizeMode="cover"
+              />
+            ) : (
+              <View style={styles.avatarPlaceholder}>
+                <Text style={styles.avatarInitials}>
+                  {user?.fullName && user.fullName.trim()
+                    ? user.fullName
+                        .trim()
+                        .split(' ')
+                        .filter(n => n.length > 0)
+                        .map(n => n[0])
+                        .join('')
+                        .toUpperCase()
+                        .slice(0, 2)
+                    : user?.email && user.email.trim()
+                    ? user.email[0].toUpperCase()
+                    : 'U'}
+                </Text>
+              </View>
+            )}
             <View style={styles.editIconContainer}>
               <Feather name="edit-2" size={16} color="white" />
             </View>
