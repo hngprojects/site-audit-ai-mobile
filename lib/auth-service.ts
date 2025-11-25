@@ -15,20 +15,26 @@ export const authService = {
       const response = await apiClient.post('/api/v1/auth/login', { email, password });
       const responseData = response.data;
       
-      const token = responseData.data?.access_token || responseData.data?.token || responseData.access_token || responseData.token;
-      const apiUser = responseData.data?.user || responseData.user;
+      // Extract token from response.data.access_token
+      const token = responseData.data?.access_token;
+      const apiUser = responseData.data?.user;
       
       if (!apiUser || !token) {
         throw new Error('Invalid response from server');
       }
       
+      // Construct full name from first_name and last_name, fallback to username
+      const fullName = apiUser.first_name && apiUser.last_name
+        ? `${apiUser.first_name} ${apiUser.last_name}`.trim()
+        : apiUser.first_name || apiUser.last_name || apiUser.username || '';
+      
       const user = {
         id: apiUser.id,
         email: apiUser.email,
-        fullName: apiUser.first_name && apiUser.last_name 
-          ? `${apiUser.first_name} ${apiUser.last_name}`.trim()
-          : apiUser.fullName || apiUser.username || '',
-        createdAt: apiUser.created_at || apiUser.createdAt || new Date().toISOString(),
+        fullName,
+        createdAt: apiUser.created_at || new Date().toISOString(),
+        phoneNumber: apiUser.phone_number || undefined,
+        profileImage: apiUser.profile_picture_url || undefined,
       };
       
       return { user, token };
@@ -69,22 +75,27 @@ export const authService = {
       });
       
       const responseData = response.data;
-      console.log(responseData);
       
-      const token = responseData.data?.access_token || responseData.data?.token || responseData.access_token || responseData.token;
-      const apiUser = responseData.data?.user || responseData.user;
+      // Extract token from response.data.access_token
+      const token = responseData.data?.access_token;
+      const apiUser = responseData.data?.user;
       
       if (!apiUser || !token) {
         throw new Error('Invalid response from server');
       }
       
+      // Construct full name from first_name and last_name, fallback to username
+      const fullName = apiUser.first_name && apiUser.last_name
+        ? `${apiUser.first_name} ${apiUser.last_name}`.trim()
+        : apiUser.first_name || apiUser.last_name || apiUser.username || '';
+      
       const user = {
         id: apiUser.id,
         email: apiUser.email,
-        fullName: apiUser.first_name && apiUser.last_name 
-          ? `${apiUser.first_name} ${apiUser.last_name}`.trim()
-          : apiUser.fullName || apiUser.username || '',
-        createdAt: apiUser.created_at || apiUser.createdAt || new Date().toISOString(),
+        fullName,
+        createdAt: apiUser.created_at || new Date().toISOString(),
+        phoneNumber: apiUser.phone_number || undefined,
+        profileImage: apiUser.profile_picture_url || undefined,
       };
       
       return { user, token };

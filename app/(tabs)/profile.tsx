@@ -19,6 +19,8 @@ const Profile = () => {
       if (isInitialized && !isAuthenticated) {
         setModalVisible(true);
       } else if (isAuthenticated) {
+        console.log(user);
+        
         setModalVisible(false);
       }
     }, [isAuthenticated, isInitialized])

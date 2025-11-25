@@ -35,6 +35,8 @@ export interface User {
   email: string;
   fullName: string;
   createdAt: string;
+  phoneNumber?: string;
+  profileImage?: string;
 }
 
 export interface AuthState {
