@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Feather } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import styles from '@/stylesheets/change-password-stylesheet';
 import { authService, MIN_PASSWORD_LENGTH } from '@/lib/auth-service';
 import { useAuthStore } from '@/store/auth-store';
+import styles from '@/stylesheets/change-password-stylesheet';
+import { Feather } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, Alert, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const ChangePasswordContent = () => {
   const router = useRouter();
