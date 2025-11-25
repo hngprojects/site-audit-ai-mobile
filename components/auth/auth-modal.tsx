@@ -51,13 +51,13 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose }) => {
   };
 
   const handleSignUp = () => {
-    router.push('/(auth)/sign-up');
-    // Don't close modal here - let it close when user successfully authenticates
+    onClose();
+    router.push({ pathname: '/(auth)/sign-up', params: { redirect: '/(hireRequest)/request-form' } });
   };
 
   const handleSignIn = () => {
-    router.push('/(auth)/sign-in');
-    // Don't close modal here - let it close when user successfully authenticates
+    onClose();
+    router.push({ pathname: '/(auth)/sign-in', params: { redirect: '/(hireRequest)/request-form' } });
   };
 
   const translateY = slideAnim.interpolate({

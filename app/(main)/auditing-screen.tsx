@@ -74,7 +74,7 @@ const scanDate = getFormattedDate();
   }, 5000);
 
   return () => clearTimeout(timer); 
-}, [router,domain,status,score,scanDate,]);
+}, [router,domain,status,score,scanDate,setAuditInfo]);
 
 
   const { url } = useLocalSearchParams<{ url: string }>();

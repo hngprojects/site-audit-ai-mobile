@@ -2,7 +2,7 @@ import { LoadingButton } from '@/components/ui/loading-button';
 import { useAuth } from '@/hooks/use-auth';
 import styles from '@/stylesheets/sign-up-stylesheet';
 import Feather from '@expo/vector-icons/Feather';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Alert, Image, KeyboardAvoidingView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -31,6 +31,7 @@ const isPasswordValid = (validation: PasswordValidation): boolean => {
 
 const SignUp = () => {
   const router = useRouter();
+  const params = useLocalSearchParams();
   const { signUp, isLoading, error, clearError, isAuthenticated } = useAuth();
 
   const [email, setEmail] = useState<string>('');
@@ -44,9 +45,9 @@ const SignUp = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.replace('/(tabs)');
+      router.replace((params.redirect as any) || '/(tabs)');
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, router, params.redirect]);
 
   // Show error alerts
   useEffect(() => {
