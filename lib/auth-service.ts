@@ -212,5 +212,44 @@ export const authService = {
       throw new Error('Failed to resend reset token. Please try again.');
     }
   },
+
+  async resetPassword(
+    currentPassword: string,
+    newPassword: string,
+    token: string
+  ): Promise<void> {
+    if (!currentPassword || !newPassword) {
+      throw new Error('Current password and new password are required');
+    }
+
+    if (newPassword.length < MIN_PASSWORD_LENGTH) {
+      throw new Error(`Password must be at least ${MIN_PASSWORD_LENGTH} characters`);
+    }
+
+    try {
+      await apiClient.post(
+        '/api/v1/auth/reset-password',
+        {
+          current_password: currentPassword,
+          new_password: newPassword,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+    } catch (error) {
+      if (isAxiosError(error)) {
+        const errorData = error.response?.data || {};
+        const errorMessage = formatErrorMessage(errorData);
+        throw new Error(errorMessage);
+      }
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Failed to reset password. Please try again.');
+    }
+  },
 };
 

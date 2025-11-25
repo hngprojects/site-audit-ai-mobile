@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import styles from '@/stylesheets/change-password-stylesheet';
+import { authService, MIN_PASSWORD_LENGTH } from '@/lib/auth-service';
+import { useAuthStore } from '@/store/auth-store';
 
 const ChangePasswordContent = () => {
   const router = useRouter();
+  const { token } = useAuthStore();
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -22,10 +25,8 @@ const ChangePasswordContent = () => {
 
     if (!newPassword.trim()) {
       newErrors.newPassword = 'New password is required';
-    } else if (newPassword.length < 8) {
-      newErrors.newPassword = 'Password must be at least 8 characters';
-    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(newPassword)) {
-      newErrors.newPassword = 'Password must contain uppercase, lowercase, and number';
+    } else if (newPassword.length < MIN_PASSWORD_LENGTH) {
+      newErrors.newPassword = `Password must be at least ${MIN_PASSWORD_LENGTH} characters`;
     }
 
     if (!confirmPassword.trim()) {
@@ -39,20 +40,22 @@ const ChangePasswordContent = () => {
   };
 
   const handleUpdatePassword = async () => {
-    if (!validateForm()) return;
+    if (!validateForm() || !token) return;
 
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await authService.resetPassword(currentPassword, newPassword, token);
 
       Alert.alert(
         'Success',
         'Password has been changed successfully',
         [{ text: 'OK', onPress: () => router.back() }]
       );
-    } catch {
-      Alert.alert('Error', 'Failed to update password. Please try again.');
+    } catch (error) {
+      Alert.alert(
+        'Error',
+        error instanceof Error ? error.message : 'Failed to update password. Please try again.'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -129,13 +132,15 @@ const ChangePasswordContent = () => {
 
           <View style={styles.buttonContainer}>
             <TouchableOpacity
-              style={styles.updateButton}
+              style={[styles.updateButton, isLoading && styles.updateButtonDisabled]}
               onPress={handleUpdatePassword}
               disabled={isLoading}
             >
-              <Text style={styles.updateButtonText}>
-                {isLoading ? 'Updating...' : 'Update Password'}
-              </Text>
+              {isLoading ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <Text style={styles.updateButtonText}>Update Password</Text>
+              )}
             </TouchableOpacity>
             <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
               <Text style={styles.cancelButtonText}>Cancel</Text>
