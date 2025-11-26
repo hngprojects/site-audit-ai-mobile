@@ -17,12 +17,39 @@ export default function HomeScreen() {
   const [urlAvailable, setUrlAvailable] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [isCreating, setIsCreating] = useState<boolean>(false);
+  // const [serverSiteRecord, setServerRecord] = useState([])
+  // const [homePageLoading, setHomePageLoading] = useState<boolean>(false)
+  
   
   const { sites, isLoading, createSite, fetchSites } = useSitesStore();
 
   useEffect(() => {
     fetchSites();
+
   }, [fetchSites]);
+
+
+//   useEffect(() => {
+//   const loadServerSites = async () => {
+//     setHomePageLoading(true)
+//     try {
+//       const siteData = await getAllServerSiteRecords(); 
+
+//       if (siteData) {
+//         setServerRecord(siteData); 
+//       }
+//     } catch (error) {
+//       console.error("Failed to load site records:", error);
+//     } finally {
+//       setHomePageLoading(false);
+//     }
+//   };
+
+//   loadServerSites();
+// }, []);
+
+
+
 
   const handleUrlChange = (text: string) => {
     setWebsiteUrl(text);

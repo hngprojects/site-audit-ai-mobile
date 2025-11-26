@@ -131,7 +131,9 @@ const styles = StyleSheet.create({
 
   itemIconContainer: {
     // padding: 12,
-    // backgroundColor: '#edededff',
+    backgroundColor: '#edededff',
+    width: 50,
+    height: 50,
     borderRadius: 100,
     display: 'flex',
     justifyContent: 'center',
@@ -174,10 +176,17 @@ const styles = StyleSheet.create({
 
   markAllButton: {
     position: 'absolute',
-    right: 0,
+    right: -10,
     zIndex: 1,
+    fontSize: 8,
+    fontFamily: "RethinkSans-Regular",
   },
-
+notificationHead: {
+  fontFamily: "RethinkSans-Bold",
+  fontSize: 15,
+  marginRight: 10,
+  marginLeft: -10
+},
   loadingPadding: {
     paddingTop: 16,
   },

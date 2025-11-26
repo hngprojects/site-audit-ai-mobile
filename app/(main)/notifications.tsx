@@ -3,6 +3,7 @@ import type { Notification } from '@/service/notifications';
 import { deleteNotification, getNotifications, markAsRead } from '@/service/notifications';
 import styles from '@/stylesheets/notifications-stylesheet';
 import { Feather, MaterialIcons } from '@expo/vector-icons';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Alert, FlatList, Image, TextInput, TouchableOpacity, View } from 'react-native';
@@ -41,10 +42,7 @@ const NotificationItem = ({ item, onMarkRead, onDelete }: { item: Notification; 
           onPress={() => onMarkRead(item.id)}
         >
           <View style={styles.itemIconContainer}>
-            <Image
-              source={item.logoThumbnail}
-              style={styles.itemIcon}
-            />
+           <Ionicons name="notifications-outline" size={24} color="blue" />
           </View>
 
           <View style={styles.cardContent}>
@@ -151,7 +149,7 @@ export default function NotificationsScreen() {
   if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
-        <ThemedText  type="title">Notification</ThemedText>
+        <ThemedText  type="title" style={styles.notificationHead}>Notification</ThemedText>
         <View style={styles.loadingPadding}>
           <SkeletonCard />
           <View style={{ height: 8 }} />
