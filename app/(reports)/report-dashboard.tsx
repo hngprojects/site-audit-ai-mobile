@@ -1,3 +1,4 @@
+import { getScanResult } from "@/actions/scan-actions";
 import styles, { reportColors } from "@/stylesheets/report-dashboard-stylesheet";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -13,6 +14,7 @@ import {
 
 import IssueCard from "@/components/issue-card";
 import { useSelectedIssuesStore } from "@/store/audit-summary-selected-issue-store";
+import { useAuditInfoStore } from "@/store/audit-website-details-store";
 import { Status } from "@/type";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Feather from '@expo/vector-icons/Feather';
@@ -29,20 +31,21 @@ export default function ReportDashboard() {
   const [showModal, setShowModal] = useState(false);
   const [modalTextInput, setModalTextInput] = useState<string>('')
   const [emptyModalTextInput, setEmptyModalTextInput] = useState<boolean>(false)
+  const [scanResult, setScanResult] = useState<any>(null);
 
-  const { addIssue } = useSelectedIssuesStore();
+  const { addIssue, clearIssues } = useSelectedIssuesStore();
 
   const { issues } = useSelectedIssuesStore();
+
+  const { setAuditInfo } = useAuditInfoStore();
 
 
   
 
 const params = useLocalSearchParams();
 
-const score = Array.isArray(params.score) ? params.score[0] : params.score;
-const status = Array.isArray(params.status) ? params.status[0] : params.status;
-const domain = Array.isArray(params.domain) ? params.domain[0] : params.domain;
-const scanDate = Array.isArray(params.scanDate) ? params.scanDate[0] : params.scanDate;
+const jobId = Array.isArray(params.jobId) ? params.jobId[0] : params.jobId;
+const url = Array.isArray(params.url) ? params.url[0] : params.url;
 
 
 
@@ -73,6 +76,16 @@ const hireAPro = () => {
     s === "Critical" ? reportColors.scoreLow :
     s === "Good" ? reportColors.scoreHigh :
     reportColors.scoreMedium;
+
+  // Normalize status to match Status type
+  const normalizeStatus = (status: string): Status => {
+    switch (status) {
+      case "Good": return "Good";
+      case "Warning": return "Warning";
+      case "Critical": return "Critical";
+      default: return "Warning";
+    }
+  };
   
 
   const modalContinueButton = () => {
@@ -88,42 +101,54 @@ const hireAPro = () => {
 
 
 
-    const ISSUE_LIST = [
-  {
-    id: "Loading-speed",
-    title: "Loading speed",
-    score: String(Math.floor(Math.random() * 71) + 30),
-    description:
-      "Your website takes longer than average to load, which can affect user experience and SEO.",
-  },
-  {
-    id: "Mobile-friendly",
-    title: "Mobile Friendly",
-    score: String(Math.floor(Math.random() * 71) + 30),
-    description:
-      "Your website takes longer than average to load, which can affect user experience and SEO.",
-  },
-  {
-    id: "Visibility",
-    title: "Visibility",
-    score: String(Math.floor(Math.random() * 71) + 30),
-    description:
-      "Your website takes longer than average to load, which can affect user experience and SEO.",
-  },
-];
+    const ISSUE_LIST = scanResult?.issues || [];
 
+    // Function to toggle all issues selection
+    const toggleAllIssues = () => {
+      const allSelected = issues.length === ISSUE_LIST.length && ISSUE_LIST.length > 0;
 
-// Function to add all issues to the store
-   
-    const addAllToSiteIssueStore = () => {
-      ISSUE_LIST.forEach((issue) => {
-        addIssue(issue);
-      });
+      if (allSelected) {
+        // Unmark all - clear the store
+        clearIssues();
+      } else {
+        // Mark all - add all issues
+        ISSUE_LIST.forEach((issue: any) => {
+          addIssue({
+            id: issue.id,
+            title: issue.title,
+            score: String(issue.score),
+            status: normalizeStatus(scanResult?.status || 'Warning'),
+            description: issue.description,
+          });
+        });
+      }
     }
 
 
 
 
+
+  useEffect(() => {
+    if (jobId) {
+      const fetchResult = async () => {
+        try {
+          const result = await getScanResult(jobId);
+          setScanResult(result);
+
+          // Set audit info for details page
+          setAuditInfo({
+            domain: url,
+            status: result.status,
+            score: String(result.overall_score),
+            scanDate: result.scanned_at ? new Date(result.scanned_at).toLocaleDateString() : '',
+          });
+        } catch (error) {
+          console.error('Failed to fetch scan result:', error);
+        }
+      };
+      fetchResult();
+    }
+  }, [jobId, url, setAuditInfo]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -157,11 +182,14 @@ const hireAPro = () => {
     <View style={[styles.screenContainer]}>
       <ScrollView showsVerticalScrollIndicator={false}>
 
-        <View style={{flexDirection: 'row', alignItems: 'center', gap: 20, marginBottom: 20,  paddingHorizontal: 20, paddingTop: 10, marginTop: 35,}}>
-          <TouchableOpacity onPress={() => router.back()}>
+        <View style={{position: 'relative', marginBottom: 20, paddingHorizontal: 20, paddingTop: 10, marginTop: 35,}}>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={{position: 'absolute', left: 20, zIndex: 1}}
+          >
             <Ionicons name="arrow-back-sharp" size={24} color="black" />
           </TouchableOpacity>
-        <Text style={styles.pageTitle}>Audit Summary</Text>
+          <Text style={[styles.pageTitle, {textAlign: 'center'}]}>Audit Summary</Text>
         </View>
 
         
@@ -184,7 +212,7 @@ const hireAPro = () => {
           alignContent: "center",
          }}>
           <Feather name="link-2" size={15} color="blue" />
-          <Text style={{...styles.domainText, alignItems: "center", color: "blue",  fontSize: 10,}}>{domain}</Text>
+          <Text style={{...styles.domainText, alignItems: "center", color: "blue",  fontSize: 10,}}>{url}</Text>
          </View>
 
          <TouchableOpacity
@@ -196,7 +224,7 @@ const hireAPro = () => {
              paddingHorizontal: 10,
              alignContent: "center",
            }}
-           onPress={() => router.push({ pathname: '/(main)/auditing-screen', params: { url: domain } })}
+           onPress={() => router.push({ pathname: '/(main)/auditing-screen', params: { url: url, isReRun: 'true' } })}
          >
            <AntDesign name="reload" size={15} color="red" />
            <Text style={{color: "red", alignItems: "center", ...styles.domainText, fontSize: 13}}>Re-run audit</Text>
@@ -205,57 +233,65 @@ const hireAPro = () => {
 
         
         <View style={{paddingHorizontal: 25, marginVertical: 5, marginTop: 15}}>
-          <Text style={[styles.scoreText, { color: statusColor(status as Status) }]}>{score}</Text>
+          <Text style={[styles.scoreText, { color: statusColor(normalizeStatus(scanResult?.status || 'Warning')) }]}>{scanResult?.overall_score || 'Loading...'}</Text>
           <Text style={{...styles.cardLabel, color: "#000"}}>Website Score</Text>
-          <Text style={{...styles.cardLabel, color: "#dfdfdfff", marginTop: 5}}>Scan Date: {scanDate}</Text>
+          <Text style={{...styles.cardLabel, color: "#dfdfdfff", marginTop: 5}}>Scan Date: {scanResult?.scanned_at ? new Date(scanResult.scanned_at).toLocaleDateString() : 'Loading...'}</Text>
           <Text style={{color: "#000", fontFamily: "RethinkSans-Medium", fontSize: 13, marginTop: 20, }}>
-            {status === "low" ? "Your website is performing poorly. Immediate improvements are needed to enhance user experience and SEO." : 
-            status === "high" ? "Great job! Your website is performing well. Keep up the good work to maintain and further enhance user experience and SEO. Fix the issues below to make it even better."  : 
+            {normalizeStatus(scanResult?.status || 'Warning') === "Critical" ? "Your website is performing poorly. Immediate improvements are needed to enhance user experience and SEO." :
+            normalizeStatus(scanResult?.status || 'Warning') === "Good" ? "Great job! Your website is performing well. Keep up the good work to maintain and further enhance user experience and SEO. Fix the issues below to make it even better."  :
             "Your website has an average performance. There is room for improvement to boost user experience and SEO." }
             </Text>
         </View>
 
-        <TouchableOpacity onPress={addAllToSiteIssueStore}>
-          <Text 
-            style={{
-              marginLeft: "auto", 
-              marginTop: 20, 
-              marginBottom: 20, 
-              marginRight: 20, 
-              color: "blue"
-            }}
-          >
-            Mark All
-          </Text>
-        </TouchableOpacity>
+        {scanResult ? (
+          <>
+            <TouchableOpacity onPress={toggleAllIssues}>
+              <Text
+                style={{
+                  marginLeft: "auto",
+                  marginTop: 20,
+                  marginBottom: 20,
+                  marginRight: 20,
+                  color: "blue"
+                }}
+              >
+                {issues.length === ISSUE_LIST.length && ISSUE_LIST.length > 0 ? "Unmark All" : "Mark All"}
+              </Text>
+            </TouchableOpacity>
 
-        <View style={{paddingHorizontal: "5%",}}>
-
-          {ISSUE_LIST.map((issue) => (
-            <IssueCard
-              key={issue.id}
-              id={issue.id}
-              title={issue.title}
-              score={issue.score}
-              description={issue.description}
-              status={status}
-              onPressDetails={() =>
-                router.push({
-                  pathname: "/[id]", 
-                  params: {
-                    id: issue.id,
-                    title: issue.title,
-                    score: issue.score,
-                    description: issue.description,
-                    status: status,
-                  },
-                })
-              }
-            />
-          ))}
-
-       
-        </View>
+            <View style={{paddingHorizontal: "5%",}}>
+              {ISSUE_LIST.map((issue: any) => (
+                <IssueCard
+                  key={issue.id}
+                  id={issue.id}
+                  title={issue.title}
+                  score={String(issue.score)}
+                  description={issue.description}
+                  status={normalizeStatus(scanResult?.status || 'Warning')}
+                  onPressDetails={() =>
+                    router.push({
+                      pathname: "/[id]",
+                      params: {
+                        id: issue.id,
+                        title: issue.title,
+                        score: String(issue.score),
+                        description: issue.description,
+                        status: normalizeStatus(scanResult?.status || 'Warning'),
+                        businessBenefits: issue.business_benefits ? JSON.stringify(issue.business_benefits) : null,
+                        impactMessage: issue.impact_message || null,
+                      },
+                    })
+                  }
+                />
+              ))}
+            </View>
+          </>
+        ) : (
+          <View style={{ paddingVertical: 40, alignItems: 'center' }}>
+            <ActivityIndicator size="large" color="#F04438" />
+            <Text style={{ marginTop: 10, color: '#666' }}>Loading scan results...</Text>
+          </View>
+        )}
 
         <View>
           <Text

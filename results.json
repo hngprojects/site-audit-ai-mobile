@@ -1,0 +1,611 @@
+{
+  "status_code": 200,
+  "status": "success",
+  "message": "Operation successful",
+  "data": {
+    "job_id": "019abed1-fdae-7660-a520-42b36b26ebd8",
+    "status": "completed",
+    "results": {
+      "score_overall": 36,
+      "score_seo": 32,
+      "score_accessibility": 26,
+      "score_performance": 64,
+      "score_design": 26,
+      "total_issues": 0,
+      "critical_issues": 0,
+      "warnings": 0,
+      "pages_discovered": 7,
+      "pages_selected": 7,
+      "pages_analyzed": 7,
+      "selected_pages": [
+        {
+          "url": "https://gradific.com/#faq",
+          "score_overall": 28,
+          "score_seo": 30,
+          "score_accessibility": 10,
+          "score_performance": 60,
+          "score_design": 10,
+          "critical_issues": 0,
+          "warnings": 0,
+          "analysis_details": {
+            "url": "https://gradific.com/#faq",
+            "overall_score": 28,
+            "scan_date": "2025-11-26 06:24:55",
+            "ux": {
+              "score": 10,
+              "title": "Usability",
+              "impact_message": "A lack of clear content structure (no headings, zero words) and no descriptive page title makes it difficult for users to understand the page's purpose. This leads to confusion, high bounce rates, and a poor overall user experience, hindering trust and engagement.",
+              "impact_score": 10,
+              "business_benefits": [
+                "Improve user satisfaction and reduce frustration by providing clear navigation and content.",
+                "Increase conversion rates by making it easier for users to find information and complete actions.",
+                "Enhance brand perception as a user-friendly and professional service."
+              ],
+              "problems": [
+                {
+                  "icon": "alert",
+                  "title": "No Headings Found (Error Level) - There are no headings (h1-h6) on this page, making it difficult to structure content and for users and search engines to understand the page hierarchy.",
+                  "description": "No Headings Found (Error Level) - There are no headings (h1-h6) on this page, making it difficult to structure content and for users and search engines to understand the page hierarchy."
+                },
+                {
+                  "icon": "alert",
+                  "title": "No Page Title (Error Level) - The page is missing a title tag, which is crucial for user experience and SEO. It provides a clear indication of the page's content in browser tabs and search results.",
+                  "description": "No Page Title (Error Level) - The page is missing a title tag, which is crucial for user experience and SEO. It provides a clear indication of the page's content in browser tabs and search results."
+                },
+                {
+                  "icon": "alert",
+                  "title": "No Content (Error Level) - The page has zero words, making it unhelpful and uninformative for users. This severely impacts user experience and SEO.",
+                  "description": "No Content (Error Level) - The page has zero words, making it unhelpful and uninformative for users. This severely impacts user experience and SEO."
+                }
+              ]
+            },
+            "performance": {
+              "score": 60,
+              "title": "Performance",
+              "impact_message": "Slow loading pages can frustrate users, leading to higher bounce rates and lost conversions. Search engines also penalize slow sites, reducing organic visibility and traffic.",
+              "impact_score": 60,
+              "business_benefits": [
+                "Improve user engagement and reduce bounce rates by ensuring fast load times.",
+                "Enhance conversion rates as faster pages lead to better user experience.",
+                "Boost search engine rankings, as site speed is a key ranking factor."
+              ],
+              "problems": []
+            },
+            "seo": {
+              "score": 30,
+              "title": "SEO",
+              "impact_message": "A missing page title and a long meta description can significantly hinder search engine visibility. This leads to lower click-through rates and reduced organic traffic, impacting lead generation and brand awareness.",
+              "impact_score": 30,
+              "business_benefits": [
+                "Increase organic traffic and visibility by ranking higher for relevant keywords.",
+                "Attract more qualified leads by appearing in search results for specific user queries.",
+                "Improve brand recognition and credibility through consistent search presence."
+              ],
+              "problems": [
+                {
+                  "icon": "alert",
+                  "title": "Missing Page Title Tag (Error Level) - Gradific - A comprehensive grading and task management platform that streamlines assessment workflows, provides automated grading features, and helps educators deliver timely, meaningful feedback to students. (Length: 208)",
+                  "description": "Missing Page Title Tag (Error Level) - Gradific - A comprehensive grading and task management platform that streamlines assessment workflows, provides automated grading features, and helps educators deliver timely, meaningful feedback to students. (Length: 208)"
+                },
+                {
+                  "icon": "warning",
+                  "title": "Meta Description Too Long (Warning Level) - Title: Missing Page Title Tag. Description: Page title is missing. Every page should have a <title> tag.",
+                  "description": "Meta Description Too Long (Warning Level) - Title: Missing Page Title Tag. Description: Page title is missing. Every page should have a <title> tag."
+                }
+              ]
+            }
+          }
+        },
+        {
+          "url": "https://gradific.com/#",
+          "score_overall": 30,
+          "score_seo": 40,
+          "score_accessibility": 20,
+          "score_performance": 70,
+          "score_design": 20,
+          "critical_issues": 0,
+          "warnings": 0,
+          "analysis_details": {
+            "url": "https://gradific.com/",
+            "overall_score": 30,
+            "scan_date": "2025-11-26 06:25:01",
+            "ux": {
+              "score": 20,
+              "title": "Usability",
+              "impact_message": "A lack of clear headings and minimal content can make it difficult for users to understand the purpose and offerings of the page. This can lead to confusion, frustration, and a higher bounce rate as users struggle to find the information they need.",
+              "impact_score": 20,
+              "business_benefits": [
+                "Improve user satisfaction and build trust.",
+                "Increase conversion rates by making the site easier to navigate and use.",
+                "Reduce support costs by providing a clear and intuitive user experience."
+              ],
+              "problems": [
+                {
+                  "icon": "alert",
+                  "title": "No Headings Found (H1-H6) - Count: 0 - Problem: Headings provide structure and improve navigation for users and search engines. The page is missing all heading tags (H1-H6).",
+                  "description": "No Headings Found (H1-H6) - Count: 0 - Problem: Headings provide structure and improve navigation for users and search engines. The page is missing all heading tags (H1-H6)."
+                },
+                {
+                  "icon": "alert",
+                  "title": "No Content Found - Word Count: 0 - Problem: The page has no discernible text content, making it impossible for users to understand its purpose or offerings. This significantly impacts user experience and SEO.",
+                  "description": "No Content Found - Word Count: 0 - Problem: The page has no discernible text content, making it impossible for users to understand its purpose or offerings. This significantly impacts user experience and SEO."
+                },
+                {
+                  "icon": "alert",
+                  "title": "No Images with Alt Text - Count: 0 - Problem: While there are no images on the page, it's important to note that alt text is crucial for accessibility and SEO. If images were present, their absence of alt text would be a significant issue.",
+                  "description": "No Images with Alt Text - Count: 0 - Problem: While there are no images on the page, it's important to note that alt text is crucial for accessibility and SEO. If images were present, their absence of alt text would be a significant issue."
+                }
+              ]
+            },
+            "performance": {
+              "score": 70,
+              "title": "Performance",
+              "impact_message": "Slow loading times can frustrate users, leading to higher bounce rates and lost potential customers. Poor performance also negatively impacts search engine rankings, reducing organic visibility and traffic.",
+              "impact_score": 60,
+              "business_benefits": [
+                "Improve user engagement and reduce bounce rates.",
+                "Enhance conversion rates and revenue.",
+                "Boost search engine rankings and organic traffic."
+              ],
+              "problems": []
+            },
+            "seo": {
+              "score": 40,
+              "title": "SEO",
+              "impact_message": "Missing or poorly optimized meta titles and descriptions can lead to lower click-through rates from search engine results pages (SERPs). Without a clear and compelling title, users may overlook the page, reducing organic traffic and potential conversions.",
+              "impact_score": 40,
+              "business_benefits": [
+                "Increase organic search visibility and attract more qualified leads.",
+                "Improve click-through rates from search results.",
+                "Establish brand authority and credibility."
+              ],
+              "problems": [
+                {
+                  "icon": "alert",
+                  "title": "Missing Page Title (H1 equivalent for SEO)  - Length: 0px - Error: Page title is missing. Every page should have a <title> tag.  - Severity: Error: Page title is missing. Every page should have a <title> tag.  - Field: title - Message: Page title is missing. Every page should have a <title> tag.  - Valid: False - Issues: [{'field': 'title', 'severity': 'error', 'message': 'Page title is missing. Every page should have a <title> tag.'}] - Recommended: 50-60 characters. Consider adding a descriptive title to improve search engine visibility and user understanding.",
+                  "description": "Missing Page Title (H1 equivalent for SEO)  - Length: 0px - Error: Page title is missing. Every page should have a <title> tag.  - Severity: Error: Page title is missing. Every page should have a <title> tag.  - Field: title - Message: Page title is missing. Every page should have a <title> tag.  - Valid: False - Issues: [{'field': 'title', 'severity': 'error', 'message': 'Page title is missing. Every page should have a <title> tag.'}] - Recommended: 50-60 characters. Consider adding a descriptive title to improve search engine visibility and user understanding."
+                },
+                {
+                  "icon": "warning",
+                  "title": "Meta Description Too Long - Length: 208px - Warning: Description is too long (208 chars). Recommended: 120-160 characters. Long descriptions may be truncated in search results.  - Severity: Warning: Description is too long (208 chars). Recommended: 120-160 characters. Long descriptions may be truncated in search results.  - Field: description - Message: Description is too long (208 chars). Recommended: 120-160 characters. Long descriptions may be truncated in search results.  - Valid: False - Issues: [{'field': 'description', 'severity': 'warning', 'message': 'Description is too long (208 chars). Recommended: 120-160 characters. Long descriptions may be truncated in search results.'}] - Recommended: 120-160 characters. Consider shortening the description to ensure it is fully displayed in search results and effectively communicates the page's content.",
+                  "description": "Meta Description Too Long - Length: 208px - Warning: Description is too long (208 chars). Recommended: 120-160 characters. Long descriptions may be truncated in search results.  - Severity: Warning: Description is too long (208 chars). Recommended: 120-160 characters. Long descriptions may be truncated in search results.  - Field: description - Message: Description is too long (208 chars). Recommended: 120-160 characters. Long descriptions may be truncated in search results.  - Valid: False - Issues: [{'field': 'description', 'severity': 'warning', 'message': 'Description is too long (208 chars). Recommended: 120-160 characters. Long descriptions may be truncated in search results.'}] - Recommended: 120-160 characters. Consider shortening the description to ensure it is fully displayed in search results and effectively communicates the page's content."
+                },
+                {
+                  "icon": "alert",
+                  "title": "Missing Canonical URL - Severity: Error: Page is missing a canonical URL. Canonical tags help search engines understand the preferred version of a page, preventing duplicate content issues.",
+                  "description": "Missing Canonical URL - Severity: Error: Page is missing a canonical URL. Canonical tags help search engines understand the preferred version of a page, preventing duplicate content issues."
+                }
+              ]
+            }
+          }
+        },
+        {
+          "url": "https://gradific.com/terms",
+          "score_overall": 36,
+          "score_seo": 40,
+          "score_accessibility": 10,
+          "score_performance": 50,
+          "score_design": 10,
+          "critical_issues": 0,
+          "warnings": 0,
+          "analysis_details": {
+            "url": "https://gradific.com/terms",
+            "overall_score": 36,
+            "scan_date": "2025-11-26 06:24:15",
+            "ux": {
+              "score": 10,
+              "title": "Usability",
+              "impact_message": "A page with no content and missing essential elements like headings and interactive elements provides a poor user experience. Users visiting this page will likely find it unhelpful and may leave immediately, impacting engagement and the perception of the brand.",
+              "impact_score": 10,
+              "business_benefits": [
+                "Improve user satisfaction and encourage repeat visits.",
+                "Reduce user frustration and support task completion.",
+                "Enhance brand perception and trustworthiness."
+              ],
+              "problems": [
+                {
+                  "icon": "alert",
+                  "title": "No Content on Page. The page is empty, providing no value to the user and failing to meet their likely intent for visiting a 'terms' page.",
+                  "description": "No Content on Page. The page is empty, providing no value to the user and failing to meet their likely intent for visiting a 'terms' page."
+                },
+                {
+                  "icon": "alert",
+                  "title": "Missing Headings. The absence of headings (H1, H2, etc.) makes it difficult for users and assistive technologies to navigate and understand the page structure and key information.",
+                  "description": "Missing Headings. The absence of headings (H1, H2, etc.) makes it difficult for users and assistive technologies to navigate and understand the page structure and key information."
+                },
+                {
+                  "icon": "warning",
+                  "title": "No Images with Alt Text. While there are no images, if any were added, the lack of alt text would negatively impact accessibility for visually impaired users and SEO.",
+                  "description": "No Images with Alt Text. While there are no images, if any were added, the lack of alt text would negatively impact accessibility for visually impaired users and SEO."
+                },
+                {
+                  "icon": "alert",
+                  "title": "Basic Content Structure Missing. The page lacks fundamental content elements like headings and substantial text, making it unusable.",
+                  "description": "Basic Content Structure Missing. The page lacks fundamental content elements like headings and substantial text, making it unusable."
+                }
+              ]
+            },
+            "performance": {
+              "score": 50,
+              "title": "Performance",
+              "impact_message": "Slow page load times can lead to user frustration, causing visitors to leave before engaging with content, directly impacting conversion rates and potential revenue. Search engines also penalize slow sites, reducing organic visibility and traffic.",
+              "impact_score": 50,
+              "business_benefits": [
+                "Improve user engagement and reduce bounce rates.",
+                "Enhance conversion rates and revenue.",
+                "Boost search engine rankings and organic traffic."
+              ],
+              "problems": [
+                {
+                  "icon": "warning",
+                  "title": "No performance data available for analysis in the provided input. Cannot identify specific performance issues.",
+                  "description": "No performance data available for analysis in the provided input. Cannot identify specific performance issues."
+                }
+              ]
+            },
+            "seo": {
+              "score": 40,
+              "title": "SEO",
+              "impact_message": "Missing or poorly optimized page titles and descriptions can significantly harm search engine rankings and user click-through rates. Without clear signals to search engines and users, the page is less likely to be discovered or chosen from search results.",
+              "impact_score": 40,
+              "business_benefits": [
+                "Increase organic search visibility and attract more qualified leads.",
+                "Improve brand credibility and user trust through clear and informative metadata.",
+                "Enhance click-through rates from search engine results pages (SERPs)."
+              ],
+              "problems": [
+                {
+                  "icon": "alert",
+                  "title": "Page Title is Missing or Empty. A clear and concise page title is crucial for SEO and user experience, helping search engines understand the page content and users decide whether to click.",
+                  "description": "Page Title is Missing or Empty. A clear and concise page title is crucial for SEO and user experience, helping search engines understand the page content and users decide whether to click."
+                },
+                {
+                  "icon": "warning",
+                  "title": "Meta Description is Too Long. While descriptive, this meta description exceeds the recommended length and may be truncated in search results, reducing its effectiveness in attracting clicks.",
+                  "description": "Meta Description is Too Long. While descriptive, this meta description exceeds the recommended length and may be truncated in search results, reducing its effectiveness in attracting clicks."
+                },
+                {
+                  "icon": "alert",
+                  "title": "No Canonical URL Specified. This can lead to duplicate content issues or prevent search engines from consolidating link equity to the preferred version of the page.",
+                  "description": "No Canonical URL Specified. This can lead to duplicate content issues or prevent search engines from consolidating link equity to the preferred version of the page."
+                }
+              ]
+            }
+          }
+        },
+        {
+          "url": "https://gradific.com/contact-us",
+          "score_overall": 33,
+          "score_seo": 30,
+          "score_accessibility": 30,
+          "score_performance": 70,
+          "score_design": 30,
+          "critical_issues": 0,
+          "warnings": 0,
+          "analysis_details": {
+            "url": "https://gradific.com/contact-us",
+            "overall_score": 33,
+            "scan_date": "2025-11-26 06:24:49",
+            "ux": {
+              "score": 30,
+              "title": "Usability",
+              "impact_message": "The lack of clear headings and content can make the page difficult to navigate and understand for users, potentially leading to frustration and abandonment. Without easily scannable text, users may struggle to find the information they need, impacting their overall experience and trust in the brand.",
+              "impact_score": 40,
+              "business_benefits": [
+                "Improved user satisfaction and trust.",
+                "Increased task completion rates for visitors.",
+                "Reduced user frustration and support inquiries."
+              ],
+              "problems": [
+                {
+                  "icon": "alert",
+                  "title": "Missing Headings (H1-H6) - Alert Severity Issue Found on Page: The page contains 0 headings. Headings structure content, making it easier for users to scan and understand the page hierarchy. Lack of headings can negatively impact usability and accessibility, particularly for users relying on screen readers. Implement a clear heading structure (starting with an H1) to organize content logically and improve user navigation.",
+                  "description": "Missing Headings (H1-H6) - Alert Severity Issue Found on Page: The page contains 0 headings. Headings structure content, making it easier for users to scan and understand the page hierarchy. Lack of headings can negatively impact usability and accessibility, particularly for users relying on screen readers. Implement a clear heading structure (starting with an H1) to organize content logically and improve user navigation."
+                },
+                {
+                  "icon": "alert",
+                  "title": "No Content Found - Alert Severity Issue Found on Page: The page has a word count of 0. Pages with no discernible content offer no value to users or search engines. This can lead to high bounce rates and poor user engagement. Ensure that all pages have relevant and valuable content that meets user intent and search engine expectations.",
+                  "description": "No Content Found - Alert Severity Issue Found on Page: The page has a word count of 0. Pages with no discernible content offer no value to users or search engines. This can lead to high bounce rates and poor user engagement. Ensure that all pages have relevant and valuable content that meets user intent and search engine expectations."
+                },
+                {
+                  "icon": "alert",
+                  "title": "No Images with Alt Text Found - Alert Severity Issue Found on Page: The page contains 0 images. While this specific page has no images, in general, images without alt text reduce accessibility for visually impaired users and harm SEO by missing out on image-based search traffic. All images should have descriptive alt text that accurately conveys the image's content and purpose.",
+                  "description": "No Images with Alt Text Found - Alert Severity Issue Found on Page: The page contains 0 images. While this specific page has no images, in general, images without alt text reduce accessibility for visually impaired users and harm SEO by missing out on image-based search traffic. All images should have descriptive alt text that accurately conveys the image's content and purpose."
+                }
+              ]
+            },
+            "performance": {
+              "score": 70,
+              "title": "Performance",
+              "impact_message": "Slow loading times can significantly deter users, leading to higher bounce rates and lost conversion opportunities. Search engines also penalize slow-performing pages, reducing visibility and organic traffic.",
+              "impact_score": 50,
+              "business_benefits": [
+                "Improved user engagement and reduced bounce rates.",
+                "Higher conversion rates due to faster loading times.",
+                "Enhanced search engine rankings, leading to increased organic traffic."
+              ],
+              "problems": []
+            },
+            "seo": {
+              "score": 30,
+              "title": "SEO",
+              "impact_message": "A missing page title and an overly long meta description directly harm search engine visibility and click-through rates. Search engines may truncate or ignore these elements, making the page less attractive to potential visitors.",
+              "impact_score": 20,
+              "business_benefits": [
+                "Increased visibility in search engine results pages (SERPs).",
+                "Higher quality organic traffic from relevant search queries.",
+                "Improved click-through rates from search results due to clear titles and descriptions."
+              ],
+              "problems": [
+                {
+                  "icon": "alert",
+                  "title": "Missing Page Title (H1 Equivalent for SEO purposes) - Error Severity Issue Found on Page: Missing <title> tag is a critical SEO error that impacts search engine indexing and user understanding of the page content. This can lead to significantly lower search rankings and fewer organic visits. Consider adding a concise and descriptive title that accurately reflects the page's content. The recommended length is between 50-60 characters to ensure it is fully displayed in search results. Ensure the title is unique for every page on your website to improve search engine crawlability and user experience when presented with multiple results. Example: \"Contact Gradific - Get In Touch For Support & Inquiries\".",
+                  "description": "Missing Page Title (H1 Equivalent for SEO purposes) - Error Severity Issue Found on Page: Missing <title> tag is a critical SEO error that impacts search engine indexing and user understanding of the page content. This can lead to significantly lower search rankings and fewer organic visits. Consider adding a concise and descriptive title that accurately reflects the page's content. The recommended length is between 50-60 characters to ensure it is fully displayed in search results. Ensure the title is unique for every page on your website to improve search engine crawlability and user experience when presented with multiple results. Example: \"Contact Gradific - Get In Touch For Support & Inquiries\"."
+                },
+                {
+                  "icon": "warning",
+                  "title": "Meta Description Too Long - Warning Severity Issue Found on Page: Description is too long (208 chars). Recommended: 120-160 characters. Long descriptions may be truncated in search results. While not a direct ranking factor, an excessively long meta description may be cut off by search engines, failing to provide a compelling summary to users and potentially reducing click-through rates. Aim for a concise and informative description within the recommended character count to maximize its effectiveness in search snippets.",
+                  "description": "Meta Description Too Long - Warning Severity Issue Found on Page: Description is too long (208 chars). Recommended: 120-160 characters. Long descriptions may be truncated in search results. While not a direct ranking factor, an excessively long meta description may be cut off by search engines, failing to provide a compelling summary to users and potentially reducing click-through rates. Aim for a concise and informative description within the recommended character count to maximize its effectiveness in search snippets."
+                },
+                {
+                  "icon": "warning",
+                  "title": "Missing Canonical URL - Warning Severity Issue Found on Page: Canonical URL is missing. Duplicate or similar content can dilute ranking signals and confuse search engines. Implementing canonical tags helps search engines understand the preferred version of a page, consolidating ranking power and improving indexing efficiency. This is particularly important for sites with dynamically generated content or multiple URLs leading to the same page.",
+                  "description": "Missing Canonical URL - Warning Severity Issue Found on Page: Canonical URL is missing. Duplicate or similar content can dilute ranking signals and confuse search engines. Implementing canonical tags helps search engines understand the preferred version of a page, consolidating ranking power and improving indexing efficiency. This is particularly important for sites with dynamically generated content or multiple URLs leading to the same page."
+                }
+              ]
+            }
+          }
+        },
+        {
+          "url": "https://gradific.com/",
+          "score_overall": 42,
+          "score_seo": 30,
+          "score_accessibility": 45,
+          "score_performance": 50,
+          "score_design": 45,
+          "critical_issues": 0,
+          "warnings": 0,
+          "analysis_details": {
+            "url": "https://gradific.com/",
+            "overall_score": 42,
+            "scan_date": "2025-11-26 06:21:30",
+            "ux": {
+              "score": 45,
+              "title": "Usability",
+              "impact_message": "The lack of content, headings, and image alt text creates a poor user experience, making it difficult for visitors to understand the page's purpose and find information. This absence of structure also negatively impacts accessibility for users relying on screen readers or assistive technologies.",
+              "impact_score": 45,
+              "business_benefits": [
+                "A clear and intuitive interface reduces user frustration and increases task completion rates.",
+                "Missing form labels and interactive element issues can be resolved to improve accessibility for all users.",
+                "Consistent heading structures aid navigation and content comprehension, improving overall user experience."
+              ],
+              "problems": [
+                {
+                  "icon": "alert",
+                  "title": "No Text Content",
+                  "description": "The page has no text content, making it impossible for users to understand its purpose or value."
+                },
+                {
+                  "icon": "alert",
+                  "title": "Missing Headings",
+                  "description": "The page has no headings (H1-H6), which are essential for content structure and navigation."
+                },
+                {
+                  "icon": "warning",
+                  "title": "No Images Present",
+                  "description": "The page has no images, which could be used to enhance content and user engagement."
+                }
+              ]
+            },
+            "performance": {
+              "score": 50,
+              "title": "Performance",
+              "impact_message": "While no specific performance metrics were provided, slow loading times can significantly deter users, leading to higher bounce rates and lost conversion opportunities. Search engines also penalize slow-loading sites, impacting visibility and organic traffic.",
+              "impact_score": 50,
+              "business_benefits": [
+                "Faster load times improve user satisfaction and reduce bounce rates.",
+                "Quicker page rendering leads to higher conversion rates and more engagement.",
+                "Improved performance can positively impact search engine rankings."
+              ],
+              "problems": []
+            },
+            "seo": {
+              "score": 30,
+              "title": "SEO",
+              "impact_message": "The page is missing a title tag, which is critical for search engine indexing and user understanding of the page's content. The meta description is too long, which may lead to it being truncated in search results, reducing its effectiveness in attracting clicks. The absence of a canonical URL can lead to SEO dilution if similar content appears elsewhere.",
+              "impact_score": 30,
+              "business_benefits": [
+                "Improved search engine rankings increase organic visibility and attract more qualified traffic.",
+                "Well-optimized meta descriptions and titles enhance click-through rates from search results.",
+                "A clear canonical URL prevents duplicate content issues, consolidating SEO authority."
+              ],
+              "problems": [
+                {
+                  "icon": "alert",
+                  "title": "Missing Page Title",
+                  "description": "Page title is missing. Every page should have a <title> tag."
+                },
+                {
+                  "icon": "warning",
+                  "title": "Meta Description Too Long",
+                  "description": "Description is too long (208 chars). Recommended: 120-160 characters. Long descriptions may be truncated in search results."
+                },
+                {
+                  "icon": "warning",
+                  "title": "Missing Canonical URL",
+                  "description": "The page does not have a canonical URL defined."
+                }
+              ]
+            }
+          }
+        },
+        {
+          "url": "https://gradific.com/changelog",
+          "score_overall": 50,
+          "score_seo": 40,
+          "score_accessibility": 50,
+          "score_performance": 80,
+          "score_design": 50,
+          "critical_issues": 0,
+          "warnings": 0,
+          "analysis_details": {
+            "url": "https://gradific.com/changelog",
+            "overall_score": 50,
+            "scan_date": "2025-11-26 06:24:49",
+            "ux": {
+              "score": 50,
+              "title": "Usability",
+              "impact_message": "The absence of headings and a very low word count on the changelog page makes it difficult for users to scan and find relevant information quickly. This poor content structure can lead to user frustration and a decreased likelihood of them engaging with or returning to the page.",
+              "impact_score": 50,
+              "business_benefits": [
+                "Enhanced user satisfaction and loyalty through an intuitive interface.",
+                "Reduced support requests due to clear navigation and content structure.",
+                "Improved task completion rates and overall user experience."
+              ],
+              "problems": [
+                {
+                  "icon": "alert",
+                  "title": "No Headings Found",
+                  "description": "No Headings Found"
+                },
+                {
+                  "icon": "warning",
+                  "title": "Very Low Word Count",
+                  "description": "Very Low Word Count"
+                },
+                {
+                  "icon": "warning",
+                  "title": "Missing Page Title (SEO & UX Impact)",
+                  "description": "Missing Page Title (SEO & UX Impact)"
+                }
+              ]
+            },
+            "performance": {
+              "score": 80,
+              "title": "Performance",
+              "impact_message": "Slow page load times can lead to a high bounce rate and reduced user engagement. Users expect websites to load quickly, and delays can cause frustration and lead them to seek alternatives. This negatively impacts conversion rates and overall user satisfaction.",
+              "impact_score": 60,
+              "business_benefits": [
+                "Improved user engagement and retention due to faster load times.",
+                "Reduced bounce rates as users don't leave due to slow performance.",
+                "Enhanced conversion rates as users can complete tasks more efficiently."
+              ],
+              "problems": []
+            },
+            "seo": {
+              "score": 40,
+              "title": "SEO",
+              "impact_message": "A missing page title and an overly long meta description can significantly harm search engine rankings and user click-through rates. Search engines may not index the page correctly, and users may be less inclined to click on truncated or irrelevant search snippets, reducing organic traffic and potential conversions.",
+              "impact_score": 30,
+              "business_benefits": [
+                "Increased organic visibility in search engine results pages (SERPs).",
+                "Higher quality traffic driven by relevant search queries.",
+                "Improved click-through rates from well-crafted meta descriptions and titles."
+              ],
+              "problems": [
+                {
+                  "icon": "alert",
+                  "title": "Missing Page Title (H1 Tag Equivalent in SEO Contexts) - Error Found: Page title is missing. Every page should have a <title> tag. - 0 characters suggested: 0-60 characters.",
+                  "description": "Missing Page Title (H1 Tag Equivalent in SEO Contexts) - Error Found: Page title is missing. Every page should have a <title> tag. - 0 characters suggested: 0-60 characters."
+                },
+                {
+                  "icon": "warning",
+                  "title": "Meta Description Too Long - Warning Found: Description is too long (208 chars). Recommended: 120-160 characters. Long descriptions may be truncated in search results. - 208 characters suggested: 120-160 characters.",
+                  "description": "Meta Description Too Long - Warning Found: Description is too long (208 chars). Recommended: 120-160 characters. Long descriptions may be truncated in search results. - 208 characters suggested: 120-160 characters."
+                },
+                {
+                  "icon": "alert",
+                  "title": "Missing Canonical URL - Alert Found: Canonical URL is missing. This can lead to duplicate content issues and affect SEO performance.",
+                  "description": "Missing Canonical URL - Alert Found: Canonical URL is missing. This can lead to duplicate content issues and affect SEO performance."
+                }
+              ]
+            }
+          }
+        },
+        {
+          "url": "https://gradific.com/#features",
+          "score_overall": 37,
+          "score_seo": 20,
+          "score_accessibility": 20,
+          "score_performance": 70,
+          "score_design": 20,
+          "critical_issues": 0,
+          "warnings": 0,
+          "analysis_details": {
+            "url": "https://gradific.com/#features",
+            "overall_score": 37,
+            "scan_date": "2025-11-26 06:25:06",
+            "ux": {
+              "score": 20,
+              "title": "Usability",
+              "impact_message": "A lack of clear headings and content structure makes it difficult for users to navigate and understand the page's purpose, potentially leading to confusion and abandonment. The absence of any textual content on the page further exacerbates this issue, leaving users without valuable information.",
+              "impact_score": 20,
+              "business_benefits": [
+                "Enhanced user satisfaction and reduced bounce rates.",
+                "Improved task completion rates and user engagement.",
+                "Positive brand perception leading to increased customer loyalty."
+              ],
+              "problems": [
+                {
+                  "icon": "alert",
+                  "title": "No Content",
+                  "description": "The page contains 0 words, which provides no meaningful content to users."
+                },
+                {
+                  "icon": "alert",
+                  "title": "No Headings",
+                  "description": "The page has 0 headings (H1-H6), making it difficult for users and assistive technologies to understand the content structure and hierarchy."
+                },
+                {
+                  "icon": "alert",
+                  "title": "Missing H1 Tag",
+                  "description": "The page is missing an H1 tag, which is the primary heading and crucial for content hierarchy and SEO."
+                }
+              ]
+            },
+            "performance": {
+              "score": 70,
+              "title": "Performance",
+              "impact_message": "Slow page load times can lead to user frustration and abandonment, directly impacting conversion rates and revenue. Search engines also penalize slow-loading pages, reducing visibility and organic traffic.",
+              "impact_score": 60,
+              "business_benefits": [
+                "Improved user retention and engagement.",
+                "Higher conversion rates due to faster loading times.",
+                "Better search engine rankings, leading to increased organic traffic."
+              ],
+              "problems": []
+            },
+            "seo": {
+              "score": 20,
+              "title": "SEO",
+              "impact_message": "Missing crucial on-page SEO elements like a page title can significantly hinder a page's ability to rank in search results. While the description is present, its excessive length may lead to truncation, reducing click-through rates from search engine result pages.",
+              "impact_score": 20,
+              "business_benefits": [
+                "Increased organic visibility and search engine rankings.",
+                "Higher quality traffic from relevant search queries.",
+                "Improved brand credibility and trust."
+              ],
+              "problems": [
+                {
+                  "icon": "alert",
+                  "title": "Missing Page Title",
+                  "description": "Page title is missing. Every page should have a <title> tag."
+                },
+                {
+                  "icon": "warning",
+                  "title": "Description Too Long",
+                  "description": "Description is too long (208 chars). Recommended: 120-160 characters. Long descriptions may be truncated in search results."
+                },
+                {
+                  "icon": "alert",
+                  "title": "Missing Canonical URL",
+                  "description": "The page is missing a canonical URL, which can lead to duplicate content issues and dilute SEO efforts."
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  }
+}
