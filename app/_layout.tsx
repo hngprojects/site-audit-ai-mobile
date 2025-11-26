@@ -3,6 +3,7 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
+import * as WebBrowser from 'expo-web-browser';
 import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
@@ -12,6 +13,10 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 
 // Prevent the splash screen from auto-hiding before fonts are loaded
 SplashScreen.preventAutoHideAsync();
+
+// CRITICAL: Complete any pending OAuth auth sessions when app starts
+// This ensures redirects from OAuth providers (like Google) work properly
+WebBrowser.maybeCompleteAuthSession();
 
 export const unstable_settings = {
   anchor: '(tabs)',
