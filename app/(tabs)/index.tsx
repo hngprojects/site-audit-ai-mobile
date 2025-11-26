@@ -2,8 +2,8 @@ import AuditResultCard from "@/components/auditResultCard";
 import EmptyState from "@/components/homeScreenEmptyState";
 import { useSitesStore } from "@/store/sites-store";
 import styles from "@/stylesheets/homeScreenStylesheet";
-import { validateWebsiteUrl } from "@/utils/url-validation";
-import { fetchWebsiteMetadata } from "@/utils/website-metadata";
+import { validateWebsiteUrl, normalizeUrl } from "@/utils/url-validation";
+import { startScan } from "@/actions/scan-actions";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Octicons from "@expo/vector-icons/Octicons";
 import { router } from "expo-router";
@@ -18,7 +18,7 @@ export default function HomeScreen() {
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [isCreating, setIsCreating] = useState<boolean>(false);
   
-  const { sites, isLoading, createSite, fetchSites } = useSitesStore();
+  const { sites, isLoading, fetchSites } = useSitesStore();
 
   useEffect(() => {
     fetchSites();
@@ -34,41 +34,35 @@ export default function HomeScreen() {
 
   const RunAudit = async () => {
     const validation = validateWebsiteUrl(websiteUrl);
-    
+
     if (!validation.isValid) {
       setUrlAvailable(false);
       setErrorMessage(validation.error);
       return;
     }
-    
+
     setUrlAvailable(true);
     setErrorMessage('');
     setIsCreating(true);
 
     try {
       const trimmedUrl = websiteUrl.trim();
-      
-      let metadata;
-      try {
-        metadata = await fetchWebsiteMetadata(trimmedUrl);
-      } catch (error) {
-        console.warn('Failed to fetch website metadata, continuing without it:', error);
-      }
-      
-      const newSite = await createSite(trimmedUrl, metadata);
-      
+      const normalizedUrl = normalizeUrl(trimmedUrl);
+
+      const scanResponse = await startScan(normalizedUrl);
+
       setWebsiteUrl('');
-      
+
       router.push({
         pathname: "/(main)/auditing-screen",
         params: {
-          url: trimmedUrl,
-          siteId: newSite.id,
+          url: normalizedUrl,
+          jobId: scanResponse.job_id,
         },
       });
     } catch (error) {
       setUrlAvailable(false);
-      setErrorMessage(error instanceof Error ? error.message : 'Failed to create site. Please try again.');
+      setErrorMessage(error instanceof Error ? error.message : 'Failed to start scan. Please try again.');
     } finally {
       setIsCreating(false);
     }

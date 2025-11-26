@@ -4,20 +4,34 @@ export interface UrlValidationResult {
 }
 
 /**
- * Normalizes a URL by adding https:// if it starts with www.
+ * Normalizes a URL by ensuring it has a proper protocol
  * @param url - The URL to normalize
- * @returns The normalized URL
+ * @returns The normalized URL with https:// protocol
  */
 export const normalizeUrl = (url: string): string => {
-  const trimmed = url.trim();
-  if (trimmed.startsWith('www.')) {
-    return `https://${trimmed}`;
+  if (!url || typeof url !== 'string') {
+    throw new Error('URL is required');
   }
-  return trimmed;
+
+  let normalized = url.trim().toLowerCase();
+
+  // Add protocol if missing
+  if (normalized.startsWith('www.')) {
+    normalized = `https://${normalized}`;
+  } else if (!normalized.startsWith('http://') && !normalized.startsWith('https://')) {
+    normalized = `https://${normalized}`;
+  }
+
+  // Convert http to https for security
+  if (normalized.startsWith('http://')) {
+    normalized = normalized.replace('http://', 'https://');
+  }
+
+  return normalized;
 };
 
 /**
- * Validates a website URL
+ * Validates a website URL with permissive input acceptance
  * @param url - The URL to validate
  * @returns Validation result with isValid flag and error message
  */
@@ -28,17 +42,32 @@ export const validateWebsiteUrl = (url: string): UrlValidationResult => {
 
   const trimmedUrl = url.trim();
 
-  // Check if URL starts with https:// or www.
-  const startsWithValid = trimmedUrl.startsWith('https://') || trimmedUrl.startsWith('www.');
-  if (!startsWithValid) {
-    return { isValid: false, error: 'URL must start with "https://" or "www."' };
+  // Allow various URL formats:
+  // - https://example.com
+  // - http://example.com
+  // - www.example.com
+  // - example.com
+  const hasValidStart = trimmedUrl.startsWith('https://') ||
+                       trimmedUrl.startsWith('http://') ||
+                       trimmedUrl.startsWith('www.') ||
+                       trimmedUrl.includes('.'); // Allow bare domains
+
+  if (!hasValidStart) {
+    return { isValid: false, error: 'Please enter a valid website URL' };
   }
 
-  // Remove protocol for domain validation
+  // Extract domain part for validation
   let domain = trimmedUrl;
+
+  // Remove protocol
   if (domain.startsWith('https://')) {
     domain = domain.substring(8);
-  } else if (domain.startsWith('www.')) {
+  } else if (domain.startsWith('http://')) {
+    domain = domain.substring(7);
+  }
+
+  // Remove www. if present
+  if (domain.startsWith('www.')) {
     domain = domain.substring(4);
   }
 
@@ -47,17 +76,21 @@ export const validateWebsiteUrl = (url: string): UrlValidationResult => {
     return { isValid: false, error: 'Please enter a valid domain name' };
   }
 
+  // Remove path/query/fragment for domain validation
+  const domainWithoutPath = domain.split('/')[0];
+  const domainWithoutQuery = domainWithoutPath.split('?')[0];
+  const cleanDomain = domainWithoutQuery.split('#')[0];
+
   // Check for valid domain format (must have at least one dot and valid TLD)
   // Domain should have format: subdomain.domain.tld or domain.tld
   const domainRegex = /^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
-  const domainWithoutPath = domain.split('/')[0]; // Remove path if present
-  
-  if (!domainRegex.test(domainWithoutPath)) {
+
+  if (!domainRegex.test(cleanDomain)) {
     return { isValid: false, error: 'Please enter a valid domain name (e.g., example.com)' };
   }
 
   // Check for valid TLD (2-6 characters)
-  const tldMatch = domainWithoutPath.match(/\.([a-zA-Z]{2,6})$/);
+  const tldMatch = cleanDomain.match(/\.([a-zA-Z]{2,6})$/);
   if (!tldMatch) {
     return { isValid: false, error: 'URL must have a valid domain extension (e.g., .com, .org)' };
   }
