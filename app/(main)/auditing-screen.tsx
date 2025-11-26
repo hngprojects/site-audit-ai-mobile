@@ -38,34 +38,6 @@ const AuditingScreen = () => {
 
   const scanDate = getFormattedDate();
 
-
-
-  // useEffect(() => {
-  //   const timer = setTimeout(() => {
-
-  //     setAuditInfo({
-  //       domain,
-  //       status,
-  //       score,
-  //       scanDate,
-  //     });
-
-
-  //     router.replace({
-  //       pathname: "../(reports)/report-dashboard",
-  //       params: {
-  //         domain,
-  //         status,
-  //         score,
-  //         scanDate,
-  //       },
-  //     });
-  //   }, 5000);
-
-  //   return () => clearTimeout(timer);
-  // }, [router, domain, status, score, scanDate,]);
-
-
   const { url } = useLocalSearchParams<{ url: string }>();
   const websiteUrl = url || '';
   const [progress, setProgress] = useState(0);
@@ -82,23 +54,29 @@ const AuditingScreen = () => {
         return Math.min(prev + increment, 100);
       });
     }, 500);
-    setAuditInfo({
-      domain,
-      status,
-      score,
-      scanDate,
-    });
-    router.replace({
-      pathname: "../(reports)/report-dashboard",
-      params: {
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    if (progress >= 100) {
+      setAuditInfo({
         domain,
         status,
         score,
         scanDate,
-      },
-    });
-    return () => clearInterval(interval);
-  }, []);
+      });
+      router.replace({
+        pathname: "../(reports)/report-dashboard",
+        params: {
+          domain,
+          status,
+          score,
+          scanDate,
+        },
+      });
+    }
+  }, [progress, domain, status, score, scanDate, setAuditInfo, router]);
 
   useEffect(() => {
     Animated.timing(animatedWidth, {

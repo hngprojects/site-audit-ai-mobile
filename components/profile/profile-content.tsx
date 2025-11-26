@@ -21,7 +21,6 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
   const [biometricAvailable, setBiometricAvailable] = useState(false);
   const [loadingBiometric, setLoadingBiometric] = useState(true);
   const [pushNotificationsEnabled, setPushNotificationsEnabled] = useState(true);
-  const [emailReportsEnabled, setEmailReportsEnabled] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
 
   // Load biometric status
@@ -225,18 +224,6 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
             <Switch
               value={pushNotificationsEnabled}
               onValueChange={setPushNotificationsEnabled}
-              trackColor={{ false: '#767577', true: '#FF5A3D' }}
-              thumbColor="#ffffff"
-            />
-          </View>
-          <View style={styles.settingsItem}>
-            <View style={styles.settingsItemLeft}>
-              <Feather name="mail" size={20} color="#1A2373" />
-              <Text style={styles.settingsItemText}>Email Reports</Text>
-            </View>
-            <Switch
-              value={emailReportsEnabled}
-              onValueChange={setEmailReportsEnabled}
               trackColor={{ false: '#767577', true: '#FF5A3D' }}
               thumbColor="#ffffff"
             />
