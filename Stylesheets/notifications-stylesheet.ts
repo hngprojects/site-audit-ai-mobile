@@ -114,6 +114,17 @@ const styles = StyleSheet.create({
     height: 50,
     marginTop: 6,
   },
+  androidSearchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 3,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#BBBCBC',
+    backgroundColor: '#fff',
+    marginTop: 6,
+  },
 
   searchInput: {
     marginLeft: 8,
@@ -131,7 +142,9 @@ const styles = StyleSheet.create({
 
   itemIconContainer: {
     // padding: 12,
-    // backgroundColor: '#edededff',
+    backgroundColor: '#edededff',
+    width: 50,
+    height: 50,
     borderRadius: 100,
     display: 'flex',
     justifyContent: 'center',
@@ -158,7 +171,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     
   },
-
+ 
   backButton: {
     position: 'absolute',
     left: 0,
@@ -170,11 +183,19 @@ const styles = StyleSheet.create({
     // flex: 1,
     fontSize: 24,
     color: '#111',
+    fontFamily: "RethinkSans-Bold"
+  },
+  androidheaderTitle: {
+    textAlign: 'center',
+    // flex: 1,
+    fontSize: 24,
+    color: '#111',
+    marginLeft: - 15,
   },
 
   markAllButton: {
     position: 'absolute',
-    right: 0,
+    right: -10,
     zIndex: 1,
   },
 
@@ -256,6 +277,12 @@ const styles = StyleSheet.create({
   markAllText: {
     color: '#FF5A3D',
     fontSize: 14,
+    fontFamily: 'RethinkSans-Medium',
+
+  },
+  markAllTextAndroid: {
+    color: '#FF5A3D',
+    fontSize: 12,
     fontFamily: 'RethinkSans-Medium',
 
   },
