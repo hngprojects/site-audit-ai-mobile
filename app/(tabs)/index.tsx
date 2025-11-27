@@ -9,7 +9,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Octicons from "@expo/vector-icons/Octicons";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 
@@ -110,13 +110,15 @@ export default function HomeScreen() {
       </View>
 
 
-      <View style={[styles.inputPlaceholder, { borderColor: !urlAvailable ? "#d32f2f" : "#C7C8C9", }]}>
-        <MaterialCommunityIcons
-          name="web" size={15}
-          color="#A0A0A0"
-          style={styles.webIcon}
-        />
-        <TextInput
+        {Platform.OS === "ios" ? 
+        (
+        <View style={[styles.inputPlaceholder, { borderColor: !urlAvailable ? "#d32f2f" : "#C7C8C9", }]}>
+          <MaterialCommunityIcons
+            name="web" size={15}
+            color="#A0A0A0"
+            style={styles.webIcon}
+          />
+          <TextInput
           placeholder="Enter your website URL"
           placeholderTextColor={"#A0A0A0"}
           style={styles.placeholderText}
@@ -126,7 +128,28 @@ export default function HomeScreen() {
           autoCorrect={false}
           keyboardType="url"
         />
-      </View>
+        </View>
+        ) : 
+        (
+        <View style={[styles.androidInputPlaceholder, { borderColor: !urlAvailable ? "#d32f2f" : "#C7C8C9", }]}>
+          <MaterialCommunityIcons
+            name="web" size={15}
+            color="#A0A0A0"
+            style={styles.webIcon}
+          />
+          <TextInput
+          placeholder="Enter your website URL"
+          placeholderTextColor={"#A0A0A0"}
+          style={styles.androidPlaceholderText}
+          value={websiteUrl ? websiteUrl.toLowerCase() : ''}
+          onChangeText={handleUrlChange}
+          autoCapitalize="none"
+          autoCorrect={false}
+          keyboardType="url"
+          />
+        </View>
+        )}
+     
       {!urlAvailable && errorMessage && (
         <Text style={styles.invalidLink}>{errorMessage}</Text>
       )}
