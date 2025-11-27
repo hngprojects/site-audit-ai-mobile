@@ -1,15 +1,17 @@
+import { startScan } from "@/actions/scan-actions";
 import AuditResultCard from "@/components/auditResultCard";
 import EmptyState from "@/components/homeScreenEmptyState";
 import { useSitesStore } from "@/store/sites-store";
 import styles from "@/stylesheets/homeScreenStylesheet";
-import { validateWebsiteUrl, normalizeUrl } from "@/utils/url-validation";
-import { startScan } from "@/actions/scan-actions";
+import { getPersistentDeviceId } from "@/utils/device-id";
+import { normalizeUrl, validateWebsiteUrl } from "@/utils/url-validation";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Octicons from "@expo/vector-icons/Octicons";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
 
 
 export default function HomeScreen() {
@@ -22,6 +24,14 @@ export default function HomeScreen() {
 
   useEffect(() => {
     fetchSites();
+    
+    const testDeviceId = async () => {
+      const id = await getPersistentDeviceId();
+      console.log("📱 Persistent Device ID:", id);
+    };
+
+    testDeviceId();
+
   }, [fetchSites]);
 
   const handleUrlChange = (text: string) => {
