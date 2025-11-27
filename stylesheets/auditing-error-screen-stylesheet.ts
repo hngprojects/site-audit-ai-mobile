@@ -48,7 +48,6 @@ const styles = StyleSheet.create({
     marginTop: 35,
     fontFamily: "RethinkSans-Bold",
     fontSize: 20,
-    fontWeight: "700",
     color: COLORS.textPrimary,
     textAlign: "center",
   },
@@ -57,7 +56,6 @@ const styles = StyleSheet.create({
     marginTop: 18,
     fontFamily: "RethinkSans-Regular",
     fontSize: 14,
-    fontWeight: "400",
     color: COLORS.textSecondary,
     textAlign: "center",
     lineHeight: 20,
@@ -68,7 +66,6 @@ const styles = StyleSheet.create({
     marginTop: 14,
     fontFamily: "RethinkSans-Medium",
     fontSize: 14,
-    fontWeight: "600",
     color: COLORS.textPrimary,
     textAlign: "center",
     lineHeight: 20,
@@ -78,7 +75,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontFamily: "RethinkSans-Regular",
     fontSize: 13,
-    fontWeight: "400",
     color: COLORS.textSecondary,
     textAlign: "center",
     lineHeight: 18,
@@ -108,7 +104,6 @@ const styles = StyleSheet.create({
   primaryButtonText: {
     fontFamily: "RethinkSans",
     fontSize: 16,
-    fontWeight: "600",
     color: "#FFFFFF",
   },
 
@@ -125,7 +120,6 @@ const styles = StyleSheet.create({
   secondaryButtonText: {
     fontFamily: "RethinkSans",
     fontSize: 16,
-    fontWeight: "600",
     color: COLORS.accent,
   },
 

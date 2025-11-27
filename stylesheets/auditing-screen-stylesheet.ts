@@ -13,17 +13,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   headerTitle: {
-    fontSize: 22,
+    fontSize: 28,
     fontFamily: 'RethinkSans-Bold',
-    fontWeight: '700',
-    color: '#000',
+    color: '#1C1C1C',
     marginBottom: 8,
     textAlign: 'center',
   },
   headerUrl: {
-    fontSize: 14,
+    fontSize: 16,
     fontFamily: 'RethinkSans-Regular',
-    color: '#555',
+    color: '#1A2373',
     textAlign: 'center',
   },
   loadingContainer: {
@@ -60,7 +59,6 @@ const styles = StyleSheet.create({
   progressText: {
     fontSize: 18,
     fontFamily: 'RethinkSans-SemiBold',
-    fontWeight: '600',
     color: '#000',
     marginTop: 12,
   },
@@ -110,6 +108,27 @@ footerText: {
   color: "#8a8a8a",
   marginTop: 15,
   fontFamily: "RethinkSans-Medium",
+},
+
+checklistContainer: {
+  width: '100%',
+  marginTop: 20,
+  paddingHorizontal: 10,
+},
+
+checklistItem: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginBottom: 12,
+},
+
+checklistIcon: {
+  marginRight: 12,
+},
+
+checklistText: {
+  fontSize: 16,
+  fontFamily: 'RethinkSans-Regular',
 },
 
 });

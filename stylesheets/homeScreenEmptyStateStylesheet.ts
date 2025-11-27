@@ -13,7 +13,6 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 15,
-    fontWeight: "500",
     fontFamily: "RethinkSans-Medium",
     color: "#555",
   },

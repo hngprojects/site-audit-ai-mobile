@@ -39,7 +39,6 @@ const styles = StyleSheet.create({
   },
   inputLabel: {
     fontSize: 16,
-    fontWeight: '600',
     fontFamily: 'RethinkSans-SemiBold',
     color: '#1c1c1c',
   },
@@ -68,7 +67,6 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 12,
-    fontWeight: '500',
     color: '#D32F2F',
     fontFamily: 'RethinkSans-Medium',
   },

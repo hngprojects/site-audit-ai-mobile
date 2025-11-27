@@ -86,7 +86,6 @@ const styles = StyleSheet.create({
   },
   sectionHeading: {
     fontSize: 16,
-    fontWeight: '600',
     color: '#1c1c1c',
     marginBottom: 12,
     fontFamily: 'RethinkSans-SemiBold',

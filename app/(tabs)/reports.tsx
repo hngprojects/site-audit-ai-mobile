@@ -56,7 +56,7 @@ const SwipeableRow: React.FC<SwipeableRowProps> = ({ item, url, onDelete, onEdit
         swipeableRef.current?.close();
         onDelete();
       }}>
-        <MaterialIcons name="delete" size={20} color="#494949" />
+        <MaterialIcons name="delete" size={20} color="#fff" />
         <Text style={styles.actionText}>Delete</Text>
       </TouchableOpacity>
     </View>

@@ -35,7 +35,6 @@ const styles = StyleSheet.create({
   domainText: {
     fontFamily: "RethinkSans-SemiBold",
     fontSize: 14,
-    fontWeight: "600",
     color: "#111827",
     marginBottom: 8,
   },
@@ -75,12 +74,11 @@ const styles = StyleSheet.create({
   },
   viewDetailsText: {
     fontFamily: "RethinkSans-Medium",
-    color: "#3F5BD9",
+    color: "#ff5a3d",
     fontSize: 13,
-    fontWeight: "600",
   },
   viewDetailsArrow: {
-    color: "#3F5BD9",
+    color: "#ff5a3d",
     marginLeft: 10,
     
   },

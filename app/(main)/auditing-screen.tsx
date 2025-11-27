@@ -1,7 +1,8 @@
-import { useAuditInfoStore } from '@/store/audit-website-details-store';
+import { getScanStatus, startScan } from '@/actions/scan-actions';
 import styles from '@/stylesheets/auditing-screen-stylesheet';
+import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Animated, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -9,79 +10,93 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 const AuditingScreen = () => {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const { setAuditInfo } = useAuditInfoStore();
-  const domain = Array.isArray(params.url) ? params.url[0] : params.url;
-  //simulating random score between 30 and 100 as scan score
-  const randomScore = Math.floor(Math.random() * (100 - 30 + 1)) + 30;
+  const jobId = Array.isArray(params.jobId) ? params.jobId[0] : params.jobId;
+  const url = Array.isArray(params.url) ? params.url[0] : params.url;
 
-  //simulating scan status based on score
-  const getStatusFromScore = (score: number) => {
-    if (score >= 30 && score <= 49) return "Critical";
-    if (score >= 50 && score <= 69) return "Warning";
-    return "Good";
-  };
-
-  //simulating current date the scan was issued
-  const getFormattedDate = () => {
-    const now = new Date();
-    const options: Intl.DateTimeFormatOptions = {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    };
-    return now.toLocaleDateString("en-US", options);
-  };
-
-
-  const score = randomScore.toString();
-  const status = getStatusFromScore(randomScore);
-
-  const scanDate = getFormattedDate();
-
-  const { url } = useLocalSearchParams<{ url: string }>();
   const websiteUrl = url || '';
   const [progress, setProgress] = useState(0);
+  const [scanStatus, setScanStatus] = useState<string>('queued');
+  const [completedSteps, setCompletedSteps] = useState<number>(0);
   const animatedWidth = useRef(new Animated.Value(0)).current;
 
+  // Scanning checklist items with appropriate icons
+  const scanSteps = [
+    { text: 'Analyzing for Critical SEO Errors...', icon: 'search', iconSet: 'FontAwesome' as const },
+    { text: 'Scanning content quality', icon: 'description', iconSet: 'MaterialIcons' as const },
+    { text: 'Checking for Costly Speed Issues...', icon: 'speed', iconSet: 'MaterialIcons' as const },
+    { text: 'Finding broken links', icon: 'link', iconSet: 'FontAwesome' as const }
+  ];
+
   useEffect(() => {
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          return 100;
+    // If we have a jobId, poll for existing scan status
+    if (jobId) {
+      let statusInterval: number;
+
+      const pollStatus = async () => {
+        try {
+          const statusResponse = await getScanStatus(jobId);
+          setScanStatus(statusResponse.status);
+          setProgress(statusResponse.progress_percent);
+
+          // Update completed steps based on real progress from API
+          const stepProgress = (statusResponse.progress_percent / 100) * scanSteps.length;
+          setCompletedSteps(Math.floor(stepProgress));
+
+          if (statusResponse.status === 'completed') {
+            setProgress(100); // Ensure progress shows 100% on completion
+            setCompletedSteps(scanSteps.length); // Mark all steps complete
+            clearInterval(statusInterval);
+
+            // Small delay to show completion before navigation
+            setTimeout(() => {
+              router.replace({
+                pathname: "../(reports)/report-dashboard",
+                params: {
+                  jobId,
+                  url: websiteUrl,
+                },
+              });
+            }, 1000);
+          }
+        } catch (error) {
+          console.error('Failed to poll scan status:', error);
         }
-        const increment = Math.random() * 5 + 1;
-        return Math.min(prev + increment, 100);
-      });
-    }, 500);
+      };
 
-    return () => clearInterval(interval);
-  }, []);
+      // Poll status immediately and then every 15 seconds
+      pollStatus();
+      statusInterval = Number(setInterval(pollStatus, 15000));
 
-  useEffect(() => {
-    if (progress >= 100) {
-      setAuditInfo({
-        domain,
-        status,
-        score,
-        scanDate,
-      });
-      router.replace({
-        pathname: "../(reports)/report-dashboard",
-        params: {
-          domain,
-          status,
-          score,
-          scanDate,
-        },
-      });
+      return () => {
+        clearInterval(statusInterval);
+      };
     }
-  }, [progress, domain, status, score, scanDate, setAuditInfo, router]);
+    // If we have a URL but no jobId (re-run scenario), start a new scan
+    else if (websiteUrl && params.isReRun === 'true') {
+      const startNewScan = async () => {
+        try {
+          const scanResponse = await startScan(websiteUrl);
+          // Navigate to same screen with the new jobId to start polling
+          router.replace({
+            pathname: '/(main)/auditing-screen',
+            params: {
+              url: websiteUrl,
+              jobId: scanResponse.job_id,
+            },
+          });
+        } catch (error) {
+          console.error('Failed to start re-run scan:', error);
+        }
+      };
+
+      startNewScan();
+    }
+  }, [jobId, router, websiteUrl, params.isReRun, scanSteps.length]);
 
   useEffect(() => {
     Animated.timing(animatedWidth, {
       toValue: progress,
-      duration: 300,
+      duration: 500,
       useNativeDriver: false,
     }).start();
   }, [progress, animatedWidth]);
@@ -101,7 +116,6 @@ const AuditingScreen = () => {
         </View>
 
         <View style={styles.content}>
-          <Text style={styles.contentText}>Hang tight, Takes about 30–60 seconds</Text>
           <View style={styles.progress}>
             <View style={styles.progressBarContainer}>
               <Animated.View
@@ -113,8 +127,43 @@ const AuditingScreen = () => {
             </View>
             <Text style={styles.progressText}>{Math.round(progress)}%</Text>
           </View>
+
+          {/* Scanning Checklist */}
+          <View style={styles.checklistContainer}>
+            {scanSteps.map((step, index) => {
+              const isCompleted = index < completedSteps;
+              const IconComponent = step.iconSet === 'MaterialIcons' ? MaterialIcons : FontAwesome;
+
+              return (
+                <View key={index} style={styles.checklistItem}>
+                  {isCompleted ? (
+                    <FontAwesome
+                      name="check"
+                      size={16}
+                      color="#58A279"
+                      style={styles.checklistIcon}
+                    />
+                  ) : (
+                    <IconComponent
+                      name={step.icon as any}
+                      size={16}
+                      color="#B9B9B9"
+                      style={styles.checklistIcon}
+                    />
+                  )}
+                  <Text style={[
+                    styles.checklistText,
+                    { color: isCompleted ? "#58A279" : "#B9B9B9" }
+                  ]}>
+                    {step.text}
+                  </Text>
+                </View>
+              );
+            })}
+          </View>
+
           <View style={styles.footer}>
-            <Text style={styles.footerText}>Process messages here</Text>
+            <Text style={styles.footerText}>Status: {scanStatus}</Text>
           </View>
         </View>
       </View>

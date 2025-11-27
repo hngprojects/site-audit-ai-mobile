@@ -23,7 +23,7 @@ const Profile = () => {
         
         setModalVisible(false);
       }
-    }, [isAuthenticated, isInitialized])
+    }, [isAuthenticated, isInitialized, user])
   );
 
   useEffect(() => {

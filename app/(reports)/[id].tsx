@@ -23,7 +23,7 @@ const SingleIssueDetailScreen = () => {
 
     const params = useLocalSearchParams();
 
-    const { id, title, score: miniscore, description, status: ministatus } = params;
+    const { id, title, score: miniscore, description, status: ministatus, businessBenefits: _businessBenefits, impactMessage: _impactMessage } = params;
 
     console.log(id, ministatus)
 
@@ -125,17 +125,20 @@ const rawDescription = Array.isArray(params.description) ? params.description[0]
                 <Text style={{...styles.domainText, alignItems: "center", color: "blue",  fontSize: 10,}}>{domain}</Text>
                 </View>
             
-                <View style={{
+                <TouchableOpacity
+                  style={{
                     flexDirection: "row",
                     alignItems: "center",
                     gap: 10,
                     padding: 3,
                     paddingHorizontal: 10,
                     alignContent: "center",
-                    }}>
-                      <AntDesign name="reload" size={15} color="red" />
-                      <Text style={{color: "red", alignItems: "center", ...styles.domainText, fontSize: 13}}>Re-run audit</Text>
-                </View>
+                  }}
+                  onPress={() => router.push({ pathname: '/(main)/auditing-screen', params: { url: domain, isReRun: 'true' } })}
+                >
+                  <AntDesign name="reload" size={15} color="red" />
+                  <Text style={{color: "red", alignItems: "center", ...styles.domainText, fontSize: 13}}>Re-run audit</Text>
+                </TouchableOpacity>
             </View>
             
                     
@@ -194,7 +197,7 @@ const rawDescription = Array.isArray(params.description) ? params.description[0]
     <Text style={{
       ...styles.usabilityText
     }}>
-      Usability
+      {ministatus === 'UX' ? 'User Experience' : ministatus === 'Performance' ? 'Performance' : 'SEO'}
     </Text>
 
     <View style={{
@@ -230,9 +233,9 @@ const rawDescription = Array.isArray(params.description) ? params.description[0]
   <Text style={{
     ...styles.whatThisWillDoText
   }}>
-    •  Lower conversions for your website{"\n"}
-    •  Poor user experience{"\n"}
-    •  People leaving your website early
+    • Lower conversions for your website{"\n"}
+    • Poor user experience{"\n"}
+    • People leaving your website early
   </Text>
 
   {/* PROBLEMS */}
@@ -251,7 +254,9 @@ const rawDescription = Array.isArray(params.description) ? params.description[0]
       <Text style={{
         ...styles.problemText
       }}>
-        Hard to use navigation makes your site feel stressful.
+        {ministatus === 'UX' ? 'Issues with user interface and navigation' :
+         ministatus === 'Performance' ? 'Slow loading times and performance bottlenecks' :
+         'Problems with search engine optimization'}
       </Text>
     </View>
 
@@ -294,8 +299,9 @@ const rawDescription = Array.isArray(params.description) ? params.description[0]
   <Text style={{
     ...styles.suggestionText
   }}>
-    Improving the usability can make your site easier to use, increase engagement,
-    and boost customer trust.
+    {ministatus === 'UX' ? 'Improve user interface design and navigation structure to enhance user experience.' :
+     ministatus === 'Performance' ? 'Optimize images, enable compression, and improve server response times for better performance.' :
+     'Fix meta tags, improve content structure, and enhance internal linking for better SEO.'}
   </Text>
 
   {/* Continue Button */}

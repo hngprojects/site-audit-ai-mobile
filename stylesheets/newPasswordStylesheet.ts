@@ -12,7 +12,6 @@ export default StyleSheet.create({
 
   title: {
     fontSize: 24,
-    fontWeight: "700",
     marginBottom: 5,
   },
   headerSection: {
@@ -68,7 +67,6 @@ export default StyleSheet.create({
   resetBtnText: {
     textAlign: "center",
     color: "#FFF",
-    fontWeight: "700",
     fontSize: 16,
   },
   errorText: {

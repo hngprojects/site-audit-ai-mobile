@@ -17,7 +17,6 @@ export default StyleSheet.create({
   title: {
     fontSize: 28,
     fontFamily: "RethinkSans-Bold",
-    fontWeight: "700",
     color: "#1C1C1c",
     marginBottom: 6,
     textAlign: "center",
@@ -87,7 +86,6 @@ export default StyleSheet.create({
 
   sectionTitle: {
     fontSize: 16,
-    fontWeight: "600",
     color: "#000",
     marginBottom: 14,
     fontFamily: "RethinkSans-SemiBold"
@@ -115,7 +113,6 @@ export default StyleSheet.create({
   },
   runButtonText: {
     color: "#fff",
-    fontWeight: "600",
     fontSize: 16,
      fontFamily: "RethinkSans-SemiBold"
   },

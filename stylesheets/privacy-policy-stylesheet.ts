@@ -33,7 +33,6 @@ const styles = StyleSheet.create({
   },
   lastUpdatedText: {
     fontSize: 14,
-    fontWeight: '400',
     fontStyle: 'italic',
     color: '#666666',
     fontFamily: 'RethinkSans-Regular',
@@ -44,14 +43,12 @@ const styles = StyleSheet.create({
   },
   sectionHeader: {
     fontSize: 16,
-    fontWeight: '600',
     color: '#1c1c1c',
     fontFamily: 'RethinkSans-SemiBold',
     marginBottom: 8,
   },
   listHeader: {
     fontSize: 14,
-    fontWeight: '400',
     color: '#1c1c1c',
     fontFamily: 'RethinkSans-Medium',
     marginBottom: 8,
@@ -87,7 +84,6 @@ const styles = StyleSheet.create({
   },
   contactHeader: {
     fontSize: 16,
-    fontWeight: '600',
     color: '#1c1c1c',
     fontFamily: 'RethinkSans-SemiBold',
     marginBottom: 8,
