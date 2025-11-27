@@ -197,12 +197,14 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
               {loadingBiometric ? (
                 <View style={{ width: 51, height: 31 }} />
               ) : (
-                <Switch
-                  value={biometricEnabled}
-                  onValueChange={handleBiometricToggle}
-                  trackColor={{ false: '#767577', true: '#FF5A3D' }}
-                  thumbColor="#ffffff"
-                />
+                <View>
+                  <Switch
+                    value={biometricEnabled}
+                    onValueChange={handleBiometricToggle}
+                    trackColor={{ false: '#767577', true: '#FF5A3D' }}
+                    thumbColor="#ffffff"
+                  />
+                </View>
               )}
             </View>
           )}
@@ -222,14 +224,16 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
               <Feather name="bell" size={20} color="#1A2373" />
               <Text style={styles.settingsItemText}>Push Notifications</Text>
             </View>
-            <Switch
-              value={pushNotificationsEnabled}
-              onValueChange={setPushNotificationsEnabled}
-              trackColor={{ false: '#767577', true: '#FF5A3D' }}
-              thumbColor="#ffffff"
-            />
+            <View>
+              <Switch
+                value={pushNotificationsEnabled}
+                onValueChange={setPushNotificationsEnabled}
+                trackColor={{ false: '#767577', true: '#FF5A3D' }}
+                thumbColor="#ffffff"
+              />
+            </View>
           </View>
-          <View style={styles.settingsItem}>
+          {/* <View style={styles.settingsItem}>
             <View style={styles.settingsItemLeft}>
               <Feather name="mail" size={20} color="#1A2373" />
               <Text style={styles.settingsItemText}>Email Reports</Text>
@@ -240,7 +244,7 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
               trackColor={{ false: '#767577', true: '#FF5A3D' }}
               thumbColor="#ffffff"
             />
-          </View>
+          </View> */}
           <TouchableOpacity style={styles.settingsItem} onPress={() => router.push('/(settings)/language')}>
             <View style={styles.settingsItemLeft}>
               <Feather name="globe" size={20} color="#1A2373" />
