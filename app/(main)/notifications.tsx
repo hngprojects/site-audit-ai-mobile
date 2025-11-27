@@ -2,10 +2,10 @@ import { ThemedText } from '@/components/themed-text';
 import type { Notification } from '@/service/notifications';
 import { deleteNotification, getNotifications, markAsRead } from '@/service/notifications';
 import styles from '@/stylesheets/notifications-stylesheet';
-import { Feather, MaterialIcons } from '@expo/vector-icons';
+import { Feather, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
-import { Alert, FlatList, Image, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, FlatList, Image, Platform, TextInput, TouchableOpacity, View } from 'react-native';
 import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -41,10 +41,7 @@ const NotificationItem = ({ item, onMarkRead, onDelete }: { item: Notification; 
           onPress={() => onMarkRead(item.id)}
         >
           <View style={styles.itemIconContainer}>
-            <Image
-              source={item.logoThumbnail}
-              style={styles.itemIcon}
-            />
+              <Ionicons name="notifications-outline" size={24} color="blue" />
           </View>
 
           <View style={styles.cardContent}>
@@ -165,7 +162,10 @@ export default function NotificationsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
+      {Platform.OS === "ios" ? 
+      (
+        <>
+        <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
             <Feather name="arrow-left" size={24} color="#1A2373" />
         </TouchableOpacity>
@@ -181,6 +181,27 @@ export default function NotificationsScreen() {
           <TextInput value={search} onChangeText={setSearch} placeholder="Search" placeholderTextColor="#C7C8C9" style={styles.searchInput} />
         </View>
       </View>
+      </>
+      ) : (
+        <>
+        <View style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+            <Feather name="arrow-left" size={24} color="#1A2373" />
+        </TouchableOpacity>
+        <ThemedText style={styles.androidheaderTitle} type="title" >Notification</ThemedText>
+        <TouchableOpacity style={styles.markAllButton} onPress={markAllRead} >
+          <ThemedText style={styles.markAllTextAndroid}>Mark all as read</ThemedText>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.searchMargin}>
+        <View style={styles.androidSearchContainer}>
+          <MaterialIcons name="search" size={18} color="#9BA1A6" />
+          <TextInput value={search} onChangeText={setSearch} placeholder="Search" placeholderTextColor="#C7C8C9" style={styles.searchInput} />
+        </View>
+      </View>
+      </>
+      )}
 
       {error ? (
         <View style={styles.errorPadding}>
@@ -201,7 +222,7 @@ export default function NotificationsScreen() {
           ListEmptyComponent={() => (
             <View style={styles.emptyContainer}>
               <View style={styles.emptyIconContainer}>
-                <Image source={require('@/assets/images/bell.png')} style={styles.emptyIcon} />
+                <Image source={require('@/assets/images/no-message-bell.png')} style={styles.emptyIcon} />
               </View>
               <ThemedText type="subtitle" style={{ marginTop: 12 }}>No message yet</ThemedText>
             </View>
