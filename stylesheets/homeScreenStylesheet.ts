@@ -21,10 +21,10 @@ export default StyleSheet.create({
     marginBottom: 6,
     textAlign: "center",
   },
-   headingSection: {
+  headingSection: {
     justifyContent: "center",
     alignItems: "center"
-   },
+  },
   sub: {
     color: "#494949",
     fontSize: 14,
@@ -54,6 +54,7 @@ export default StyleSheet.create({
   placeholderText: {
     color: "#000",
     fontSize: 16,
+    width: '100%',
   },
 
   invalidLink: {
@@ -109,11 +110,11 @@ export default StyleSheet.create({
   runButtonImage: {
     marginRight: 4,
     width: 25,
-            height: 25
+    height: 25
   },
   runButtonText: {
     color: "#fff",
     fontSize: 16,
-     fontFamily: "RethinkSans-SemiBold"
+    fontFamily: "RethinkSans-SemiBold"
   },
 });

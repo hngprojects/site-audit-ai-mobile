@@ -1,9 +1,9 @@
+import { startScan } from "@/actions/scan-actions";
 import AuditResultCard from "@/components/auditResultCard";
 import EmptyState from "@/components/homeScreenEmptyState";
 import { useSitesStore } from "@/store/sites-store";
 import styles from "@/stylesheets/homeScreenStylesheet";
-import { validateWebsiteUrl, normalizeUrl } from "@/utils/url-validation";
-import { startScan } from "@/actions/scan-actions";
+import { normalizeUrl, validateWebsiteUrl } from "@/utils/url-validation";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Octicons from "@expo/vector-icons/Octicons";
 import { router } from "expo-router";
@@ -17,7 +17,7 @@ export default function HomeScreen() {
   const [urlAvailable, setUrlAvailable] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [isCreating, setIsCreating] = useState<boolean>(false);
-  
+
   const { sites, isLoading, fetchSites } = useSitesStore();
 
   useEffect(() => {
@@ -48,6 +48,7 @@ export default function HomeScreen() {
     try {
       const trimmedUrl = websiteUrl.trim();
       const normalizedUrl = normalizeUrl(trimmedUrl);
+      console.log(normalizedUrl);
 
       const scanResponse = await startScan(normalizedUrl);
 
