@@ -1,6 +1,7 @@
 import { startScan } from "@/actions/scan-actions";
 import AuditResultCard from "@/components/auditResultCard";
 import EmptyState from "@/components/homeScreenEmptyState";
+import { useAuthStore } from "@/store/auth-store";
 import { useSitesStore } from "@/store/sites-store";
 import styles from "@/stylesheets/homeScreenStylesheet";
 import { getPersistentDeviceInfo } from "@/utils/device-id";
@@ -20,7 +21,7 @@ export default function HomeScreen() {
   const [urlAvailable, setUrlAvailable] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [isCreating, setIsCreating] = useState<boolean>(false);
-
+  const { isAuthenticated } = useAuthStore();
   const { sites, isLoading, fetchSites, createSite } = useSitesStore();
 
   useEffect(() => {
@@ -62,8 +63,10 @@ export default function HomeScreen() {
       const trimmedUrl = websiteUrl.trim();
       const normalizedUrl = normalizeUrl(trimmedUrl);
       console.log(normalizedUrl);
-      const site = await createSite(normalizedUrl);
-      console.log(site);
+      if (isAuthenticated) {
+        const site = await createSite(normalizedUrl);
+        console.log(site);
+      }
       const scanResponse = await startScan(normalizedUrl);
 
       setWebsiteUrl('');

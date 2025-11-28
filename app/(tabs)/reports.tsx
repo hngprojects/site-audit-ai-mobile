@@ -1,8 +1,10 @@
+import { startScan } from "@/actions/scan-actions";
 import DeleteConfirmationSheet from "@/components/delete-confirmation-sheet";
 import EditUrlSheet from "@/components/edit-url-sheet";
 import { useSitesStore } from "@/store/sites-store";
 import styles from "@/stylesheets/report-screen-stylesheet";
 import { ReportItemProps, Status } from "@/type";
+import { normalizeUrl } from "@/utils/url-validation";
 import { MaterialIcons } from '@expo/vector-icons';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from "expo-router";
@@ -56,8 +58,8 @@ const SwipeableRow: React.FC<SwipeableRowProps> = ({ item, url, onDelete, onEdit
         swipeableRef.current?.close();
         onDelete();
       }}>
-        <MaterialIcons name="delete" size={20} color="#fff" />
-        <Text style={styles.actionText}>Delete</Text>
+        <MaterialIcons name="delete" size={20} color="#494949" />
+        <Text style={styles.actionTextDelete}>Delete</Text>
       </TouchableOpacity>
     </View>
   );
@@ -80,7 +82,7 @@ const SwipeableRow: React.FC<SwipeableRowProps> = ({ item, url, onDelete, onEdit
               <Text style={styles.urlText} numberOfLines={1}>{url}</Text>
               <Text style={styles.scanDateText}>{item.scanDate}</Text>
             </View>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.menuButton}
               onPress={handleMenuPress}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
@@ -103,7 +105,7 @@ const ReportsScreen: React.FC = () => {
   const [itemToEdit, setItemToEdit] = useState<{ siteId: string; url: string } | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const router = useRouter();
-  
+
   const { sites, isLoading, fetchSites, deleteSite, createSite } = useSitesStore();
 
   useEffect(() => {
@@ -113,10 +115,10 @@ const ReportsScreen: React.FC = () => {
   const formatDate = (dateString?: string): string => {
     if (!dateString) return 'N/A';
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric', 
-      year: 'numeric' 
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
     });
   };
 
@@ -137,7 +139,7 @@ const ReportsScreen: React.FC = () => {
       score: 0,
       status: getStatusFromScore(undefined),
       scanDate: formatDate(site.created_at),
-      onPress: () => {},
+      onPress: () => { },
     };
   };
 
@@ -180,16 +182,31 @@ const ReportsScreen: React.FC = () => {
     try {
       // First, mark the old site as inactive (delete)
       await deleteSite(itemToEdit.siteId);
-      
+
+      // Normalize the URL
+      const normalizedUrl = normalizeUrl(newUrl.trim());
+
       // Then, create the new site
-      await createSite(newUrl);
-      
+      await createSite(normalizedUrl);
+
+      // Start a new scan
+      const scanResponse = await startScan(normalizedUrl);
+
       // Refresh the sites list
       await fetchSites();
-      
+
       // Close the sheet
       setEditSheetVisible(false);
       setItemToEdit(null);
+
+      // Navigate to the auditing screen
+      router.push({
+        pathname: "/(main)/auditing-screen",
+        params: {
+          url: normalizedUrl,
+          jobId: scanResponse.job_id,
+        },
+      });
     } catch (error) {
       Alert.alert(
         'Error',
@@ -228,7 +245,7 @@ const ReportsScreen: React.FC = () => {
             value={search}
           />
         </View>
-        
+
 
         {isLoading ? (
           <View style={styles.listWrap}>
@@ -254,7 +271,7 @@ const ReportsScreen: React.FC = () => {
                   onDelete={() => handleDelete(item.siteId, item.url)}
                   onEdit={() => handleEdit(item)}
                   onPress={() => router.push({
-                    pathname: "../(reports)/report-dashboard", 
+                    pathname: "../(reports)/report-dashboard",
                     params: {
                       domain: item.domain,
                       score: String(item.score),
@@ -277,7 +294,7 @@ const ReportsScreen: React.FC = () => {
         )}
 
         <View style={[styles.bottomButtonContainer, { paddingBottom: Math.max(insets.bottom, 20) }]}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.startNewScanButton}
             onPress={() => router.push('/(tabs)/')}
             activeOpacity={0.8}
