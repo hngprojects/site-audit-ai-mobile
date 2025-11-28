@@ -136,16 +136,16 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
                 <Text style={styles.avatarInitials}>
                   {user?.fullName && user.fullName.trim()
                     ? user.fullName
-                        .trim()
-                        .split(' ')
-                        .filter(n => n.length > 0)
-                        .map(n => n[0])
-                        .join('')
-                        .toUpperCase()
-                        .slice(0, 2)
+                      .trim()
+                      .split(' ')
+                      .filter(n => n.length > 0)
+                      .map(n => n[0])
+                      .join('')
+                      .toUpperCase()
+                      .slice(0, 2)
                     : user?.email && user.email.trim()
-                    ? user.email[0].toUpperCase()
-                    : 'U'}
+                      ? user.email[0].toUpperCase()
+                      : 'U'}
                 </Text>
               </View>
             )}
@@ -154,10 +154,10 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
             </View>
           </View>
           <View style={styles.userInfoContainer}>
-            <Text style={styles.userName}>
+            <Text style={styles.userName} numberOfLines={1} ellipsizeMode="tail">
               {user?.fullName || 'User Name'}
             </Text>
-            <Text style={styles.userEmail}>
+            <Text style={styles.userEmail} numberOfLines={1} ellipsizeMode="tail">
               {user?.email || 'user@example.com'}
             </Text>
           </View>

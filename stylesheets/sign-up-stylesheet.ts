@@ -136,6 +136,50 @@ const styles = StyleSheet.create({
   requirementTextValid: {
     color: "#4CAF50",
   },
+  orDivider: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 24,
+    width: "100%",
+  },
+  orDividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: "#babec6",
+  },
+  orDividerText: {
+    marginHorizontal: 16,
+    fontSize: 14,
+    color: "#9ba1ab",
+    fontFamily: "RethinkSans-Regular",
+  },
+  socialButton: {
+    width: "100%",
+    height: 50,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#babec6",
+    backgroundColor: "transparent",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 15,
+    paddingHorizontal: 16,
+  },
+  socialButtonText: {
+    fontSize: 16,
+    fontFamily: "RethinkSans-SemiBold",
+    color: "#000",
+    marginLeft: 12,
+  },
+  socialIcon: {
+    width: 25,
+    height: 25,
+  },
+  appleIcon: {
+    width: 35,
+    height: 35,
+  },
 });
 
 export default styles;

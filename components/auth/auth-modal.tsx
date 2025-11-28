@@ -146,16 +146,16 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose }) => {
 
                 <TouchableOpacity
                   style={styles.socialButton}
-                  onPress={handleSignUp}
+                  onPress={handleSignIn}
                 >
                   <Image
                     source={require('../../assets/images/Envelope.png')}
                     style={styles.socialIcon}
                   />
-                  <Text style={styles.emailButtonSecondaryText}>Sign up with email</Text>
+                  <Text style={styles.emailButtonSecondaryText}>Continue with email</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity
+                {/* <TouchableOpacity
                   style={styles.socialButton}
                   onPress={handleSignIn}
                 >
@@ -164,7 +164,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose }) => {
                     style={styles.socialIcon}
                   />
                   <Text style={styles.emailButtonSecondaryText}>Sign in with email</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
               </View>
 
               <View style={styles.footer}>

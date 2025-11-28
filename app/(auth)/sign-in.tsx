@@ -11,7 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 const SignIn = () => {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const { signIn, isLoading, error, clearError, isAuthenticated } = useAuth();
+  const { signIn, signInWithGoogle, isLoading, error, clearError, isAuthenticated } = useAuth();
 
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -149,6 +149,21 @@ const SignIn = () => {
   const displayError = localError || error;
   const hasError = !!displayError;
 
+  const handleGoogleLogin = async () => {
+    try {
+      await signInWithGoogle();
+      // Navigation is handled by useEffect when isAuthenticated changes
+    } catch (error) {
+      // Error is handled by the store and shown via Alert
+      console.error('Google sign-in error:', error);
+    }
+  };
+
+  const handleAppleLogin = () => {
+    // TODO: Implement Apple OAuth
+    console.log('Apple login pressed');
+  };
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
       <KeyboardAvoidingView
@@ -230,6 +245,36 @@ const SignIn = () => {
           buttonStyle={styles.signInButton}
           textStyle={styles.signInText}
         />
+
+        <View style={styles.orDivider}>
+          <View style={styles.orDividerLine} />
+          <Text style={styles.orDividerText}>OR</Text>
+          <View style={styles.orDividerLine} />
+        </View>
+
+        <TouchableOpacity
+          style={[styles.socialButton, isLoading && { opacity: 0.6 }]}
+          onPress={handleGoogleLogin}
+          disabled={isLoading}
+        >
+          <Image
+            source={require('../../assets/images/google.png')}
+            style={styles.socialIcon}
+          />
+          <Text style={styles.socialButtonText}>Continue with Google</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.socialButton}
+          onPress={handleAppleLogin}
+        >
+          <Image
+            source={require('../../assets/images/apple.png')}
+            style={styles.appleIcon}
+          />
+          <Text style={styles.socialButtonText}>Continue with Apple</Text>
+        </TouchableOpacity>
+
         <View style={styles.tipBox}>
           <Image
             source={require('../../assets/images/light-bulb.png')}

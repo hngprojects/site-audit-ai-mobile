@@ -39,12 +39,27 @@ const styles = StyleSheet.create({
   },
   avatarContainer: {
     position: 'relative',
+    width: 70,
+    height: 70,
+  },
+  avatarImage: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
   },
   avatarPlaceholder: {
     width: 70,
     height: 70,
     backgroundColor: '#333333',
     borderRadius: 35,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  avatarInitials: {
+    fontSize: 24,
+    fontFamily: 'RethinkSans-SemiBold',
+    color: '#FFFFFF',
+    textAlign: 'center',
   },
   editIconContainer: {
     position: 'absolute',
@@ -56,6 +71,8 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
   },
   userInfoContainer: {
     width: '100%',

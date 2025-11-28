@@ -514,7 +514,6 @@ export const googleAuthService = {
               errorMessage.includes('DEVELOPER_ERROR') ||
               errorMessage.includes('10:') ||
               error.code === '10' ||
-              error.code === 10 ||
               errorString.includes('non-recoverable') ||
               errorString.includes('sign in failure') ||
               errorString.includes('apiException') ||
