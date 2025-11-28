@@ -1,6 +1,7 @@
 import LogoutModal from '@/components/profile/logout-modal';
 import { biometricService } from '@/lib/biometric-service';
 import { useAuthStore } from '@/store/auth-store';
+import { useEmailReportsStore } from '@/store/email-reports-store';
 import styles from '@/stylesheets/profile-stylesheet';
 import type { User } from '@/type';
 import { getFullImageUrl } from '@/utils/image-url';
@@ -17,11 +18,23 @@ interface ProfileContentProps {
 const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
   const router = useRouter();
   const { signOut } = useAuthStore();
+  const { frequency } = useEmailReportsStore();
   const [biometricEnabled, setBiometricEnabled] = useState(false);
   const [biometricAvailable, setBiometricAvailable] = useState(false);
   const [loadingBiometric, setLoadingBiometric] = useState(true);
   const [pushNotificationsEnabled, setPushNotificationsEnabled] = useState(true);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
+
+  const getFrequencyLabel = () => {
+    if (!frequency) return null;
+    const labels: Record<string, string> = {
+      weekly: 'Weekly',
+      monthly: 'Monthly',
+      quarterly: 'Quarterly',
+      never: 'Never',
+    };
+    return labels[frequency] || null;
+  };
 
   // Load biometric status
   useEffect(() => {
@@ -233,7 +246,12 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
               <Feather name="mail" size={20} color="#1A2373" />
               <Text style={styles.settingsItemText}>Email Reports</Text>
             </View>
-            <Feather name="chevron-right" size={16} color="#1A2373" />
+            <View style={styles.settingsItemRight}>
+              {getFrequencyLabel() && (
+                <Text style={styles.frequencyText}>{getFrequencyLabel()}</Text>
+              )}
+              <Feather name="chevron-right" size={16} color="#1A2373" />
+            </View>
           </TouchableOpacity>
           <TouchableOpacity style={styles.settingsItem} onPress={() => router.push('/(settings)/language')}>
             <View style={styles.settingsItemLeft}>

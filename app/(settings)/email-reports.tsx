@@ -1,15 +1,19 @@
+import { useEmailReportsStore, type EmailFrequency } from '@/store/email-reports-store';
 import styles from '@/stylesheets/email-reports-stylesheet';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-type EmailFrequency = 'weekly' | 'monthly' | 'quarterly' | 'never';
-
 const EmailReportsContent = () => {
   const router = useRouter();
-  const [selectedFrequency, setSelectedFrequency] = useState<EmailFrequency | null>(null);
+  const { frequency, setFrequency } = useEmailReportsStore();
+  const [selectedFrequency, setSelectedFrequency] = useState<EmailFrequency | null>(frequency);
+
+  useEffect(() => {
+    setSelectedFrequency(frequency);
+  }, [frequency]);
 
   const frequencies: { value: EmailFrequency; label: string }[] = [
     { value: 'weekly', label: 'Weekly' },
@@ -20,7 +24,7 @@ const EmailReportsContent = () => {
 
   const handleSave = () => {
     if (selectedFrequency) {
-      // TODO: Save email frequency preference
+      setFrequency(selectedFrequency);
       Alert.alert('Success', 'Email report frequency has been updated successfully');
       router.back();
     }

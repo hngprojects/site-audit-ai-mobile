@@ -127,9 +127,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
   },
+  settingsItemRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
   settingsItemText: {
     fontSize: 14,
     color: '#1c1c1c',
+    fontFamily: 'RethinkSans-Regular',
+  },
+  frequencyText: {
+    fontSize: 14,
+    color: '#6B7280',
     fontFamily: 'RethinkSans-Regular',
   },
   logoutText: {
