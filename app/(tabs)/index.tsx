@@ -21,7 +21,7 @@ export default function HomeScreen() {
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [isCreating, setIsCreating] = useState<boolean>(false);
 
-  const { sites, isLoading, fetchSites } = useSitesStore();
+  const { sites, isLoading, fetchSites, createSite } = useSitesStore();
 
   useEffect(() => {
     fetchSites();
@@ -62,7 +62,8 @@ export default function HomeScreen() {
       const trimmedUrl = websiteUrl.trim();
       const normalizedUrl = normalizeUrl(trimmedUrl);
       console.log(normalizedUrl);
-
+      const site = await createSite(normalizedUrl);
+      console.log(site);
       const scanResponse = await startScan(normalizedUrl);
 
       setWebsiteUrl('');

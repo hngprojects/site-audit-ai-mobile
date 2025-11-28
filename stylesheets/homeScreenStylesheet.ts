@@ -103,7 +103,7 @@ export default StyleSheet.create({
   },
 
   tipText: {
-    fontSize: 13,
+    fontSize: 16,
     color: "#5C4500",
     fontFamily: "RethinkSans-Regular",
     flex: 1

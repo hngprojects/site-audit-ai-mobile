@@ -65,11 +65,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose }) => {
     onClose();
   };
 
-  const handleSignUp = () => {
-    onClose();
-    router.push({ pathname: '/(auth)/sign-up', params: { redirect: '/(hireRequest)/request-form' } });
-  };
-
   const handleSignIn = () => {
     onClose();
     router.push({ pathname: '/(auth)/sign-in', params: { redirect: '/(hireRequest)/request-form' } });
