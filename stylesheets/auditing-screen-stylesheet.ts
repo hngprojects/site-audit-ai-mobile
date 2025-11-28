@@ -28,8 +28,8 @@ const styles = StyleSheet.create({
   loadingContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginVertical: 20,
-    minHeight: 60,
+    marginVertical: 40,
+    minHeight: 120,
   },
   content: {
     flex: 1,

@@ -3,7 +3,7 @@ import styles from '@/stylesheets/auditing-screen-stylesheet';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Animated, Text, View } from 'react-native';
+import { ActivityIndicator, Animated, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 
@@ -116,6 +116,9 @@ const AuditingScreen = () => {
         </View>
 
         <View style={styles.content}>
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#ff5a3d" style={{ transform: [{ scale: 2 }] }} />
+          </View>
           <View style={styles.progress}>
             <View style={styles.progressBarContainer}>
               <Animated.View
