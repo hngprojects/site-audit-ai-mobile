@@ -3,8 +3,9 @@ import styles from '@/stylesheets/email-reports-stylesheet';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 
 const EmailReportsContent = () => {
   const router = useRouter();
@@ -25,7 +26,11 @@ const EmailReportsContent = () => {
   const handleSave = () => {
     if (selectedFrequency) {
       setFrequency(selectedFrequency);
-      Alert.alert('Success', 'Email report frequency has been updated successfully');
+      Toast.show({
+        type: 'success',
+        text1: 'Success',
+        text2: 'Email report frequency has been updated successfully',
+      });
       router.back();
     }
   };
