@@ -57,6 +57,19 @@ const AuditingScreen = () => {
                 },
               });
             }, 1000);
+          } else if (statusResponse.status === 'failed') {
+            clearInterval(statusInterval);
+
+            // Redirect to error screen when scan fails
+            setTimeout(() => {
+              router.replace({
+                pathname: "/(main)/auditing-error-screen",
+                params: {
+                  url: websiteUrl,
+                  jobId,
+                },
+              });
+            }, 1000);
           }
         } catch (error) {
           console.error('Failed to poll scan status:', error);
