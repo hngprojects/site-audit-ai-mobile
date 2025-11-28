@@ -1,29 +1,34 @@
 {
-    "build": {
-      "development": {
-        "developmentClient": true,
-        "distribution": "internal",
-        "android": {
-          "buildType": "apk"
-        }
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
       },
-      "preview": {
-        "android": {
-          "buildType": "apk"
-        }
-      },
-      "preview2": {
-        "android": {
-          "gradleCommand": ":app:assembleRelease"
-        }
-      },
-      "preview3": {
-        "developmentClient": true
-      },
-      "preview4": {
-        "distribution": "internal"
-      },
-      "production": {}
-    }
+      "env": {
+        "EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID": "546863276810-l24ttcjpguld9vpcifolbqk99t8soges.apps.googleusercontent.com",
+        "EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID": "546863276810-i0vhnk3u5q7sktomm3nnt9lemsh58239.apps.googleusercontent.com",
+        "EXPO_PUBLIC_GOOGLE_CLIENT_ID": "546863276810-2o511s5l3p12e349lbl69bem6s6u70ll.apps.googleusercontent.com",
+        "EXPO_PUBLIC_BASE_URL": "https://api.staging.tokugawa.emerj.net"
+      }
+    },
+    "preview": {
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "preview2": {
+      "android": {
+        "gradleCommand": ":app:assembleRelease"
+      }
+    },
+    "preview3": {
+      "developmentClient": true
+    },
+    "preview4": {
+      "distribution": "internal"
+    },
+    "production": {}
   }
-  
+}

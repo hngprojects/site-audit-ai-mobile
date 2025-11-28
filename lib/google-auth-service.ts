@@ -308,6 +308,7 @@ const GOOGLE_WEB_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID;
 // Validate configuration
 if (!GOOGLE_WEB_CLIENT_ID) {
   console.error('❌ EXPO_PUBLIC_GOOGLE_CLIENT_ID is required');
+  throw new Error('EXPO_PUBLIC_GOOGLE_CLIENT_ID environment variable is not set. Please add it to your .env file or eas.json build profile.');
 }
 if (!GOOGLE_IOS_CLIENT_ID && Platform.OS === 'ios') {
   console.warn('⚠️ EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID not set (required for iOS)');
@@ -328,12 +329,22 @@ function configureGoogleSignIn() {
     return;
   }
 
+  // Validate webClientId is set before configuring
+  if (!GOOGLE_WEB_CLIENT_ID) {
+    throw new Error(
+      'Google Sign-In configuration failed: EXPO_PUBLIC_GOOGLE_CLIENT_ID is not set.\n\n' +
+      'Please add it to your .env file or eas.json build profile:\n' +
+      'EXPO_PUBLIC_GOOGLE_CLIENT_ID=your-web-client-id.apps.googleusercontent.com'
+    );
+  }
+
   // Configure Google Sign-In with platform-specific client IDs
+  // Note: Removed unnecessary scopes - only request what's needed for authentication
   const config: any = {
     webClientId: GOOGLE_WEB_CLIENT_ID, // Required: Web OAuth Client ID (also used for Android)
-    offlineAccess: true,
+    offlineAccess: false, // Set to false - we only need id_token, not refresh token
     forceCodeForRefreshToken: false,
-    scopes: ["https://www.googleapis.com/auth/drive.readonly"],
+    // Removed scopes - not needed for basic Google Sign-In authentication
   };
 
   // Add iOS client ID if available (required for iOS)
@@ -494,9 +505,23 @@ export const googleAuthService = {
             throw new Error('Sign-in is required. Please try again.');
 
           default:
-            // Check if it's a DEVELOPER_ERROR (configuration issue)
+            // Check if it's a DEVELOPER_ERROR or non-recoverable sign in failure (configuration issue)
             const errorMessage = (error as any).message || '';
-            if (errorMessage.includes('DEVELOPER_ERROR') || errorMessage.includes('10:') || error.code === '10') {
+            const errorString = String(errorMessage).toLowerCase();
+
+            // Check for various error indicators
+            const isDeveloperError =
+              errorMessage.includes('DEVELOPER_ERROR') ||
+              errorMessage.includes('10:') ||
+              error.code === '10' ||
+              error.code === 10 ||
+              errorString.includes('non-recoverable') ||
+              errorString.includes('sign in failure') ||
+              errorString.includes('apiException') ||
+              (error as any).statusCode === 10 ||
+              (error as any).statusCode === 8;
+
+            if (isDeveloperError) {
               // Build detailed troubleshooting message
               let troubleshooting =
                 '🔴 DEVELOPER_ERROR: Google Sign-In configuration issue\n\n';
