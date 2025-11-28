@@ -4,7 +4,8 @@ import { useResetPasswordEmailStore } from '@/zustardStore/resetPasswordEmailSto
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { ActivityIndicator, Alert, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Text, TextInput, TouchableOpacity, View } from "react-native";
+import Toast from 'react-native-toast-message';
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function NewPassword() {
@@ -60,7 +61,11 @@ export default function NewPassword() {
             const errorMessage = err instanceof Error ? err.message : 'Failed to reset password. Please try again.';
             setError(errorMessage);
             setMismatchedPassword(true);
-            Alert.alert('Error', errorMessage);
+            Toast.show({
+              type: 'error',
+              text1: 'Error',
+              text2: errorMessage,
+            });
         } finally {
             setLoading(false);
         }

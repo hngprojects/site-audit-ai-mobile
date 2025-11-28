@@ -24,22 +24,38 @@ const EmailSupportContent = () => {
     const trimmedMessage = message.trim();
 
     if (!trimmedEmail) {
-      Alert.alert('Error', 'Please enter your email address');
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Please enter your email address',
+      });
       return;
     }
 
     if (!isValidEmail(trimmedEmail)) {
-      Alert.alert('Error', 'Please enter a valid email address');
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Please enter a valid email address',
+      });
       return;
     }
 
     if (!trimmedSubject) {
-      Alert.alert('Error', 'Please enter a subject');
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Please enter a subject',
+      });
       return;
     }
 
     if (!trimmedMessage) {
-      Alert.alert('Error', 'Please enter your message');
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Please enter your message',
+      });
       return;
     }
 
@@ -50,11 +66,18 @@ const EmailSupportContent = () => {
         subject: trimmedSubject,
         message: trimmedMessage,
       });
-      Alert.alert('Success', 'Your email has been sent successfully', [
-        { text: 'OK', onPress: () => router.back() },
-      ]);
+      Toast.show({
+        type: 'success',
+        text1: 'Success',
+        text2: 'Your email has been sent successfully',
+      });
+      setTimeout(() => router.back(), 1500);
     } catch (error) {
-      Alert.alert('Error', error instanceof Error ? error.message : 'Failed to send email. Please try again.');
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: error instanceof Error ? error.message : 'Failed to send email. Please try again.',
+      });
     } finally {
       setIsLoading(false);
     }

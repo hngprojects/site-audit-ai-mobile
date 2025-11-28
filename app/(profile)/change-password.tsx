@@ -4,7 +4,8 @@ import styles from '@/stylesheets/change-password-stylesheet';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const ChangePasswordContent = () => {
@@ -46,16 +47,18 @@ const ChangePasswordContent = () => {
     try {
       await authService.resetPassword(currentPassword, newPassword, token);
 
-      Alert.alert(
-        'Success',
-        'Password has been changed successfully',
-        [{ text: 'OK', onPress: () => router.back() }]
-      );
+      Toast.show({
+        type: 'success',
+        text1: 'Success',
+        text2: 'Password has been changed successfully',
+      });
+      setTimeout(() => router.back(), 1500);
     } catch (error) {
-      Alert.alert(
-        'Error',
-        error instanceof Error ? error.message : 'Failed to update password. Please try again.'
-      );
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: error instanceof Error ? error.message : 'Failed to update password. Please try again.',
+      });
     } finally {
       setIsLoading(false);
     }

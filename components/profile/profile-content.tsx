@@ -8,8 +8,9 @@ import { getFullImageUrl } from '@/utils/image-url';
 import { Feather, Fontisto } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Alert, Image, Platform, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Platform, Switch, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 
 interface ProfileContentProps {
   user: User | null;
@@ -74,13 +75,13 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
 
   const handleBiometricToggle = async (value: boolean) => {
     if (!biometricAvailable) {
-      Alert.alert(
-        'Biometrics Not Available',
-        Platform.OS === 'ios'
+      Toast.show({
+        type: 'warning',
+        text1: 'Biometrics Not Available',
+        text2: Platform.OS === 'ios'
           ? 'Face ID is not available on this device. Please set up Face ID in your device settings.'
           : 'Fingerprint authentication is not available on this device. Please set up fingerprint in your device settings.',
-        [{ text: 'OK' }]
-      );
+      });
       return;
     }
 
@@ -96,40 +97,40 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
         if (result.success) {
           await biometricService.enable();
           setBiometricEnabled(true);
-          Alert.alert(
-            'Biometrics Enabled',
-            Platform.OS === 'ios'
+          Toast.show({
+            type: 'success',
+            text1: 'Biometrics Enabled',
+            text2: Platform.OS === 'ios'
               ? 'Face ID login has been enabled. Your credentials will be saved securely.'
               : 'Fingerprint login has been enabled. Your credentials will be saved securely.',
-            [{ text: 'OK' }]
-          );
+          });
         } else if (result.error === 'user_cancel') {
           // User cancelled, do nothing
           return;
         } else {
-          Alert.alert(
-            'Authentication Failed',
-            'Biometric authentication failed. Please try again.',
-            [{ text: 'OK' }]
-          );
+          Toast.show({
+            type: 'error',
+            text1: 'Authentication Failed',
+            text2: 'Biometric authentication failed. Please try again.',
+          });
         }
       } else {
         // Disable biometrics
         await biometricService.disable();
         setBiometricEnabled(false);
-        Alert.alert(
-          'Biometrics Disabled',
-          'Biometric login has been disabled and saved credentials have been removed.',
-          [{ text: 'OK' }]
-        );
+        Toast.show({
+          type: 'success',
+          text1: 'Biometrics Disabled',
+          text2: 'Biometric login has been disabled and saved credentials have been removed.',
+        });
       }
     } catch (error) {
       console.error('Error toggling biometric:', error);
-      Alert.alert(
-        'Error',
-        'Failed to update biometric settings. Please try again.',
-        [{ text: 'OK' }]
-      );
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to update biometric settings. Please try again.',
+      });
     }
   };
 

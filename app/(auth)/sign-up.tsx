@@ -4,8 +4,9 @@ import styles from '@/stylesheets/sign-up-stylesheet';
 import Feather from '@expo/vector-icons/Feather';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
-import { Alert, Image, KeyboardAvoidingView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Image, KeyboardAvoidingView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 
 interface PasswordValidation {
   hasMinLength: boolean;
@@ -49,12 +50,15 @@ const SignUp = () => {
     }
   }, [isAuthenticated, router, params.redirect]);
 
-  // Show error alerts
+  // Show error toasts
   useEffect(() => {
     if (error) {
-      Alert.alert('Sign Up Error', error, [
-        { text: 'OK', onPress: clearError },
-      ]);
+      Toast.show({
+        type: 'error',
+        text1: 'Sign Up Error',
+        text2: error,
+      });
+      clearError();
     }
   }, [error, clearError]);
 

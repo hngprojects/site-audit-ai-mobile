@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ActivityIndicator, TouchableOpacity, ScrollView, View, TextInput, Alert, Text } from 'react-native';
+import { ActivityIndicator, TouchableOpacity, ScrollView, View, TextInput, Text } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -58,7 +59,11 @@ const DeleteAccountVerificationContent = () => {
       // Verify code logic
       router.push('/(account)/delete-account-final-confirmation');
     } else {
-      Alert.alert('Error', 'Please enter the complete 6-digit code');
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Please enter the complete 6-digit code',
+      });
     }
   };
 
@@ -66,7 +71,11 @@ const DeleteAccountVerificationContent = () => {
     setTimer(56);
     setCanResend(false);
     // Resend code logic
-    Alert.alert('Code Resent', 'A new verification code has been sent to your email');
+    Toast.show({
+      type: 'success',
+      text1: 'Code Resent',
+      text2: 'A new verification code has been sent to your email',
+    });
   };
 
   return (

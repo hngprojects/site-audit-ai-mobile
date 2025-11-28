@@ -4,7 +4,8 @@ import { useResetPasswordEmailStore } from "@/zustardStore/resetPasswordEmailSto
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { ActivityIndicator, Alert, Keyboard, KeyboardAvoidingView, Platform, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { ActivityIndicator, Keyboard, KeyboardAvoidingView, Platform, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import Toast from 'react-native-toast-message';
 import { OtpInput } from "react-native-otp-entry";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -39,20 +40,32 @@ const OTPVerification = () => {
 
   const handleResend = async () => {
     if (!emailWeSentYourCode) {
-      Alert.alert('Error', 'Email not found. Please start the password reset process again.');
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Email not found. Please start the password reset process again.',
+      });
       return;
     }
 
     setResending(true);
     try {
       await resendResetToken(emailWeSentYourCode);
-      Alert.alert('Success', 'Reset code has been resent to your email.');
+      Toast.show({
+        type: 'success',
+        text1: 'Success',
+        text2: 'Reset code has been resent to your email.',
+      });
       setOtpCode('');
       setOtpFilled(false);
       setInvalidOtp(false);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to resend code. Please try again.';
-      Alert.alert('Error', errorMessage);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: errorMessage,
+      });
     } finally {
       setResending(false);
     }

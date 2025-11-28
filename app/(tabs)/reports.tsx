@@ -10,13 +10,13 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-  Alert,
   FlatList,
   Text,
   TextInput,
   TouchableOpacity,
   View
 } from "react-native";
+import Toast from 'react-native-toast-message';
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -159,7 +159,11 @@ const ReportsScreen: React.FC = () => {
   const confirmDelete = () => {
     if (itemToDelete) {
       deleteSite(itemToDelete.siteId).catch((error) => {
-        Alert.alert('Error', error instanceof Error ? error.message : 'Failed to delete report');
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: error instanceof Error ? error.message : 'Failed to delete report',
+        });
       });
       setItemToDelete(null);
     }
@@ -208,10 +212,11 @@ const ReportsScreen: React.FC = () => {
         },
       });
     } catch (error) {
-      Alert.alert(
-        'Error',
-        error instanceof Error ? error.message : 'Failed to update URL. Please try again.'
-      );
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: error instanceof Error ? error.message : 'Failed to update URL. Please try again.',
+      });
     } finally {
       setIsEditing(false);
     }

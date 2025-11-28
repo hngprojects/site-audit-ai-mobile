@@ -5,8 +5,9 @@ import styles from '@/stylesheets/sign-in-stylesheet';
 import Feather from '@expo/vector-icons/Feather';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Alert, Image, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Image, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 
 const SignIn = () => {
   const router = useRouter();
@@ -42,11 +43,11 @@ const SignIn = () => {
         } catch {
           // If login fails, credentials might be invalid, remove them
           await biometricService.removeCredentials();
-          Alert.alert(
-            'Biometric Login Failed',
-            'Saved credentials are invalid. Please sign in manually.',
-            [{ text: 'OK' }]
-          );
+          Toast.show({
+            type: 'error',
+            text1: 'Biometric Login Failed',
+            text2: 'Saved credentials are invalid. Please sign in manually.',
+          });
         }
       } else if (result.error === 'user_cancel') {
         // User cancelled biometric prompt - silently allow manual login
@@ -98,12 +99,15 @@ const SignIn = () => {
     }
   }, [isAuthenticated, router, params.redirect]);
 
-  // Show error alerts
+  // Show error toasts
   useEffect(() => {
     if (error) {
-      Alert.alert('Sign In Error', error, [
-        { text: 'OK', onPress: clearError },
-      ]);
+      Toast.show({
+        type: 'error',
+        text1: 'Sign In Error',
+        text2: error,
+      });
+      clearError();
     }
   }, [error, clearError]);
 
