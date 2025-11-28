@@ -3,7 +3,7 @@ import { useAuth } from '@/hooks/use-auth';
 import styles from '@/stylesheets/sign-up-stylesheet';
 import Feather from '@expo/vector-icons/Feather';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Alert, Image, KeyboardAvoidingView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -126,7 +126,7 @@ const SignUp = () => {
         <Image
           source={require('../../assets/imgs/logo-variant-2.png')}
           style={
-           styles.logo
+            styles.logo
           }
         />
 
@@ -154,8 +154,8 @@ const SignUp = () => {
             borderColor: hasError
               ? '#ff5a3d'
               : showPasswordRequirements && password.length > 0 && !isPasswordComplete
-              ? '#ff9800'
-              : '#babec6',
+                ? '#ff9800'
+                : '#babec6',
             ...styles.passwordContainer,
           }}
         >
@@ -309,7 +309,16 @@ const SignUp = () => {
           <Text style={styles.socialButtonText}>Continue with Apple</Text>
         </TouchableOpacity>
 
-        <View style={styles.tipBox}>
+        <View style={styles.accountLinkContainer}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+            <Text style={styles.accountLinkText}>Already have an account? </Text>
+            <TouchableOpacity onPress={() => router.push('/(auth)/sign-in')}>
+              <Text style={styles.accountLinkButton}>Sign in</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* <View style={styles.tipBox}>
           <Image
             source={require('../../assets/images/light-bulb.png')}
             style={styles.lightBulbIcon}
@@ -318,17 +327,8 @@ const SignUp = () => {
           <Text style={styles.tipText}>
             Join 2000+ business owners who&#39;ve improved their sales with Sitelytics.
           </Text>
-        </View>
+        </View> */}
       </KeyboardAvoidingView>
-
-      <View style={styles.signInButtonContainer}>
-        <TouchableOpacity
-          style={styles.signInButton}
-          onPress={() => router.push('/(auth)/sign-in')}
-        >
-          <Text style={styles.signInButtonText}>Sign In</Text>
-        </TouchableOpacity>
-      </View>
     </SafeAreaView>
   );
 };

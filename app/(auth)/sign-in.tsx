@@ -4,7 +4,7 @@ import { biometricService } from '@/lib/biometric-service';
 import styles from '@/stylesheets/sign-in-stylesheet';
 import Feather from '@expo/vector-icons/Feather';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Alert, Image, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -30,8 +30,8 @@ const SignIn = () => {
 
       // Authenticate with biometrics
       const result = await biometricService.authenticate(
-        Platform.OS === 'ios' 
-          ? 'Use Face ID to sign in' 
+        Platform.OS === 'ios'
+          ? 'Use Face ID to sign in'
           : 'Use your fingerprint to sign in'
       );
 
@@ -228,7 +228,7 @@ const SignIn = () => {
         </View>
 
         <View style={styles.forgotPasswordContainer}>
-          <TouchableOpacity onPress={() => {router.push('/(auth)/forgot-password')}}>
+          <TouchableOpacity onPress={() => { router.push('/(auth)/forgot-password') }}>
             <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
           </TouchableOpacity>
         </View>
@@ -275,7 +275,16 @@ const SignIn = () => {
           <Text style={styles.socialButtonText}>Continue with Apple</Text>
         </TouchableOpacity>
 
-        <View style={styles.tipBox}>
+        <View style={styles.accountLinkContainer}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+            <Text style={styles.accountLinkText}>Don&apos;t have an account? </Text>
+            <TouchableOpacity onPress={() => router.push('/(auth)/sign-up')}>
+              <Text style={styles.accountLinkButton}>Sign up</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* <View style={styles.tipBox}>
           <Image
             source={require('../../assets/images/light-bulb.png')}
             style={styles.lightBulbIcon}
@@ -284,17 +293,8 @@ const SignIn = () => {
           <Text style={styles.tipText}>
             Join 2000+ business owners who&#39;ve improved their sales with Sitelytics.
           </Text>
-        </View>
+        </View> */}
       </KeyboardAvoidingView>
-
-      <View style={styles.signUpButtonContainer}>
-        <TouchableOpacity
-          style={styles.signUpButton}
-          onPress={() => router.push('/(auth)/sign-up')}
-        >
-          <Text style={styles.signUpButtonText}>Sign Up</Text>
-        </TouchableOpacity>
-      </View>
     </SafeAreaView>
   );
 };

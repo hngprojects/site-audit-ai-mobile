@@ -62,26 +62,20 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: "RethinkSans-SemiBold",
   },
-  signInButtonContainer: {
-    paddingHorizontal: "5%",
-    paddingBottom: 20,
-    paddingTop: 10,
-    backgroundColor: "#fff",
-  },
-  signInButton: {
-    width: "100%",
-    height: 50,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#ff5a3d",
-    backgroundColor: "transparent",
-    justifyContent: "center",
+  accountLinkContainer: {
+    marginTop: 20,
     alignItems: "center",
+    justifyContent: "center",
   },
-  signInButtonText: {
-    color: "#ff5a3d",
-    fontSize: 18,
+  accountLinkText: {
+    fontSize: 14,
+    fontFamily: "RethinkSans-Regular",
+    color: "#000",
+  },
+  accountLinkButton: {
+    fontSize: 14,
     fontFamily: "RethinkSans-SemiBold",
+    color: "#ff5a3d",
   },
   incorrectPassword: {
     color: "#ff5a3d",
