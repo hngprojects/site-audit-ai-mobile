@@ -4,7 +4,7 @@ import { useAuthStore } from '@/store/auth-store';
 import styles from '@/stylesheets/profile-stylesheet';
 import type { User } from '@/type';
 import { getFullImageUrl } from '@/utils/image-url';
-import { Feather } from '@expo/vector-icons';
+import { Feather, Fontisto } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Alert, Image, Platform, Switch, Text, TouchableOpacity, View } from 'react-native';
@@ -228,9 +228,16 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
               thumbColor="#ffffff"
             />
           </View>
+          <TouchableOpacity style={styles.settingsItem} onPress={() => router.push('/(settings)/email-reports')}>
+            <View style={styles.settingsItemLeft}>
+              <Feather name="mail" size={20} color="#1A2373" />
+              <Text style={styles.settingsItemText}>Email Reports</Text>
+            </View>
+            <Feather name="chevron-right" size={16} color="#1A2373" />
+          </TouchableOpacity>
           <TouchableOpacity style={styles.settingsItem} onPress={() => router.push('/(settings)/language')}>
             <View style={styles.settingsItemLeft}>
-              <Feather name="globe" size={20} color="#1A2373" />
+              <Fontisto name="language" size={20} color="#1A2373" />
               <Text style={styles.settingsItemText}>Language</Text>
             </View>
             <Feather name="chevron-right" size={16} color="#1A2373" />
