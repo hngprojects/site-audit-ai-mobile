@@ -104,7 +104,7 @@ const ProfilePhotoSheet: React.FC<ProfilePhotoSheetProps> = ({
                                 </TouchableOpacity>
 
                                 <TouchableOpacity
-                                    style={styles.optionRow}
+                                    style={styles.optionRowLast}
                                     onPress={handleChoosePhoto}
                                     activeOpacity={0.7}
                                 >
@@ -127,7 +127,7 @@ const ProfilePhotoSheet: React.FC<ProfilePhotoSheetProps> = ({
                                 )}
 
                                 <TouchableOpacity
-                                    style={styles.optionRow}
+                                    style={styles.optionRowLast}
                                     onPress={onClose}
                                     activeOpacity={0.7}
                                 >
@@ -176,14 +176,23 @@ const styles = StyleSheet.create({
     },
     section: {
         marginBottom: 16,
+        backgroundColor: '#F5F5F5',
+        // padding: 16,
+        borderRadius: 12,
     },
     optionRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingVertical: 16,
+        padding: 16,
         borderBottomWidth: 1,
-        borderBottomColor: '#F3F4F6',
+        borderBottomColor: '#E8E8E8',
+    },
+    optionRowLast: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: 16,
     },
     optionText: {
         fontSize: 16,

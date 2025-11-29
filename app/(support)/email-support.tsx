@@ -1,10 +1,11 @@
-import styles from '@/stylesheets/email-support-stylesheet';
 import { supportService } from '@/lib/support-service';
+import styles from '@/stylesheets/email-support-stylesheet';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 
 const EmailSupportContent = () => {
   const router = useRouter();
@@ -139,8 +140,8 @@ const EmailSupportContent = () => {
             />
           </View>
 
-          <TouchableOpacity 
-            style={[styles.sendButton, isLoading && styles.sendButtonDisabled]} 
+          <TouchableOpacity
+            style={[styles.sendButton, isLoading && styles.sendButtonDisabled]}
             onPress={handleSend}
             disabled={isLoading}
           >
