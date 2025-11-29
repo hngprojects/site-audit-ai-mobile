@@ -1,6 +1,6 @@
+import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import { storage, STORAGE_KEYS } from '@/lib/storage';
 
 export type LanguageCode = 'en' | 'fr' | 'es' | 'ru' | 'ur' | 'hi' | 'it' | 'sw' | 'ar' | 'ja' | 'de' | 'vi' | 'tr';
 
@@ -14,14 +14,14 @@ export const LANGUAGES: Language[] = [
   { name: 'English', code: 'en', nativeName: 'English' },
   { name: 'French', code: 'fr', nativeName: 'Français' },
   { name: 'Spanish', code: 'es', nativeName: 'Español' },
+  { name: 'German', code: 'de', nativeName: 'Deutsch' },
+  { name: 'Italian', code: 'it', nativeName: 'Italiano' },
   { name: 'Russian', code: 'ru', nativeName: 'Русский' },
   { name: 'Urdu', code: 'ur', nativeName: 'اردو' },
   { name: 'Hindi', code: 'hi', nativeName: 'हिन्दी' },
-  { name: 'Italian', code: 'it', nativeName: 'Italiano' },
   { name: 'Swahili', code: 'sw', nativeName: 'Kiswahili' },
   { name: 'Arabic', code: 'ar', nativeName: 'العربية' },
   { name: 'Japanese', code: 'ja', nativeName: '日本語' },
-  { name: 'German', code: 'de', nativeName: 'Deutsch' },
   { name: 'Vietnamese', code: 'vi', nativeName: 'Tiếng Việt' },
   { name: 'Turkish', code: 'tr', nativeName: 'Türkçe' },
 ];
