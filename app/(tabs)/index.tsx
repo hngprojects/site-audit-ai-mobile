@@ -54,15 +54,19 @@ export default function HomeScreen() {
       return;
     }
 
+
     setUrlAvailable(true);
     setErrorMessage('');
     setIsCreating(true);
+
 
     try {
       const trimmedUrl = websiteUrl.trim();
       const normalizedUrl = normalizeUrl(trimmedUrl);
 
       const scanResponse = await startScan(normalizedUrl);
+
+      
 
       setWebsiteUrl('');
 

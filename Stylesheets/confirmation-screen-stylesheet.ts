@@ -1,5 +1,7 @@
 import { StyleSheet } from 'react-native';
 
+
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -8,9 +10,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: "#fff",
     gap: 4,
-    marginBottom: 30,
-    marginTop: 30,
-
   },
   loadingContainer: {
     flex: 1,
@@ -83,10 +82,28 @@ const styles = StyleSheet.create({
     width: '100%',
     // marginHorizontal: -20,
   },
+  shareButtonContainer: {
+    backgroundColor: "#fff",
+    borderColor: '#FF5A3D',
+    flexDirection: "row",
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    paddingVertical: 14,
+    borderRadius: 12,
+    marginTop: 8
+  },
   buttonText: {
     color: '#FFFFFF',
     fontSize: 14,
     fontFamily: 'RethinkSans-Bold',
+  },
+  shareButtonText: {
+    color: '#FF5A3D',
+    fontSize: 14,
+    fontFamily: 'RethinkSans-Bold',
+    marginLeft: 8
   },
 });
 

@@ -1,16 +1,21 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { useAuditStore } from '@/store/website-domain';
 import styles from '@/stylesheets/confirmation-screen-stylesheet';
-import { Ionicons } from '@expo/vector-icons';
+import { Feather, Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const ConfirmationScreenContent = () => {
   const router = useRouter();
+  const website = useAuditStore((state) => state.domain);
+  const inset = useSafeAreaInsets();
+ 
 
   return (
-    <ThemedView style={styles.container}>
+    <ThemedView style={[styles.container, {paddingTop: inset.top, paddingBottom: inset.bottom}]}>
       <View style={styles.content}>
         <View style={styles.checkmarkContainerOuter}>
           <View style={styles.checkmarkContainer}>
@@ -24,8 +29,19 @@ const ConfirmationScreenContent = () => {
 
       </View>
 
-      <TouchableOpacity style={styles.button} onPress={() => router.replace('/')}>
+      <TouchableOpacity style={styles.button} onPress={() => router.replace('/(tabs)/')}>
         <Text style={styles.buttonText}>Back to home</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.shareButtonContainer} 
+      onPress={() =>
+        router.replace({
+        pathname: "/(socialShare)/share-audit-promo-image-screen",
+        params: { website },
+        })}
+      >
+        <Feather name="share-2" size={18} color="#FF5A3D" />
+        <Text style={styles.shareButtonText}>Share</Text>
       </TouchableOpacity>
     </ThemedView>
   );
