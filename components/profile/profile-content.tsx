@@ -7,6 +7,7 @@ import { useEmailReportsStore } from '@/store/email-reports-store';
 import styles from '@/stylesheets/profile-stylesheet';
 import type { User } from '@/type';
 import { getFullImageUrl } from '@/utils/image-url';
+import { useTranslation } from '@/utils/translations';
 import { Feather, Fontisto } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
@@ -20,6 +21,7 @@ interface ProfileContentProps {
 }
 
 const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
+  const { t } = useTranslation();
   const router = useRouter();
   const { signOut } = useAuthStore();
   const { frequency } = useEmailReportsStore();
@@ -35,10 +37,10 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
   const getFrequencyLabel = () => {
     if (!frequency) return null;
     const labels: Record<string, string> = {
-      weekly: 'Weekly',
-      monthly: 'Monthly',
-      quarterly: 'Quarterly',
-      never: 'Never',
+      weekly: t('emailReports.weekly'),
+      monthly: t('emailReports.monthly'),
+      quarterly: t('emailReports.quarterly'),
+      never: t('emailReports.never'),
     };
     return labels[frequency] || null;
   };
@@ -330,22 +332,22 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
 
       <View style={styles.accountSettingsContainer}>
         <View style={styles.settingsList}>
-          <Text style={styles.sectionHeading}>Account</Text>
+          <Text style={styles.sectionHeading}>{t('profile.account')}</Text>
           <TouchableOpacity style={styles.settingsItem} onPress={() => router.push('/(profile)/edit-profile')}>
             <View style={styles.settingsItemLeft}>
               <Feather name="user" size={20} color="#1A2373" />
-              <Text style={styles.settingsItemText}>Edit Profile</Text>
+              <Text style={styles.settingsItemText}>{t('profile.edit')}</Text>
             </View>
             <Feather name="chevron-right" size={16} color="#1A2373" />
           </TouchableOpacity>
         </View>
 
         <View style={styles.settingsList}>
-          <Text style={styles.sectionHeading}>Security</Text>
+          <Text style={styles.sectionHeading}>{t('profile.security')}</Text>
           <TouchableOpacity style={styles.settingsItem} onPress={() => router.push('/(profile)/change-password')}>
             <View style={styles.settingsItemLeft}>
               <Feather name="lock" size={20} color="#1A2373" />
-              <Text style={styles.settingsItemText}>Change Password</Text>
+              <Text style={styles.settingsItemText}>{t('profile.changePassword')}</Text>
             </View>
             <Feather name="chevron-right" size={16} color="#1A2373" />
           </TouchableOpacity>
@@ -354,7 +356,7 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
               <View style={styles.settingsItemLeft}>
                 <Feather name="shield" size={20} color="#1A2373" />
                 <Text style={styles.settingsItemText}>
-                  Biometrics
+                  {t('profile.biometrics')}
                 </Text>
               </View>
               {loadingBiometric ? (
@@ -372,14 +374,14 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
           <TouchableOpacity style={styles.settingsItem} onPress={() => router.push('/(profile)/privacy-policy')}>
             <View style={styles.settingsItemLeft}>
               <Feather name="file-text" size={20} color="#1A2373" />
-              <Text style={styles.settingsItemText}>Privacy Policy</Text>
+              <Text style={styles.settingsItemText}>{t('profile.privacy')}</Text>
             </View>
             <Feather name="chevron-right" size={16} color="#1A2373" />
           </TouchableOpacity>
         </View>
 
         <View style={styles.settingsList}>
-          <Text style={styles.sectionHeading}>Preferences</Text>
+          <Text style={styles.sectionHeading}>{t('profile.preferences')}</Text>
           {/* <View style={styles.settingsItem}>
             <View style={styles.settingsItemLeft}>
               <Feather name="bell" size={20} color="#1A2373" />
@@ -395,7 +397,7 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
           <TouchableOpacity style={styles.settingsItem} onPress={() => router.push('/(settings)/email-reports')}>
             <View style={styles.settingsItemLeft}>
               <Feather name="mail" size={20} color="#1A2373" />
-              <Text style={styles.settingsItemText}>Email Reports</Text>
+              <Text style={styles.settingsItemText}>{t('profile.emailReports')}</Text>
             </View>
             <View style={styles.settingsItemRight}>
               {getFrequencyLabel() && (
@@ -407,32 +409,32 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
           <TouchableOpacity style={styles.settingsItem} onPress={() => router.push('/(settings)/language')}>
             <View style={styles.settingsItemLeft}>
               <Fontisto name="language" size={20} color="#1A2373" />
-              <Text style={styles.settingsItemText}>Language</Text>
+              <Text style={styles.settingsItemText}>{t('profile.language')}</Text>
             </View>
             <Feather name="chevron-right" size={16} color="#1A2373" />
           </TouchableOpacity>
         </View>
 
         <View style={styles.settingsList}>
-          <Text style={styles.sectionHeading}>Help & Support</Text>
+          <Text style={styles.sectionHeading}>{t('profile.helpSupport')}</Text>
           <TouchableOpacity style={styles.settingsItem} onPress={() => router.push('/(support)/faq')}>
             <View style={styles.settingsItemLeft}>
               <Feather name="help-circle" size={20} color="#1A2373" />
-              <Text style={styles.settingsItemText}>FAQ</Text>
+              <Text style={styles.settingsItemText}>{t('profile.faq')}</Text>
             </View>
             <Feather name="chevron-right" size={16} color="#1A2373" />
           </TouchableOpacity>
           <TouchableOpacity style={styles.settingsItem} onPress={() => router.push('/(support)/contact-support')}>
             <View style={styles.settingsItemLeft}>
               <Feather name="message-circle" size={20} color="#1A2373" />
-              <Text style={styles.settingsItemText}>Contact Support</Text>
+              <Text style={styles.settingsItemText}>{t('profile.contactSupport')}</Text>
             </View>
             <Feather name="chevron-right" size={16} color="#1A2373" />
           </TouchableOpacity>
           <TouchableOpacity style={styles.settingsItem} onPress={() => router.push('/(account)/delete-account-choice-selection')}>
             <View style={styles.settingsItemLeft}>
               <Feather name="trash-2" size={20} color="#1A2373" />
-              <Text style={styles.settingsItemText}>Delete Account</Text>
+              <Text style={styles.settingsItemText}>{t('profile.deleteAccount')}</Text>
             </View>
             <Feather name="chevron-right" size={16} color="#1A2373" />
           </TouchableOpacity>
@@ -440,7 +442,7 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
       </View>
 
       <TouchableOpacity onPress={handleLogoutPress}>
-        <Text style={styles.logoutText}>Log out</Text>
+        <Text style={styles.logoutText}>{t('profile.logoutConfirm')}</Text>
       </TouchableOpacity>
 
       <LogoutModal

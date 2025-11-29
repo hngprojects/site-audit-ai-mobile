@@ -2,6 +2,7 @@ import { LoadingButton } from '@/components/ui/loading-button';
 import { useAuth } from '@/hooks/use-auth';
 import { biometricService } from '@/lib/biometric-service';
 import styles from '@/stylesheets/sign-in-stylesheet';
+import { useTranslation } from '@/utils/translations';
 import Feather from '@expo/vector-icons/Feather';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
@@ -10,6 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
 const SignIn = () => {
+  const { t } = useTranslation();
   const router = useRouter();
   const params = useLocalSearchParams();
   const { signIn, signInWithGoogle, isLoading, error, clearError, isAuthenticated } = useAuth();
@@ -45,8 +47,8 @@ const SignIn = () => {
           await biometricService.removeCredentials();
           Toast.show({
             type: 'error',
-            text1: 'Biometric Login Failed',
-            text2: 'Saved credentials are invalid. Please sign in manually.',
+            text1: t('auth.biometricLoginFailed'),
+            text2: t('auth.invalidCredentials'),
           });
         }
       } else if (result.error === 'user_cancel') {
@@ -104,7 +106,7 @@ const SignIn = () => {
     if (error) {
       Toast.show({
         type: 'error',
-        text1: 'Sign In Error',
+        text1: t('auth.signInError'),
         text2: error,
       });
       clearError();
@@ -118,19 +120,19 @@ const SignIn = () => {
 
     // Validation
     if (!email.trim()) {
-      setLocalError('Email is required');
+      setLocalError(t('auth.emailRequired'));
       return;
     }
 
     if (!password.trim()) {
-      setLocalError('Password is required');
+      setLocalError(t('auth.passwordRequired'));
       return;
     }
 
     // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.trim())) {
-      setLocalError('Please enter a valid email address');
+      setLocalError(t('auth.invalidEmail'));
       return;
     }
 
@@ -181,10 +183,10 @@ const SignIn = () => {
           style={styles.logo}
         />
 
-        <Text style={{ ...styles.textInputLabel }}>Email</Text>
+        <Text style={{ ...styles.textInputLabel }}>{t('auth.email')}</Text>
 
         <TextInput
-          placeholder="user@gmail.com"
+          placeholder={t('auth.emailPlaceholder')}
           style={styles.textInput}
           placeholderTextColor="#dfdfdfff"
           value={email}
@@ -198,7 +200,7 @@ const SignIn = () => {
           editable={!isLoading}
         />
 
-        <Text style={{ ...styles.textInputLabel }}>Password</Text>
+        <Text style={{ ...styles.textInputLabel }}>{t('auth.password')}</Text>
 
         <View
           style={{
@@ -207,7 +209,7 @@ const SignIn = () => {
           }}
         >
           <TextInput
-            placeholder="Enter your password"
+            placeholder={t('auth.passwordPlaceholder')}
             style={styles.passwordTextInput}
             placeholderTextColor="#dfdfdfff"
             value={password}
@@ -233,7 +235,7 @@ const SignIn = () => {
 
         <View style={styles.forgotPasswordContainer}>
           <TouchableOpacity onPress={() => { router.push('/(auth)/forgot-password') }}>
-            <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+            <Text style={styles.forgotPasswordText}>{t('auth.forgotPassword')}</Text>
           </TouchableOpacity>
         </View>
 
@@ -245,14 +247,14 @@ const SignIn = () => {
           onPress={handleSignIn}
           loading={isLoading}
           disabled={isLoading}
-          text="Sign In"
+          text={t('auth.signIn')}
           buttonStyle={styles.signInButton}
           textStyle={styles.signInText}
         />
 
         <View style={styles.orDivider}>
           <View style={styles.orDividerLine} />
-          <Text style={styles.orDividerText}>OR</Text>
+          <Text style={styles.orDividerText}>{t('common.or')}</Text>
           <View style={styles.orDividerLine} />
         </View>
 
@@ -265,7 +267,7 @@ const SignIn = () => {
             source={require('../../assets/images/google.png')}
             style={styles.socialIcon}
           />
-          <Text style={styles.socialButtonText}>Continue with Google</Text>
+          <Text style={styles.socialButtonText}>{t('auth.continueGoogle')}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -276,14 +278,14 @@ const SignIn = () => {
             source={require('../../assets/images/apple.png')}
             style={styles.appleIcon}
           />
-          <Text style={styles.socialButtonText}>Continue with Apple</Text>
+          <Text style={styles.socialButtonText}>{t('auth.continueApple')}</Text>
         </TouchableOpacity>
 
         <View style={styles.accountLinkContainer}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-            <Text style={styles.accountLinkText}>Don&apos;t have an account? </Text>
+            <Text style={styles.accountLinkText}>{t('auth.noAccount')} </Text>
             <TouchableOpacity onPress={() => router.push('/(auth)/sign-up')}>
-              <Text style={styles.accountLinkButton}>Sign up</Text>
+              <Text style={styles.accountLinkButton}>{t('auth.signUp')}</Text>
             </TouchableOpacity>
           </View>
         </View>

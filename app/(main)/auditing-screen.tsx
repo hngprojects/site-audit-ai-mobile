@@ -1,6 +1,7 @@
 import { getScanStatus, startScan } from '@/actions/scan-actions';
 import { useAuditStore } from '@/store/website-domain';
 import styles from '@/stylesheets/auditing-screen-stylesheet';
+import { useTranslation } from '@/utils/translations';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
@@ -9,6 +10,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 const AuditingScreen = () => {
+  const { t } = useTranslation();
   const router = useRouter();
   const params = useLocalSearchParams();
   const jobId = Array.isArray(params.jobId) ? params.jobId[0] : params.jobId;
@@ -24,10 +26,10 @@ const AuditingScreen = () => {
 
   // Scanning checklist items with appropriate icons
   const scanSteps = [
-    { text: 'Analyzing for Critical SEO Errors...', icon: 'search', iconSet: 'FontAwesome' as const },
-    { text: 'Scanning content quality', icon: 'description', iconSet: 'MaterialIcons' as const },
-    { text: 'Checking for Costly Speed Issues...', icon: 'speed', iconSet: 'MaterialIcons' as const },
-    { text: 'Finding broken links', icon: 'link', iconSet: 'FontAwesome' as const }
+    { text: t('auditing.analyzing'), icon: 'search', iconSet: 'FontAwesome' as const },
+    { text: t('auditing.scanningContent'), icon: 'description', iconSet: 'MaterialIcons' as const },
+    { text: t('auditing.checkingSpeed'), icon: 'speed', iconSet: 'MaterialIcons' as const },
+    { text: t('auditing.findingLinks'), icon: 'link', iconSet: 'FontAwesome' as const }
   ];
 
   useEffect(() => {
@@ -128,7 +130,7 @@ const AuditingScreen = () => {
     <SafeAreaView style={styles.container}>
       <View style={{ flex: 1 }}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Scanning Website...</Text>
+          <Text style={styles.headerTitle}>{t('auditing.scanning')}</Text>
           <Text style={styles.headerUrl}>{websiteUrl}</Text>
         </View>
 
@@ -183,7 +185,7 @@ const AuditingScreen = () => {
           </View>
 
           <View style={styles.footer}>
-            <Text style={styles.footerText}>Status: {scanStatus}</Text>
+            <Text style={styles.footerText}>{t('auditing.status')}: {scanStatus}</Text>
           </View>
         </View>
       </View>

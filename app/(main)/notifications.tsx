@@ -2,6 +2,7 @@ import { ThemedText } from '@/components/themed-text';
 import type { Notification } from '@/service/notifications';
 import { deleteNotification, getNotifications, markAsRead } from '@/service/notifications';
 import styles from '@/stylesheets/notifications-stylesheet';
+import { useTranslation } from '@/utils/translations';
 import { Feather, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -85,6 +86,7 @@ const NotificationItem = ({ item, onMarkRead, onDelete }: { item: Notification; 
 };
 
 export default function NotificationsScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -129,8 +131,8 @@ export default function NotificationsScreen() {
       console.error('Mark read error', e);
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: 'Could not mark notification as read',
+        text1: t('common.error'),
+        text2: t('notifications.markReadError'),
       });
     }
   };
@@ -144,16 +146,16 @@ export default function NotificationsScreen() {
         setNotifications((prev) => prev.filter((n) => n.id !== id));
         Toast.show({
           type: 'success',
-          text1: 'Success',
-          text2: 'Notification deleted successfully',
+          text1: t('common.success'),
+          text2: t('notifications.deleteSuccess'),
         });
       }
     } catch (e) {
       console.error('Delete notification error', e);
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: 'Could not delete notification',
+        text1: t('common.error'),
+        text2: t('notifications.deleteError'),
       });
     }
   };
