@@ -57,11 +57,10 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "c79758da-0b13-4a7a-bf58-ed343449a3c2"
+        "projectId": "9669fbe1-08a2-4584-879e-10b3a80cc7"
       }
     },
     "privacy": "unlisted",
-    "owner": "peliah",
-    "owner": "yhoungbrown"
+    "owner": "peliah"
   }
 }
