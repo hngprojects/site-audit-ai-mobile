@@ -83,6 +83,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  updateButtonDisabled: {
+    opacity: 0.6,
+  },
   updateButtonText: {
     fontSize: 16,
     fontFamily: 'RethinkSans-Medium',

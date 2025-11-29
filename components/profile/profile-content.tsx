@@ -23,7 +23,7 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
   const [biometricEnabled, setBiometricEnabled] = useState(false);
   const [biometricAvailable, setBiometricAvailable] = useState(false);
   const [loadingBiometric, setLoadingBiometric] = useState(true);
-  const [pushNotificationsEnabled, setPushNotificationsEnabled] = useState(true);
+  // const [pushNotificationsEnabled, setPushNotificationsEnabled] = useState(true);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
 
   const getFrequencyLabel = () => {
