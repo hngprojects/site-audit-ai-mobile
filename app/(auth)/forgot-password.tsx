@@ -1,5 +1,6 @@
 import { authService } from '@/lib/auth-service';
 import styles from '@/stylesheets/forgot-password-stylesheet';
+import { useTranslation } from '@/utils/translations';
 import { useResetPasswordEmailStore } from '@/zustardStore/resetPasswordEmailStore';
 import { Feather } from '@expo/vector-icons';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -10,6 +11,7 @@ import Toast from 'react-native-toast-message';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const ForgotPassword = () => {
+    const { t } = useTranslation();
     const router = useRouter();
     const inset = useSafeAreaInsets();
 
@@ -25,14 +27,14 @@ const ForgotPassword = () => {
         setLoading(true);
 
         if (!email.trim()) {
-            setError('Please enter your email address.');
+            setError(t('auth.emailRequired'));
             setLoading(false);
             return;
         }
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email.trim())) {
-            setError('Please enter a valid email address.');
+            setError(t('auth.invalidEmail'));
             setLoading(false);
             return;
         }
@@ -47,7 +49,7 @@ const ForgotPassword = () => {
             setError(errorMessage);
             Toast.show({
               type: 'error',
-              text1: 'Error',
+              text1: t('common.error'),
               text2: errorMessage,
             });
         } finally {
@@ -74,21 +76,21 @@ const ForgotPassword = () => {
             </TouchableOpacity>
 
             <Text style={styles.headerText}>
-                Forgot Password
+                {t('forgotPassword.title')}
             </Text>
 
         </View>
         <Text style={{...styles.createAccountTitle}}>
-            Enter your email and we&#39;ll send you a mail to reset your password.
+            {t('forgotPassword.description')}
         </Text>
 
 
         <Text style={{...styles.textInputLabel}}>
-            Email
+            {t('auth.email')}
         </Text>
 
         <TextInput
-            placeholder="user@gmail.com"
+            placeholder={t('forgotPassword.emailPlaceholder')}
             style={[
                 styles.textInput,
                 error && { borderColor: '#ff5a3d' }
@@ -119,7 +121,7 @@ const ForgotPassword = () => {
                     onPress={sendingResetCode}
                     style={styles.continueButton}>
                         <Text style={styles.continueText}>
-                            Continue
+                            {t('forgotPassword.sendCode')}
                         </Text>
                 </TouchableOpacity>
             )}
@@ -134,11 +136,10 @@ const ForgotPassword = () => {
 
                  <Text style={{
                     ...styles.checkyourmail}}>
-                    Check your email
+                    {t('forgotPassword.checkEmail')}
                  </Text>
                  <Text style={styles.subText}>
-                   We&#39;ve sent a password code to your email
-                   address, pls check your inbox
+                   {t('forgotPassword.emailSent')}
                  </Text>
 
 
@@ -147,7 +148,7 @@ const ForgotPassword = () => {
                         style={[styles.continueButton, Platform.OS === 'ios' ? {marginTop: 220 } : {marginTop: 140 }]}
                     >
                             <Text style={styles.continueText}>
-                                Continue
+                                {t('common.continue')}
                             </Text>
                     </TouchableOpacity>
             </View>

@@ -1,6 +1,7 @@
 import styles from '@/stylesheets/hire-request-stylesheet';
 import IssueCard from '@/components/issue-card';
 import { useSelectedIssuesStore } from '@/store/audit-summary-selected-issue-store';
+import { useTranslation } from '@/utils/translations';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
@@ -33,6 +34,7 @@ const ISSUE_LIST = [
 ];
 
 const RequestForm = () => {
+    const { t } = useTranslation();
     const router = useRouter();
     const { issues, addIssue, clearIssues } = useSelectedIssuesStore();
     const [additionalNotes, setAdditionalNotes] = useState('');
@@ -51,8 +53,8 @@ const RequestForm = () => {
         if (issues.length === 0) {
             Toast.show({
               type: 'error',
-              text1: 'Error',
-              text2: 'No issues selected',
+              text1: t('common.error'),
+              text2: t('requestForm.noIssues'),
             });
             return;
         }
@@ -66,17 +68,17 @@ const RequestForm = () => {
                 <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
                     <Feather name="arrow-left" size={24} color="#1A2373" />
                 </TouchableOpacity>
-                <Text style={styles.headerText}>Request Form</Text>
+                <Text style={styles.headerText}>{t('requestForm.title')}</Text>
                 <TouchableOpacity style={styles.selectButton} onPress={handleToggleSelect}>
-                    <Text style={styles.selectButtonText}>{isAllSelected ? 'Deselect' : 'Select'}</Text>
+                    <Text style={styles.selectButtonText}>{isAllSelected ? t('requestForm.deselect') : t('requestForm.select')}</Text>
                 </TouchableOpacity>
             </View>
             <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
                 <Text style={styles.mainTitle}>
-                  Confirm your review
+                  {t('requestForm.confirmReview')}
                 </Text>
                 <Text style={styles.subtitle}>
-                  Need professional support? Sitelytics connects you with experts who’ll review at no cost. Expect a message from a Sitelytics expert within 24 hours.
+                  {t('requestForm.subtitle')}
                 </Text>
                 <View style={styles.issuesContainer}>
                   {ISSUE_LIST.map((issue) => (
@@ -102,16 +104,16 @@ const RequestForm = () => {
                     />
                   ))}
                 </View>
-                <Text style={styles.additionalNotesLabel}>Additional Notes</Text>
+                <Text style={styles.additionalNotesLabel}>{t('requestForm.additionalNotes')}</Text>
                 <TextInput
                   style={styles.textInput}
-                  placeholder="Tell us more about your specific need"
+                  placeholder={t('requestForm.placeholder')}
                   value={additionalNotes}
                   onChangeText={setAdditionalNotes}
                   multiline
                 />
                 <TouchableOpacity style={styles.primaryButton} onPress={handleSubmit}>
-                    <Text style={styles.primaryButtonText}>Submit Request</Text>
+                    <Text style={styles.primaryButtonText}>{t('requestForm.submitRequest')}</Text>
                 </TouchableOpacity>
             </ScrollView>
         </SafeAreaView>

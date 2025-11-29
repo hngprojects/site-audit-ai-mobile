@@ -19,7 +19,7 @@ export const en = {
   'common.search': 'Search',
   'common.or': 'OR',
   'common.tryAgain': 'Try Again',
-  
+
   // Home Screen
   'home.title': 'Improve your website with a quick scan',
   'home.subtitle': 'Quick AI review with clear action steps',
@@ -28,12 +28,12 @@ export const en = {
   'home.recentAudits': 'Recent audits',
   'home.tip': 'Join 2000+ business owners who have improved their sales with Sitelytics',
   'home.failedToStart': 'Failed to start scan. Please try again.',
-  
+
   // Language Screen
   'language.title': 'Language',
   'language.select': 'Select your preferred language',
   'language.changed': 'Language has been changed successfully',
-  
+
   // Profile
   'profile.edit': 'Edit Profile',
   'profile.changePassword': 'Change Password',
@@ -51,7 +51,7 @@ export const en = {
   'profile.deleteAccount': 'Delete Account',
   'profile.contactSupport': 'Contact Support',
   'profile.faq': 'FAQ',
-  
+
   // Auth
   'auth.signIn': 'Sign In',
   'auth.signUp': 'Sign Up',
@@ -72,7 +72,14 @@ export const en = {
   'auth.continueApple': 'Continue with Apple',
   'auth.emailPlaceholder': 'user@gmail.com',
   'auth.passwordPlaceholder': 'Enter your password',
-  
+  'auth.passwordRequirementsNotMet': 'Please ensure your password meets all requirements',
+  'auth.passwordMustContain': 'Password must contain:',
+  'auth.passwordRequirementMinLength': 'At least 8 characters',
+  'auth.passwordRequirementUppercase': 'One uppercase letter',
+  'auth.passwordRequirementLowercase': 'One lowercase letter',
+  'auth.passwordRequirementNumber': 'One number',
+  'auth.passwordRequirementSpecial': 'One special character',
+
   // Reports
   'reports.title': 'Reports',
   'reports.search': 'Search',
@@ -80,7 +87,7 @@ export const en = {
   'reports.startNewScan': 'Start New Scan',
   'reports.deleteError': 'Failed to delete report',
   'reports.updateError': 'Failed to update URL. Please try again.',
-  
+
   // Email Reports
   'emailReports.title': 'Email Reports',
   'emailReports.subtitle': 'Schedule automated reports',
@@ -90,7 +97,7 @@ export const en = {
   'emailReports.quarterly': 'Quarterly',
   'emailReports.never': 'Never',
   'emailReports.updated': 'Email report frequency has been updated successfully',
-  
+
   // Edit Profile
   'editProfile.title': 'Edit Profile',
   'editProfile.fullName': 'Full Name',
@@ -114,7 +121,7 @@ export const en = {
   'editProfile.nameInvalidChars': 'Full name can only contain letters, numbers, and spaces',
   'editProfile.phoneInvalid': 'Please enter a valid phone number',
   'editProfile.changePhoto': 'Change Photo',
-  
+
   // Change Password
   'changePassword.title': 'Change Password',
   'changePassword.currentPassword': 'Current Password',
@@ -131,13 +138,13 @@ export const en = {
   'changePassword.confirmRequired': 'Please confirm your new password',
   'changePassword.passwordsDontMatch': "Passwords don't match",
   'changePassword.updatePassword': 'Update Password',
-  
+
   // Profile Photo Sheet
   'photoSheet.title': 'Edit Profile Picture',
   'photoSheet.takePhoto': 'Take photo',
   'photoSheet.choosePhoto': 'Choose photo',
   'photoSheet.deletePhoto': 'Delete photo',
-  
+
   // Auditing Screen
   'auditing.scanning': 'Scanning Website...',
   'auditing.analyzing': 'Analyzing for Critical SEO Errors...',
@@ -146,19 +153,22 @@ export const en = {
   'auditing.findingLinks': 'Finding broken links',
   'auditing.status': 'Status',
   'auditing.pleaseWait': 'Please wait while we scan your website',
-  
+
   // Auditing Error Screen
   'auditingError.title': "Oops! URL Didn't Load",
   'auditingError.description': "A broken or unreachable link prevented us from scanning this website..",
   'auditingError.verifyUrl': 'Please verify the URL and try once more.',
   'auditingError.tryAgain': 'Try Again',
-  
+
   // Notifications
   'notifications.title': 'Notifications',
+  'notifications.markAllRead': 'Mark all as read',
   'notifications.markReadError': 'Could not mark notification as read',
   'notifications.deleteSuccess': 'Notification deleted successfully',
   'notifications.deleteError': 'Could not delete notification',
-  
+  'notifications.noMessage': 'No message yet',
+  'notifications.tryAgain': 'Try again',
+
   // Email Support
   'emailSupport.title': 'Email Support',
   'emailSupport.yourEmail': 'Your Email',
@@ -174,12 +184,14 @@ export const en = {
   'emailSupport.emailPlaceholder': 'user@gmail.com',
   'emailSupport.subjectPlaceholder': 'e.g Inquiry',
   'emailSupport.messagePlaceholder': 'Type your message here...',
-  
+
   // Send Message
-  'sendMessage.fullName': 'Full Name',
+  'sendMessage.send': 'Send Message',
+  'sendMessage.needHelp': 'Need Help?',
+  'sendMessage.subtitle': "We'd love to hear from you. Send us a message and we'll respond within 24 hours.",
+  'sendMessage.fullName': 'Name',
   'sendMessage.email': 'Email',
   'sendMessage.message': 'Message',
-  'sendMessage.send': 'Send Message',
   'sendMessage.nameRequired': 'Please enter your full name',
   'sendMessage.emailRequired': 'Please enter your email address',
   'sendMessage.invalidEmail': 'Please enter a valid email address',
@@ -187,50 +199,104 @@ export const en = {
   'sendMessage.helpPlaceholder': 'How can we help you?',
   'sendMessage.namePlaceholder': 'Enter your full name',
   'sendMessage.emailPlaceholder': 'user@gmail.com',
-  
+
   // Request Form
+  'requestForm.title': 'Request Form',
+  'requestForm.select': 'Select',
+  'requestForm.deselect': 'Deselect',
+  'requestForm.confirmReview': 'Confirm your review',
+  'requestForm.subtitle': "Need professional support? Sitelytics connects you with experts who'll review at no cost. Expect a message from a Sitelytics expert within 24 hours.",
+  'requestForm.additionalNotes': 'Additional Notes',
+  'requestForm.submitRequest': 'Submit Request',
   'requestForm.noIssues': 'No issues selected',
   'requestForm.tellMore': 'Tell us more about your specific need',
   'requestForm.placeholder': 'Tell us more about your specific need',
-  
+
   // OTP Verification
+  'otp.verification': 'Verification',
+  'otp.codeSent': "We've sent a 6-digit code to",
+  'otp.enterCode': 'Enter it below to confirm your email.',
+  'otp.invalidCode': 'Invalid code, check your email and try again',
+  'otp.didntReceive': "Didn't receive a code?",
+  'otp.resend': 'Resend',
+  'otp.resending': 'Resending...',
   'otp.emailNotFound': 'Email not found. Please start the password reset process again.',
   'otp.codeResent': 'Reset code has been resent to your email.',
   'otp.resendError': 'Failed to resend code. Please try again.',
-  
+
   // New Password
   'newPassword.title': 'New Password',
+  'newPassword.subtitle': 'Your new password must be different from the previous one.',
+  'newPassword.passwordRequired': 'Please enter your desired password',
+  'newPassword.missingCredentials': 'Missing email or verification token. Please start the process again.',
+  'newPassword.reset': 'Reset',
   'newPassword.enterNew': 'Enter new password',
   'newPassword.confirmNew': 'Confirm new password',
   'newPassword.passwordPlaceholder': '***********',
-  
+
   // Forgot Password
   'forgotPassword.title': 'Forgot Password',
-  'forgotPassword.description': 'Enter your email address and we will send you a code to reset your password.',
-  'forgotPassword.sendCode': 'Send Code',
+  'forgotPassword.description': "Enter your email and we'll send you a mail to reset your password.",
+  'forgotPassword.sendCode': 'Continue',
   'forgotPassword.emailPlaceholder': 'user@gmail.com',
-  
+  'forgotPassword.checkEmail': 'Check your email',
+  'forgotPassword.emailSent': "We've sent a password code to your email address, pls check your inbox",
+
   // Delete Account Verification
+  'deleteAccount.title': 'Delete Account',
+  'deleteAccount.verifyIdentity': 'Verify your identity',
+  'deleteAccount.subtitle': 'For security purposes, please enter the 6-digit code sent to da*********i20@gmail.com',
   'deleteAccount.codeRequired': 'Please enter the complete 6-digit code',
+  'deleteAccount.codeResentTitle': 'Code Resent',
   'deleteAccount.codeResent': 'A new verification code has been sent to your email',
   'deleteAccount.codePlaceholder': '*',
-  
+  'deleteAccount.didntReceive': "Didn't receive a code?",
+  'deleteAccount.resend': 'Resend',
+  'deleteAccount.resendIn': 'Resend code in',
+  'deleteAccount.verifyAndConfirm': 'Verify and Confirm Deletion',
+
   // Delete Confirmation Sheet
   'deleteSheet.title': 'Delete Url',
-  'deleteSheet.message': 'Are you sure you want to delete this URL?',
+  'deleteSheet.message': 'Are you sure you want to delete this scan? This action cannot be undone.',
   'deleteSheet.confirm': 'Delete',
-  
+
   // Edit URL Sheet
   'editUrlSheet.title': 'Edit URL',
+  'editUrlSheet.currentUrl': 'Current Website URL',
+  'editUrlSheet.newUrl': 'New Website URL',
   'editUrlSheet.enterUrl': 'Enter new URL',
-  'editUrlSheet.save': 'Save',
-  
+  'editUrlSheet.scan': 'Scan',
+  'editUrlSheet.scanning': 'Scanning...',
+
   // Report Dashboard
+  'reportDashboard.auditSummary': 'Audit Summary',
+  'reportDashboard.rerunAudit': 'Re-run audit',
+  'reportDashboard.websiteScore': 'Website Score',
+  'reportDashboard.scanDate': 'Scan Date',
+  'reportDashboard.statusCritical': 'Your website is performing poorly. Immediate improvements are needed to enhance user experience and SEO.',
+  'reportDashboard.statusGood': "Great job! Your website is performing well. Keep up the good work to maintain and further enhance user experience and SEO. Fix the issues below to make it even better.",
+  'reportDashboard.statusWarning': 'Your website has an average performance. There is room for improvement to boost user experience and SEO.',
+  'reportDashboard.markAll': 'Mark All',
+  'reportDashboard.unmarkAll': 'Unmark All',
+  'reportDashboard.loadingResults': 'Loading scan results...',
+  'reportDashboard.getSalesUp': 'Get your sales up with a free review from an expert',
+  'reportDashboard.modalTitle': 'Your website can be better',
+  'reportDashboard.modalSubtitle': "Dont miss a chance to stay ahead. Get free website monitoring and insights",
   'reportDashboard.enterEmail': 'Enter Email',
-  
+  'reportDashboard.invalidEmail': 'Pls ensure you enter a valid email address',
+  'reportDashboard.gotIt': 'Got It',
+  'reportDashboard.selectIssues': 'Please select the issues you want our professionals to assist you with',
+  'reportDashboard.emailSent': "We've sent you an email",
+
   // Live Chat
+  'liveChat.title': 'Live Chat',
   'liveChat.typeMessage': 'Type a message...',
-  
+  'liveChat.you': 'You',
+  'liveChat.attachLink': 'Attach Link',
+  'liveChat.enterUrl': 'Enter the URL you want to share:',
+  'liveChat.attach': 'Attach',
+  'liveChat.selectEmoji': 'Select Emoji',
+
   // Status
   'status.passed': 'Passed',
   'status.average': 'Average',
@@ -238,4 +304,35 @@ export const en = {
   'status.good': 'Good',
   'status.warning': 'Warning',
   'status.critical': 'Critical',
+
+  // Report Screen
+  'reportScreen.title': 'Report Screen',
+  'reportScreen.placeholder': 'This is the report screen placeholder.',
+
+  // FAQ
+  'faq.title': 'FAQ',
+  'faq.stillConfused': 'Still Confused?',
+  'faq.contactUs': 'Contact Us',
+
+  // Audit Result Card
+  'auditResultCard.score': 'Score',
+  'auditResultCard.hoursAgo': 'hours ago',
+
+  // Issue Card
+  'issueCard.noIssues': 'No issues found',
+  'issueCard.viewDetail': 'View Detail',
+
+  // Report Card
+  'reportCard.viewDetails': 'View Details',
+  'reportCard.low': 'Low',
+  'reportCard.high': 'High',
+  'reportCard.medium': 'Medium',
+
+  // Empty State
+  'emptyState.noRecentAudit': 'No recent audit yet',
+
+  // Share
+  'share.backToHome': 'Back to home',
+  'share.permissionNeeded': 'Permission needed to save and share image.',
+  'common.share': 'Share',
 };

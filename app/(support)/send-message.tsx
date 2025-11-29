@@ -1,3 +1,4 @@
+import { useTranslation } from '@/utils/translations';
 import React, { useState, useEffect } from 'react';
 import { ActivityIndicator, TouchableOpacity, ScrollView, Text, View, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -6,6 +7,7 @@ import { useRouter } from 'expo-router';
 import styles from '../../stylesheets/send-message-stylesheet';
 
 const SendMessageContent = () => {
+  const { t } = useTranslation();
   const router = useRouter();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('user@gmail.com');
@@ -27,24 +29,24 @@ const SendMessageContent = () => {
     let hasError = false;
 
     if (!trimmedName) {
-      setNameError('Please enter your full name');
+      setNameError(t('sendMessage.nameRequired'));
       hasError = true;
     } else {
       setNameError('');
     }
 
     if (!trimmedEmail) {
-      setEmailError('Please enter your email address');
+      setEmailError(t('sendMessage.emailRequired'));
       hasError = true;
     } else if (!isValidEmail(trimmedEmail)) {
-      setEmailError('Please enter a valid email address');
+      setEmailError(t('sendMessage.invalidEmail'));
       hasError = true;
     } else {
       setEmailError('');
     }
 
     if (!trimmedMessage) {
-      setMessageError('Please enter your message');
+      setMessageError(t('sendMessage.messageRequired'));
       hasError = true;
     } else {
       setMessageError('');
@@ -63,7 +65,7 @@ const SendMessageContent = () => {
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
           <Feather name="arrow-left" size={24} color="#1A2373" />
         </TouchableOpacity>
-        <Text style={styles.headerText}>Send Message</Text>
+        <Text style={styles.headerText}>{t('sendMessage.send')}</Text>
       </View>
       <ScrollView
         style={styles.scrollContainer}
@@ -71,28 +73,28 @@ const SendMessageContent = () => {
         contentContainerStyle={{ marginTop: 16, paddingBottom: 100 }}
       >
         <View style={styles.content}>
-          <Text style={styles.title}>Need Help?</Text>
-          <Text style={styles.subtitle}>We&lsquo;d love to hear from you. Send us a message and we&lsquo;ll respond within 24 hours.</Text>
+          <Text style={styles.title}>{t('sendMessage.needHelp')}</Text>
+          <Text style={styles.subtitle}>{t('sendMessage.subtitle')}</Text>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Name</Text>
+            <Text style={styles.label}>{t('sendMessage.fullName')}</Text>
             <TextInput
               style={styles.input}
               value={name}
               onChangeText={(text) => { setName(text); setNameError(''); }}
-              placeholder="Enter your full name"
+              placeholder={t('sendMessage.namePlaceholder')}
               placeholderTextColor="#999"
             />
             {nameError ? <Text style={styles.errorText}>{nameError}</Text> : null}
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Email</Text>
+            <Text style={styles.label}>{t('sendMessage.email')}</Text>
             <TextInput
               style={styles.input}
               value={email}
               onChangeText={(text) => { setEmail(text); setEmailError(''); }}
-              placeholder="user@gmail.com"
+              placeholder={t('sendMessage.emailPlaceholder')}
               placeholderTextColor="#999"
               keyboardType="email-address"
               autoCapitalize="none"
@@ -102,12 +104,12 @@ const SendMessageContent = () => {
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Message</Text>
+            <Text style={styles.label}>{t('sendMessage.message')}</Text>
             <TextInput
               style={[styles.input, styles.messageInput]}
               value={message}
               onChangeText={(text) => { setMessage(text); setMessageError(''); }}
-              placeholder="How can we help you?"
+              placeholder={t('sendMessage.helpPlaceholder')}
               placeholderTextColor="#999"
               multiline
               numberOfLines={6}
@@ -117,7 +119,7 @@ const SendMessageContent = () => {
           </View>
 
           <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
-            <Text style={styles.sendButtonText}>Send Message</Text>
+            <Text style={styles.sendButtonText}>{t('sendMessage.send')}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

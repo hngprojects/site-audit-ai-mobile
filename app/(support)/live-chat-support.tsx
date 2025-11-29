@@ -1,3 +1,4 @@
+import { useTranslation } from '@/utils/translations';
 import React, { useState, useEffect, useRef } from 'react';
 import { ActivityIndicator, TouchableOpacity, ScrollView, View, Text, TextInput, KeyboardAvoidingView, Platform, Image, Modal, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -11,6 +12,7 @@ import styles from '@/stylesheets/live-chat-support-stylesheet';
 
 
 const LiveChatSupportContent = () => {
+  const { t } = useTranslation();
   const router = useRouter();
   const scrollViewRef = useRef<ScrollView>(null);
   const [newMessage, setNewMessage] = useState('');
@@ -21,7 +23,7 @@ const LiveChatSupportContent = () => {
     if (newMessage.trim()) {
       const message: Message = {
         id: Date.now().toString(),
-        sender: 'You',
+        sender: t('liveChat.you'),
         text: newMessage.trim(),
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         isUser: true,
@@ -41,17 +43,17 @@ const LiveChatSupportContent = () => {
 
   const handleAttachLink = () => {
     Alert.prompt(
-      'Attach Link',
-      'Enter the URL you want to share:',
+      t('liveChat.attachLink'),
+      t('liveChat.enterUrl'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Attach',
+          text: t('liveChat.attach'),
           onPress: (url?: string) => {
             if (url && url.trim()) {
               const message: Message = {
                 id: Date.now().toString(),
-                sender: 'You',
+                sender: t('liveChat.you'),
                 text: `🔗 ${url.trim()}`,
                 timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                 isUser: true,
@@ -77,7 +79,7 @@ const LiveChatSupportContent = () => {
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Feather name="arrow-left" size={24} color="#1A2373" />
         </TouchableOpacity>
-        <Text style={styles.headerText}>Live Chat</Text>
+        <Text style={styles.headerText}>{t('liveChat.title')}</Text>
       </View>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
@@ -126,7 +128,7 @@ const LiveChatSupportContent = () => {
               style={styles.textInput}
               value={newMessage}
               onChangeText={setNewMessage}
-              placeholder="Type a message..."
+              placeholder={t('liveChat.typeMessage')}
               placeholderTextColor="#676767"
               multiline
             />
@@ -148,7 +150,7 @@ const LiveChatSupportContent = () => {
       <Modal visible={showEmojiPicker} animationType="slide" transparent>
         <View style={styles.emojiPickerContainer}>
           <View style={styles.emojiPickerHeader}>
-            <Text style={styles.emojiPickerTitle}>Select Emoji</Text>
+            <Text style={styles.emojiPickerTitle}>{t('liveChat.selectEmoji')}</Text>
             <TouchableOpacity onPress={() => setShowEmojiPicker(false)} style={styles.closeButton}>
               <Feather name="x" size={24} color="#666" />
             </TouchableOpacity>

@@ -17,6 +17,7 @@ import { captureRef } from "react-native-view-shot";
 
 
 export default function ShareAuditPromoImageScreen() {
+  const { t } = useTranslation();
   const screenshotRef = useRef<View>(null);
   const inset = useSafeAreaInsets();
 
@@ -35,7 +36,11 @@ export default function ShareAuditPromoImageScreen() {
     try {
       const { status } = await MediaLibrary.requestPermissionsAsync();
       if (status !== "granted") {
-        alert("Permission needed to save and share image.");
+        Toast.show({
+          type: 'error',
+          text1: t('common.error'),
+          text2: t('share.permissionNeeded'),
+        });
         return;
       }
 
@@ -106,7 +111,7 @@ export default function ShareAuditPromoImageScreen() {
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={() => router.replace('/(tabs)/')}>
-          <Text style={styles.buttonText}>Back to home</Text>
+          <Text style={styles.buttonText}>{t('share.backToHome')}</Text>
         </TouchableOpacity>
 
         {loading ? (
@@ -120,7 +125,7 @@ export default function ShareAuditPromoImageScreen() {
             onPress={takeScreenshotAndShare}
           >
             <Feather name="share-2" size={18} color="#FF5A3D" />
-            <Text style={styles.shareButtonText}>Share</Text>
+            <Text style={styles.shareButtonText}>{t('common.share')}</Text>
           </TouchableOpacity>
         )}
       </View>

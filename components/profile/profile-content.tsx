@@ -31,7 +31,6 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
   // const [pushNotificationsEnabled, setPushNotificationsEnabled] = useState(true);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
   const [photoSheetVisible, setPhotoSheetVisible] = useState(false);
-  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const { token } = useAuthStore();
 
   const getFrequencyLabel = () => {
@@ -167,7 +166,6 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
   const uploadImage = async (imageUri: string) => {
     if (!token) return;
 
-    setIsUploadingImage(true);
     try {
       const imageUrl = await profileService.uploadProfileImage(imageUri, token);
       const currentUser = useAuthStore.getState().user;
@@ -180,17 +178,15 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
       }
       Toast.show({
         type: 'success',
-        text1: 'Success',
-        text2: 'Profile photo updated successfully',
+        text1: t('common.success'),
+        text2: t('editProfile.profilePhotoUpdated'),
       });
     } catch (error) {
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: error instanceof Error ? error.message : 'Failed to upload image. Please try again.',
+        text1: t('common.error'),
+        text2: error instanceof Error ? error.message : t('profile.uploadImageError'),
       });
-    } finally {
-      setIsUploadingImage(false);
     }
   };
 

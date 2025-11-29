@@ -1,16 +1,17 @@
 import styles from "@/stylesheets/homeScreenEmptyStateStylesheet";
-import React from "react";
+import { useTranslation } from "@/utils/translations";
 import { Image, Text, View } from "react-native";
 
 export default function EmptyState() {
+  const { t } = useTranslation();
   return (
     <View style={styles.container}>
       <Image
-        source={require("../assets/images/empty.png")} 
+        source={require("../assets/images/empty.png")}
         style={styles.image}
         resizeMode="contain"
       />
-      <Text style={styles.text}>No recent audit yet</Text>
+      <Text style={styles.text}>{t('emptyState.noRecentAudit')}</Text>
     </View>
   );
 }

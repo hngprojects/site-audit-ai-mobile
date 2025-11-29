@@ -5,8 +5,8 @@ import { useAuthStore } from "@/store/auth-store";
 import { useSitesStore } from "@/store/sites-store";
 import styles from "@/stylesheets/homeScreenStylesheet";
 import { getPersistentDeviceInfo } from "@/utils/device-id";
-import { normalizeUrl, validateWebsiteUrl } from "@/utils/url-validation";
 import { useTranslation } from "@/utils/translations";
+import { normalizeUrl, validateWebsiteUrl } from "@/utils/url-validation";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Octicons from "@expo/vector-icons/Octicons";
 import { router } from "expo-router";
@@ -73,7 +73,7 @@ export default function HomeScreen() {
       }
       const scanResponse = await startScan(normalizedUrl);
 
-      
+
 
       setWebsiteUrl('');
 
@@ -106,6 +106,9 @@ export default function HomeScreen() {
     if (score >= 50) return "Average";
     return "Failed";
   };
+
+  // Note: Status values are kept as English strings for type safety
+  // They are translated in the AuditResultCard component
 
   return (
     <SafeAreaView
