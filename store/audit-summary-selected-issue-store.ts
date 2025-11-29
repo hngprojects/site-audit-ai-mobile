@@ -10,14 +10,17 @@ export type SelectedIssue = {
 
 interface SelectedIssuesState {
   issues: SelectedIssue[];
+  availableIssues: SelectedIssue[];
 
   addIssue: (issue: SelectedIssue) => void;
   removeIssue: (id: string) => void;
   clearIssues: () => void;
+  setIssues: (issues: SelectedIssue[]) => void;
 }
 
 export const useSelectedIssuesStore = create<SelectedIssuesState>((set) => ({
   issues: [],
+  availableIssues: [],
 
   addIssue: (issue) =>
     set((state) => {
@@ -31,4 +34,6 @@ export const useSelectedIssuesStore = create<SelectedIssuesState>((set) => ({
     })),
 
   clearIssues: () => set({ issues: [] }),
+
+  setIssues: (issues) => set({ availableIssues: issues }),
 }));
