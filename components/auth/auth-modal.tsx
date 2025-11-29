@@ -48,7 +48,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose, redirect }) => 
   useEffect(() => {
     if (isAuthenticated && visible) {
       if (redirect) {
-        router.push(redirect);
+        (router.push as any)({ pathname: redirect });
       } else {
         onClose();
       }
@@ -72,12 +72,12 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose, redirect }) => 
 
   const handleSignUp = () => {
     onClose();
-    router.push({ pathname: '/(auth)/sign-up' });
+    router.push({ pathname: '/(auth)/sign-up', params: redirect ? { redirect } : {} });
   };
 
   const handleSignIn = () => {
     onClose();
-    router.push({ pathname: '/(auth)/sign-in' });
+    router.push({ pathname: '/(auth)/sign-in', params: redirect ? { redirect } : {} });
   };
 
   const translateY = slideAnim.interpolate({

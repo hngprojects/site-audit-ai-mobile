@@ -149,7 +149,7 @@ const hireAPro = () => {
       };
       fetchResult();
     }
-  }, [jobId, url, setAuditInfo]);
+  }, [jobId, url, setAuditInfo, setIssues]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
