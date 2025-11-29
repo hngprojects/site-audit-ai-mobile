@@ -1,5 +1,5 @@
 export const PRIVACY_POLICY_DATA = {
-  lastUpdated: "October 2025",
+  lastUpdated: "November 2025",
   sections: [
     {
       header: "Information We Collect",
@@ -42,7 +42,7 @@ export const PRIVACY_POLICY_DATA = {
       listHeader: "",
       items: [
         "You can request to access, edit, or delete your data anytime.",
-        "Email us at privacy@sitelytics.ai for assistance."
+        "Email us at privacy@sitelytics.app for assistance."
       ]
     },
     {
@@ -55,7 +55,7 @@ export const PRIVACY_POLICY_DATA = {
     }
   ],
   contact: {
-    email: "privacy@sitelytics.ai",
-    website: "www.sitelytics.ai"
+    email: "privacy@sitelytics.app",
+    website: "www.sitelytics.app"
   }
 };

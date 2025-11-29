@@ -78,6 +78,12 @@ const styles = StyleSheet.create({
   emailHighlight: {
     color: '#FF5A3D',
     fontFamily: 'RethinkSans-Regular',
+    textDecorationLine: 'underline',
+  },
+  linkText: {
+    color: '#1A2373',
+    fontFamily: 'RethinkSans-Regular',
+    textDecorationLine: 'underline',
   },
   contactSection: {
     marginTop: 1,
@@ -93,6 +99,9 @@ const styles = StyleSheet.create({
     color: '#FF5A3D',
     fontFamily: 'RethinkSans-Regular',
     marginBottom: 4,
+  },
+  contactLink: {
+    textDecorationLine: 'underline',
   },
   loadingContainer: {
     flex: 1,
