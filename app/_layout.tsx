@@ -71,6 +71,7 @@ export default function RootLayout() {
           <Stack.Screen name="(account)" options={{ headerShown: false }} />
           <Stack.Screen name="(notifications)" options={{ headerShown: false }} />
            <Stack.Screen name="(hireRequest)" options={{ headerShown: false }} />
+           <Stack.Screen name="(socialShare)" options={{ headerShown: false }} />
           <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
         </Stack>
         <StatusBar style="dark" />

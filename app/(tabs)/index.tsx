@@ -55,9 +55,11 @@ export default function HomeScreen() {
       return;
     }
 
+
     setUrlAvailable(true);
     setErrorMessage('');
     setIsCreating(true);
+
 
     try {
       const trimmedUrl = websiteUrl.trim();
@@ -68,6 +70,8 @@ export default function HomeScreen() {
         console.log(site);
       }
       const scanResponse = await startScan(normalizedUrl);
+
+      
 
       setWebsiteUrl('');
 

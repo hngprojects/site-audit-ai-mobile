@@ -1,4 +1,5 @@
 import { getScanStatus, startScan } from '@/actions/scan-actions';
+import { useAuditStore } from '@/store/website-domain';
 import styles from '@/stylesheets/auditing-screen-stylesheet';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -12,6 +13,8 @@ const AuditingScreen = () => {
   const params = useLocalSearchParams();
   const jobId = Array.isArray(params.jobId) ? params.jobId[0] : params.jobId;
   const url = Array.isArray(params.url) ? params.url[0] : params.url;
+
+  const { setDomain } = useAuditStore();
 
   const websiteUrl = url || '';
   const [progress, setProgress] = useState(0);
@@ -28,6 +31,7 @@ const AuditingScreen = () => {
   ];
 
   useEffect(() => {
+    setDomain(websiteUrl)
     // If we have a jobId, poll for existing scan status
     if (jobId) {
       let statusInterval: number;
