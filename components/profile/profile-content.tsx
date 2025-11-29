@@ -230,7 +230,7 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
 
         <View style={styles.settingsList}>
           <Text style={styles.sectionHeading}>Preferences</Text>
-          <View style={styles.settingsItem}>
+          {/* <View style={styles.settingsItem}>
             <View style={styles.settingsItemLeft}>
               <Feather name="bell" size={20} color="#1A2373" />
               <Text style={styles.settingsItemText}>Push Notifications</Text>
@@ -241,7 +241,7 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
               trackColor={{ false: '#767577', true: '#FF5A3D' }}
               thumbColor="#ffffff"
             />
-          </View>
+          </View> */}
           <TouchableOpacity style={styles.settingsItem} onPress={() => router.push('/(settings)/email-reports')}>
             <View style={styles.settingsItemLeft}>
               <Feather name="mail" size={20} color="#1A2373" />
