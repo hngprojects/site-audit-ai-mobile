@@ -38,6 +38,7 @@ export default StyleSheet.create({
     paddingHorizontal: 12,
     justifyContent: "flex-start",
 
+
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.03,
@@ -63,10 +64,9 @@ export default StyleSheet.create({
   },
   swipeableContainer: {
     position: 'relative',
-    marginBottom: 12,
   },
   swipeableContent: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'transparent',
   },
   deleteAction: {
     width: 80,
@@ -74,16 +74,13 @@ export default StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#E8E8E8',
-    // marginLeft: 8,
   },
   deleteIconContainer: {
     justifyContent: 'center',
     alignItems: 'center',
   },
   separator: {
-    height: 1,
-    backgroundColor: '#F3F4F6',
-    marginVertical: 8,
+    height: 12,
   },
   skeletonCard: {
     backgroundColor: '#FFFFFF',
@@ -94,7 +91,12 @@ export default StyleSheet.create({
     justifyContent: 'space-between',
     borderWidth: 1,
     borderColor: '#F2F2F2',
-    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 1,
+    marginBottom: 0,
   },
   skeletonLeft: {
     flex: 1,
@@ -108,10 +110,9 @@ export default StyleSheet.create({
   },
   rightActions: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'stretch',
     justifyContent: 'flex-end',
-    height: '98%',
-    marginBottom: 12,
+    height: '100%',
   },
   editAction: {
     width: 80,
@@ -119,6 +120,7 @@ export default StyleSheet.create({
     backgroundColor: '#ff5a3d',
     justifyContent: 'center',
     alignItems: 'center',
+    marginRight: 0,
   },
   actionText: {
     color: '#FFFFFF',
