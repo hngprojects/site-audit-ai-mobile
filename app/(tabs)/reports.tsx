@@ -1,18 +1,22 @@
+import { startScan } from "@/actions/scan-actions";
+import DeleteConfirmationSheet from "@/components/delete-confirmation-sheet";
+import EditUrlSheet from "@/components/edit-url-sheet";
 import { useSitesStore } from "@/store/sites-store";
 import styles from "@/stylesheets/report-screen-stylesheet";
 import { ReportItemProps, Status } from "@/type";
+import { normalizeUrl } from "@/utils/url-validation";
 import { MaterialIcons } from '@expo/vector-icons';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from "expo-router";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
-  Alert,
   FlatList,
   Text,
   TextInput,
   TouchableOpacity,
   View
 } from "react-native";
+import Toast from 'react-native-toast-message';
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -55,7 +59,7 @@ const SwipeableRow: React.FC<SwipeableRowProps> = ({ item, url, onDelete, onEdit
         onDelete();
       }}>
         <MaterialIcons name="delete" size={20} color="#494949" />
-        <Text style={styles.actionText}>Delete</Text>
+        <Text style={styles.actionTextDelete}>Delete</Text>
       </TouchableOpacity>
     </View>
   );
@@ -78,7 +82,7 @@ const SwipeableRow: React.FC<SwipeableRowProps> = ({ item, url, onDelete, onEdit
               <Text style={styles.urlText} numberOfLines={1}>{url}</Text>
               <Text style={styles.scanDateText}>{item.scanDate}</Text>
             </View>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.menuButton}
               onPress={handleMenuPress}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
@@ -95,9 +99,14 @@ const SwipeableRow: React.FC<SwipeableRowProps> = ({ item, url, onDelete, onEdit
 const ReportsScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
   const [search, setSearch] = React.useState("");
+  const [deleteSheetVisible, setDeleteSheetVisible] = useState(false);
+  const [editSheetVisible, setEditSheetVisible] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<{ siteId: string; url: string } | null>(null);
+  const [itemToEdit, setItemToEdit] = useState<{ siteId: string; url: string } | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
   const router = useRouter();
-  
-  const { sites, isLoading, fetchSites, deleteSite } = useSitesStore();
+
+  const { sites, isLoading, fetchSites, deleteSite, createSite } = useSitesStore();
 
   useEffect(() => {
     fetchSites();
@@ -106,10 +115,10 @@ const ReportsScreen: React.FC = () => {
   const formatDate = (dateString?: string): string => {
     if (!dateString) return 'N/A';
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric', 
-      year: 'numeric' 
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
     });
   };
 
@@ -130,7 +139,7 @@ const ReportsScreen: React.FC = () => {
       score: 0,
       status: getStatusFromScore(undefined),
       scanDate: formatDate(site.created_at),
-      onPress: () => {},
+      onPress: () => { },
     };
   };
 
@@ -142,24 +151,80 @@ const ReportsScreen: React.FC = () => {
     item.domain.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleDelete = (siteId: string, domain: string) => {
-    Alert.alert('Delete', 'Are you sure you want to delete this report?', [
-      { text: 'Cancel', style: 'cancel' },
-      { 
-        text: 'Delete', 
-        style: 'destructive', 
-        onPress: () => {
-          deleteSite(siteId).catch((error) => {
-            Alert.alert('Error', error instanceof Error ? error.message : 'Failed to delete report');
-          });
-        }
-      },
-    ]);
+  const handleDelete = (siteId: string, url: string) => {
+    setItemToDelete({ siteId, url });
+    setDeleteSheetVisible(true);
+  };
+
+  const confirmDelete = () => {
+    if (itemToDelete) {
+      deleteSite(itemToDelete.siteId).catch((error) => {
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: error instanceof Error ? error.message : 'Failed to delete report',
+        });
+      });
+      setItemToDelete(null);
+    }
+  };
+
+  const closeDeleteSheet = () => {
+    setDeleteSheetVisible(false);
+    setItemToDelete(null);
   };
 
   const handleEdit = (item: typeof filteredData[0]) => {
-    // TODO: Implement edit functionality
-    Alert.alert('Edit', `Edit functionality for ${item.domain} will be implemented soon.`);
+    setItemToEdit({ siteId: item.siteId, url: item.url });
+    setEditSheetVisible(true);
+  };
+
+  const handleEditConfirm = async (newUrl: string) => {
+    if (!itemToEdit) return;
+
+    setIsEditing(true);
+    try {
+      // First, mark the old site as inactive (delete)
+      await deleteSite(itemToEdit.siteId);
+
+      // Normalize the URL
+      const normalizedUrl = normalizeUrl(newUrl.trim());
+
+      // Then, create the new site
+      await createSite(normalizedUrl);
+
+      // Start a new scan
+      const scanResponse = await startScan(normalizedUrl);
+
+      // Refresh the sites list
+      await fetchSites();
+
+      // Close the sheet
+      setEditSheetVisible(false);
+      setItemToEdit(null);
+
+      // Navigate to the auditing screen
+      router.push({
+        pathname: "/(main)/auditing-screen",
+        params: {
+          url: normalizedUrl,
+          jobId: scanResponse.job_id,
+        },
+      });
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: error instanceof Error ? error.message : 'Failed to update URL. Please try again.',
+      });
+    } finally {
+      setIsEditing(false);
+    }
+  };
+
+  const closeEditSheet = () => {
+    setEditSheetVisible(false);
+    setItemToEdit(null);
   };
 
 
@@ -185,7 +250,7 @@ const ReportsScreen: React.FC = () => {
             value={search}
           />
         </View>
-        
+
 
         {isLoading ? (
           <View style={styles.listWrap}>
@@ -208,10 +273,10 @@ const ReportsScreen: React.FC = () => {
                 <SwipeableRow
                   item={item}
                   url={item.url}
-                  onDelete={() => handleDelete(item.siteId, item.domain)}
+                  onDelete={() => handleDelete(item.siteId, item.url)}
                   onEdit={() => handleEdit(item)}
                   onPress={() => router.push({
-                    pathname: "../(reports)/report-dashboard", 
+                    pathname: "../(reports)/report-dashboard",
                     params: {
                       domain: item.domain,
                       score: String(item.score),
@@ -234,7 +299,7 @@ const ReportsScreen: React.FC = () => {
         )}
 
         <View style={[styles.bottomButtonContainer, { paddingBottom: Math.max(insets.bottom, 20) }]}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.startNewScanButton}
             onPress={() => router.push('/(tabs)/')}
             activeOpacity={0.8}
@@ -242,6 +307,21 @@ const ReportsScreen: React.FC = () => {
             <Text style={styles.startNewScanText}>Start New Scan</Text>
           </TouchableOpacity>
         </View>
+
+        <DeleteConfirmationSheet
+          visible={deleteSheetVisible}
+          onClose={closeDeleteSheet}
+          onConfirm={confirmDelete}
+          url={itemToDelete?.url}
+        />
+
+        <EditUrlSheet
+          visible={editSheetVisible}
+          onClose={closeEditSheet}
+          onConfirm={handleEditConfirm}
+          currentUrl={itemToEdit?.url || ''}
+          isLoading={isEditing}
+        />
       </View>
     </GestureHandlerRootView>
   );

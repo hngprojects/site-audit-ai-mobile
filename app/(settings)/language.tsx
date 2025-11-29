@@ -2,9 +2,10 @@ import { LANGUAGES } from '@/constants/language';
 import styles from '@/stylesheets/language-screen-stylesheet';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 
 const LanguageContent = () => {
   const router = useRouter();
@@ -42,7 +43,11 @@ const LanguageContent = () => {
         ]}
         disabled={!selectedLanguage}
         onPress={() => {
-          Alert.alert('Success', 'Language has been changed successfully');
+          Toast.show({
+            type: 'success',
+            text1: 'Success',
+            text2: 'Language has been changed successfully',
+          });
           router.back();
         }}
       >

@@ -43,7 +43,6 @@ const styles = StyleSheet.create({
     color: '#1c1c1c',
     textAlign: 'center',
     marginBottom: 16,
-    fontWeight: 700,
   },
   description: {
     fontSize: 16,
@@ -52,7 +51,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 20,
     marginBottom: 48,
-    fontWeight: 500,
   },
   buttonContainer: {
     width: '100%',

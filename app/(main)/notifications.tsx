@@ -5,7 +5,8 @@ import styles from '@/stylesheets/notifications-stylesheet';
 import { Feather, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
-import { Alert, FlatList, Image, Platform, TextInput, TouchableOpacity, View } from 'react-native';
+import { FlatList, Image, Platform, TextInput, TouchableOpacity, View } from 'react-native';
+import Toast from 'react-native-toast-message';
 import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -126,23 +127,35 @@ export default function NotificationsScreen() {
       }
     } catch (e) {
       console.error('Mark read error', e);
-      Alert.alert('Error', 'Could not mark notification as read');
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Could not mark notification as read',
+      });
     }
   };
 
   const handleDelete = async (id: string) => {
-    Alert.alert('Delete', 'Are you sure you want to delete this notification?', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Delete', style: 'destructive', onPress: async () => {
-        try {
-          const ok = await deleteNotification(id);
-          if (ok) setNotifications((prev) => prev.filter((n) => n.id !== id));
-        } catch (e) {
-          console.error('Delete notification error', e);
-          Alert.alert('Error', 'Could not delete notification');
-        }
-      } },
-    ]);
+    // For confirmation dialogs, we'll keep using Alert for now as Toast doesn't support user interaction
+    // But we can show a toast after deletion
+    try {
+      const ok = await deleteNotification(id);
+      if (ok) {
+        setNotifications((prev) => prev.filter((n) => n.id !== id));
+        Toast.show({
+          type: 'success',
+          text1: 'Success',
+          text2: 'Notification deleted successfully',
+        });
+      }
+    } catch (e) {
+      console.error('Delete notification error', e);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Could not delete notification',
+      });
+    }
   };
 
   if (isLoading) {

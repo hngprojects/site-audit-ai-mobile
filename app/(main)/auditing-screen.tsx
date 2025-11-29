@@ -3,8 +3,8 @@ import { useAuditStore } from '@/store/website-domain';
 import styles from '@/stylesheets/auditing-screen-stylesheet';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Text, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, Animated, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 
@@ -14,7 +14,7 @@ const AuditingScreen = () => {
   const jobId = Array.isArray(params.jobId) ? params.jobId[0] : params.jobId;
   const url = Array.isArray(params.url) ? params.url[0] : params.url;
 
-  const {setDomain} = useAuditStore();
+  const { setDomain } = useAuditStore();
 
   const websiteUrl = url || '';
   const [progress, setProgress] = useState(0);
@@ -61,6 +61,19 @@ const AuditingScreen = () => {
                 },
               });
             }, 1000);
+          } else if (statusResponse.status === 'failed') {
+            clearInterval(statusInterval);
+
+            // Redirect to error screen when scan fails
+            setTimeout(() => {
+              router.replace({
+                pathname: "/(main)/auditing-error-screen",
+                params: {
+                  url: websiteUrl,
+                  jobId,
+                },
+              });
+            }, 1000);
           }
         } catch (error) {
           console.error('Failed to poll scan status:', error);
@@ -69,7 +82,7 @@ const AuditingScreen = () => {
 
       // Poll status immediately and then every 15 seconds
       pollStatus();
-      statusInterval = setInterval(pollStatus, 15000);
+      statusInterval = Number(setInterval(pollStatus, 15000));
 
       return () => {
         clearInterval(statusInterval);
@@ -120,6 +133,9 @@ const AuditingScreen = () => {
         </View>
 
         <View style={styles.content}>
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#ff5a3d" style={{ transform: [{ scale: 2 }] }} />
+          </View>
           <View style={styles.progress}>
             <View style={styles.progressBarContainer}>
               <Animated.View

@@ -1,6 +1,7 @@
 import { startScan } from "@/actions/scan-actions";
 import AuditResultCard from "@/components/auditResultCard";
 import EmptyState from "@/components/homeScreenEmptyState";
+import { useAuthStore } from "@/store/auth-store";
 import { useSitesStore } from "@/store/sites-store";
 import styles from "@/stylesheets/homeScreenStylesheet";
 import { getPersistentDeviceInfo } from "@/utils/device-id";
@@ -20,12 +21,12 @@ export default function HomeScreen() {
   const [urlAvailable, setUrlAvailable] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [isCreating, setIsCreating] = useState<boolean>(false);
-  
-  const { sites, isLoading, fetchSites } = useSitesStore();
+  const { isAuthenticated } = useAuthStore();
+  const { sites, isLoading, fetchSites, createSite } = useSitesStore();
 
   useEffect(() => {
     fetchSites();
-   
+
     const testDeviceId = async () => {
       const info = await getPersistentDeviceInfo();
       console.log(" DEVICE INFO:", info);
@@ -63,7 +64,11 @@ export default function HomeScreen() {
     try {
       const trimmedUrl = websiteUrl.trim();
       const normalizedUrl = normalizeUrl(trimmedUrl);
-
+      console.log(normalizedUrl);
+      if (isAuthenticated) {
+        const site = await createSite(normalizedUrl);
+        console.log(site);
+      }
       const scanResponse = await startScan(normalizedUrl);
 
       
@@ -117,46 +122,46 @@ export default function HomeScreen() {
       </View>
 
 
-        {Platform.OS === "ios" ? 
+      {Platform.OS === "ios" ?
         (
-        <View style={[styles.inputPlaceholder, { borderColor: !urlAvailable ? "#d32f2f" : "#C7C8C9", }]}>
-          <MaterialCommunityIcons
-            name="web" size={15}
-            color="#A0A0A0"
-            style={styles.webIcon}
-          />
-          <TextInput
-          placeholder="Enter your website URL"
-          placeholderTextColor={"#A0A0A0"}
-          style={styles.placeholderText}
-          value={websiteUrl ? websiteUrl.toLowerCase() : ''}
-          onChangeText={handleUrlChange}
-          autoCapitalize="none"
-          autoCorrect={false}
-          keyboardType="url"
-        />
-        </View>
-        ) : 
+          <View style={[styles.inputPlaceholder, { borderColor: !urlAvailable ? "#d32f2f" : "#C7C8C9", }]}>
+            <MaterialCommunityIcons
+              name="web" size={15}
+              color="#A0A0A0"
+              style={styles.webIcon}
+            />
+            <TextInput
+              placeholder="Enter your website URL"
+              placeholderTextColor={"#A0A0A0"}
+              style={styles.placeholderText}
+              value={websiteUrl ? websiteUrl.toLowerCase() : ''}
+              onChangeText={handleUrlChange}
+              autoCapitalize="none"
+              autoCorrect={false}
+              keyboardType="url"
+            />
+          </View>
+        ) :
         (
-        <View style={[styles.androidInputPlaceholder, { borderColor: !urlAvailable ? "#d32f2f" : "#C7C8C9", }]}>
-          <MaterialCommunityIcons
-            name="web" size={15}
-            color="#A0A0A0"
-            style={styles.webIcon}
-          />
-          <TextInput
-          placeholder="Enter your website URL"
-          placeholderTextColor={"#A0A0A0"}
-          style={styles.androidPlaceholderText}
-          value={websiteUrl ? websiteUrl.toLowerCase() : ''}
-          onChangeText={handleUrlChange}
-          autoCapitalize="none"
-          autoCorrect={false}
-          keyboardType="url"
-          />
-        </View>
+          <View style={[styles.androidInputPlaceholder, { borderColor: !urlAvailable ? "#d32f2f" : "#C7C8C9", }]}>
+            <MaterialCommunityIcons
+              name="web" size={15}
+              color="#A0A0A0"
+              style={styles.webIcon}
+            />
+            <TextInput
+              placeholder="Enter your website URL"
+              placeholderTextColor={"#A0A0A0"}
+              style={styles.androidPlaceholderText}
+              value={websiteUrl ? websiteUrl.toLowerCase() : ''}
+              onChangeText={handleUrlChange}
+              autoCapitalize="none"
+              autoCorrect={false}
+              keyboardType="url"
+            />
+          </View>
         )}
-     
+
       {!urlAvailable && errorMessage && (
         <Text style={styles.invalidLink}>{errorMessage}</Text>
       )}

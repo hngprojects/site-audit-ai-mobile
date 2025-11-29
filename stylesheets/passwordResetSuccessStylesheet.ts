@@ -48,7 +48,6 @@ export default StyleSheet.create({
     },
   title: {
     fontSize: 22,
-    fontWeight: "700",
     marginBottom: 10,
     marginTop: -15,
     fontFamily: "RethinkSans-Bold"
@@ -82,7 +81,6 @@ export default StyleSheet.create({
     textAlign: "center",
     color: "#FFF",
     fontSize: 16,
-    fontWeight: "700",
     fontFamily: "RethinkSans-SemiBold"
   },
 });

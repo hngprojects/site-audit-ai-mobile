@@ -5,6 +5,7 @@ export default function SettingsLayout() {
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="privacy" />
       <Stack.Screen name="language" />
+      <Stack.Screen name="email-reports" />
     </Stack>
   );
 }

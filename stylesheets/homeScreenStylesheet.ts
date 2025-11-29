@@ -17,15 +17,14 @@ export default StyleSheet.create({
   title: {
     fontSize: 28,
     fontFamily: "RethinkSans-Bold",
-    fontWeight: "700",
     color: "#1C1C1c",
     marginBottom: 6,
     textAlign: "center",
   },
-   headingSection: {
+  headingSection: {
     justifyContent: "center",
     alignItems: "center"
-   },
+  },
   sub: {
     color: "#494949",
     fontSize: 14,
@@ -79,6 +78,7 @@ export default StyleSheet.create({
   placeholderText: {
     color: "#000",
     fontSize: 16,
+    width: '100%',
   },
 
   invalidLink: {
@@ -103,7 +103,7 @@ export default StyleSheet.create({
   },
 
   tipText: {
-    fontSize: 13,
+    fontSize: 16,
     color: "#5C4500",
     fontFamily: "RethinkSans-Regular",
     flex: 1
@@ -111,7 +111,6 @@ export default StyleSheet.create({
 
   sectionTitle: {
     fontSize: 16,
-    fontWeight: "600",
     color: "#000",
     marginBottom: 14,
     fontFamily: "RethinkSans-SemiBold"
@@ -135,12 +134,11 @@ export default StyleSheet.create({
   runButtonImage: {
     marginRight: 4,
     width: 25,
-            height: 25
+    height: 25
   },
   runButtonText: {
     color: "#fff",
-    fontWeight: "600",
     fontSize: 16,
-     fontFamily: "RethinkSans-SemiBold"
+    fontFamily: "RethinkSans-SemiBold"
   },
 });

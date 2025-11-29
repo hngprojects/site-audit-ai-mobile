@@ -52,7 +52,6 @@ const styles = StyleSheet.create({
   supportTitle: {
     fontSize: 16,
     fontFamily: 'RethinkSans-Bold',
-    fontWeight: '500',
     color: '#1C1C1C',
     marginBottom: 4,
   },

@@ -38,7 +38,6 @@ const styles = StyleSheet.create({
 
   title: {
     fontSize: 22,
-    fontWeight: "700",
     fontFamily: "RethinkSans-Bold",
     textAlign: "center",
     marginBottom: 12,
@@ -73,7 +72,6 @@ const styles = StyleSheet.create({
   nextText: { 
     color: "#fff", 
     fontSize: 17, 
-    fontWeight: "600" 
  },
 });
 

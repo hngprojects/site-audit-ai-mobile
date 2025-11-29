@@ -45,6 +45,30 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     backgroundColor: '#333333',
   },
+  profileImagePlaceholder: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: '#333333',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  profileImageInitials: {
+    fontSize: 32,
+    fontFamily: 'RethinkSans-SemiBold',
+    color: '#FFFFFF',
+  },
+  imageUploadOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    borderRadius: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   editImageButton: {
     position: 'absolute',
     bottom: 0,
@@ -58,7 +82,6 @@ const styles = StyleSheet.create({
   },
   changePhotoText: {
     fontSize: 14,
-    fontWeight: '500',
     color: '#1A2373',
     fontFamily: 'RethinkSans-Medium',
   },
@@ -70,7 +93,6 @@ const styles = StyleSheet.create({
   },
   inputLabel: {
     fontSize: 16,
-    fontWeight: '600',
     fontFamily: 'RethinkSans-SemiBold',
     color: '#1c1c1c',
   },
@@ -91,7 +113,6 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 12,
-    fontWeight: '500',
     color: '#D32F2F',
     fontFamily: 'RethinkSans-Medium',
   },
@@ -122,6 +143,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#FF5A3D',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  saveButtonDisabled: {
+    opacity: 0.6,
   },
   saveButtonText: {
     fontSize: 16,

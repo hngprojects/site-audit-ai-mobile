@@ -5,7 +5,8 @@ import { Feather } from '@expo/vector-icons';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { ActivityIndicator, Alert, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const ForgotPassword = () => {
@@ -44,7 +45,11 @@ const ForgotPassword = () => {
             console.error("Error sending reset code:", error);
             const errorMessage = error instanceof Error ? error.message : 'An error occurred while sending the reset code. Please try again.';
             setError(errorMessage);
-            Alert.alert('Error', errorMessage);
+            Toast.show({
+              type: 'error',
+              text1: 'Error',
+              text2: errorMessage,
+            });
         } finally {
             setLoading(false);
         }

@@ -15,20 +15,20 @@ export const authService = {
     try {
       const response = await apiClient.post('/api/v1/auth/login', { email, password });
       const responseData = response.data;
-      
+
       // Extract token from response.data.access_token
       const token = responseData.data?.access_token;
       const apiUser = responseData.data?.user;
-      
+
       if (!apiUser || !token) {
         throw new Error('Invalid response from server');
       }
-      
+
       // Construct full name from first_name and last_name, fallback to username
       const fullName = apiUser.first_name && apiUser.last_name
         ? `${apiUser.first_name} ${apiUser.last_name}`.trim()
         : apiUser.first_name || apiUser.last_name || apiUser.username || '';
-      
+
       const user = {
         id: apiUser.id,
         email: apiUser.email,
@@ -37,7 +37,7 @@ export const authService = {
         phoneNumber: apiUser.phone_number || undefined,
         profileImage: apiUser.profile_picture_url || undefined,
       };
-      
+
       return { user, token };
     } catch (error) {
       if (isAxiosError(error)) {
@@ -74,22 +74,22 @@ export const authService = {
         password,
         username: email.split('@')[0],
       });
-      
+
       const responseData = response.data;
-      
+
       // Extract token from response.data.access_token
       const token = responseData.data?.access_token;
       const apiUser = responseData.data?.user;
-      
+
       if (!apiUser || !token) {
         throw new Error('Invalid response from server');
       }
-      
+
       // Construct full name from first_name and last_name, fallback to username
       const fullName = apiUser.first_name && apiUser.last_name
         ? `${apiUser.first_name} ${apiUser.last_name}`.trim()
         : apiUser.first_name || apiUser.last_name || apiUser.username || '';
-      
+
       const user = {
         id: apiUser.id,
         email: apiUser.email,
@@ -98,7 +98,7 @@ export const authService = {
         phoneNumber: apiUser.phone_number || undefined,
         profileImage: apiUser.profile_picture_url || undefined,
       };
-      
+
       return { user, token };
     } catch (error) {
       if (isAxiosError(error)) {
@@ -266,20 +266,20 @@ export const authService = {
       });
 
       const responseData = response.data;
-      
+
       // Extract token from response.data.access_token
       const token = responseData.data?.access_token;
       const apiUser = responseData.data?.user;
-      
+
       if (!apiUser || !token) {
         throw new Error('Invalid response from server');
       }
-      
+
       // Construct full name from first_name and last_name, fallback to username
       const fullName = apiUser.first_name && apiUser.last_name
         ? `${apiUser.first_name} ${apiUser.last_name}`.trim()
         : apiUser.first_name || apiUser.last_name || apiUser.username || '';
-      
+
       const user = {
         id: apiUser.id,
         email: apiUser.email,
@@ -288,7 +288,7 @@ export const authService = {
         phoneNumber: apiUser.phone_number || undefined,
         profileImage: apiUser.profile_picture_url || undefined,
       };
-      
+
       return { user, token };
     } catch (error) {
       if (isAxiosError(error)) {

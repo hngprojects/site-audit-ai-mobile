@@ -4,7 +4,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         paddingHorizontal: "5%",
-        marginTop: '10%',
+        paddingTop: '10%',
         backgroundColor: "#fff",
     },
     header: {
@@ -65,7 +65,6 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         fontSize: 14,
-        fontWeight: '500',
     },
     buttonTextActive: {
         color: '#fff',
@@ -73,7 +72,7 @@ const styles = StyleSheet.create({
     buttonTextInactive: {
         color: '#B9B9B9',
     },
-    chooseYourLanguageTitle : {
+    chooseYourLanguageTitle: {
         color: "#000",
         fontFamily: 'RethinkSans-Bold',
         fontSize: 20,

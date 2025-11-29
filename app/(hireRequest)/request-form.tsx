@@ -4,7 +4,8 @@ import { useSelectedIssuesStore } from '@/store/audit-summary-selected-issue-sto
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Alert, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const ISSUE_LIST = [
@@ -48,7 +49,11 @@ const RequestForm = () => {
 
     const handleSubmit = () => {
         if (issues.length === 0) {
-            Alert.alert('Error', 'No issues selected');
+            Toast.show({
+              type: 'error',
+              text1: 'Error',
+              text2: 'No issues selected',
+            });
             return;
         }
         // Handle form submission with issues and additionalNotes

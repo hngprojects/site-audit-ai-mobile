@@ -51,7 +51,6 @@ const styles = StyleSheet.create({
 
   time: {
     fontSize: 12,
-    fontWeight: 'semibold',
     fontFamily: 'RethinkSans-Regular',
   },
 

@@ -4,14 +4,15 @@ import { biometricService } from '@/lib/biometric-service';
 import styles from '@/stylesheets/sign-in-stylesheet';
 import Feather from '@expo/vector-icons/Feather';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
-import { Alert, Image, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Image, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 
 const SignIn = () => {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const { signIn, isLoading, error, clearError, isAuthenticated } = useAuth();
+  const { signIn, signInWithGoogle, isLoading, error, clearError, isAuthenticated } = useAuth();
 
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -30,8 +31,8 @@ const SignIn = () => {
 
       // Authenticate with biometrics
       const result = await biometricService.authenticate(
-        Platform.OS === 'ios' 
-          ? 'Use Face ID to sign in' 
+        Platform.OS === 'ios'
+          ? 'Use Face ID to sign in'
           : 'Use your fingerprint to sign in'
       );
 
@@ -42,11 +43,11 @@ const SignIn = () => {
         } catch {
           // If login fails, credentials might be invalid, remove them
           await biometricService.removeCredentials();
-          Alert.alert(
-            'Biometric Login Failed',
-            'Saved credentials are invalid. Please sign in manually.',
-            [{ text: 'OK' }]
-          );
+          Toast.show({
+            type: 'error',
+            text1: 'Biometric Login Failed',
+            text2: 'Saved credentials are invalid. Please sign in manually.',
+          });
         }
       } else if (result.error === 'user_cancel') {
         // User cancelled biometric prompt - silently allow manual login
@@ -98,12 +99,15 @@ const SignIn = () => {
     }
   }, [isAuthenticated, router, params.redirect]);
 
-  // Show error alerts
+  // Show error toasts
   useEffect(() => {
     if (error) {
-      Alert.alert('Sign In Error', error, [
-        { text: 'OK', onPress: clearError },
-      ]);
+      Toast.show({
+        type: 'error',
+        text1: 'Sign In Error',
+        text2: error,
+      });
+      clearError();
     }
   }, [error, clearError]);
 
@@ -148,6 +152,21 @@ const SignIn = () => {
 
   const displayError = localError || error;
   const hasError = !!displayError;
+
+  const handleGoogleLogin = async () => {
+    try {
+      await signInWithGoogle();
+      // Navigation is handled by useEffect when isAuthenticated changes
+    } catch (error) {
+      // Error is handled by the store and shown via Alert
+      console.error('Google sign-in error:', error);
+    }
+  };
+
+  const handleAppleLogin = () => {
+    // TODO: Implement Apple OAuth
+    console.log('Apple login pressed');
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
@@ -213,7 +232,7 @@ const SignIn = () => {
         </View>
 
         <View style={styles.forgotPasswordContainer}>
-          <TouchableOpacity onPress={() => {router.push('/(auth)/forgot-password')}}>
+          <TouchableOpacity onPress={() => { router.push('/(auth)/forgot-password') }}>
             <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
           </TouchableOpacity>
         </View>
@@ -230,7 +249,46 @@ const SignIn = () => {
           buttonStyle={styles.signInButton}
           textStyle={styles.signInText}
         />
-        <View style={styles.tipBox}>
+
+        <View style={styles.orDivider}>
+          <View style={styles.orDividerLine} />
+          <Text style={styles.orDividerText}>OR</Text>
+          <View style={styles.orDividerLine} />
+        </View>
+
+        <TouchableOpacity
+          style={[styles.socialButton, isLoading && { opacity: 0.6 }]}
+          onPress={handleGoogleLogin}
+          disabled={isLoading}
+        >
+          <Image
+            source={require('../../assets/images/google.png')}
+            style={styles.socialIcon}
+          />
+          <Text style={styles.socialButtonText}>Continue with Google</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.socialButton}
+          onPress={handleAppleLogin}
+        >
+          <Image
+            source={require('../../assets/images/apple.png')}
+            style={styles.appleIcon}
+          />
+          <Text style={styles.socialButtonText}>Continue with Apple</Text>
+        </TouchableOpacity>
+
+        <View style={styles.accountLinkContainer}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+            <Text style={styles.accountLinkText}>Don&apos;t have an account? </Text>
+            <TouchableOpacity onPress={() => router.push('/(auth)/sign-up')}>
+              <Text style={styles.accountLinkButton}>Sign up</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* <View style={styles.tipBox}>
           <Image
             source={require('../../assets/images/light-bulb.png')}
             style={styles.lightBulbIcon}
@@ -239,17 +297,8 @@ const SignIn = () => {
           <Text style={styles.tipText}>
             Join 2000+ business owners who&#39;ve improved their sales with Sitelytics.
           </Text>
-        </View>
+        </View> */}
       </KeyboardAvoidingView>
-
-      <View style={styles.signUpButtonContainer}>
-        <TouchableOpacity
-          style={styles.signUpButton}
-          onPress={() => router.push('/(auth)/sign-up')}
-        >
-          <Text style={styles.signUpButtonText}>Sign Up</Text>
-        </TouchableOpacity>
-      </View>
     </SafeAreaView>
   );
 };

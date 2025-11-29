@@ -33,7 +33,6 @@ const styles = StyleSheet.create({
     fontFamily: 'RethinkSans-Bold',
     color: '#1c1c1c',
     textAlign: 'center',
-    fontWeight: 700,
   },
   content: {
     flex: 1,

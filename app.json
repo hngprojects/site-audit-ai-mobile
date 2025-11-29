@@ -9,7 +9,8 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.peliah.sitelytics"
     },
     "android": {
       "adaptiveIcon": {
@@ -40,7 +41,14 @@
           }
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-web-browser",
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.546863276810-l24ttcjpguld9vpcifolbqk99t8soges"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
@@ -52,6 +60,8 @@
         "projectId": "c79758da-0b13-4a7a-bf58-ed343449a3c2"
       }
     },
+    "privacy": "unlisted",
+    "owner": "peliah",
     "owner": "yhoungbrown"
   }
 }

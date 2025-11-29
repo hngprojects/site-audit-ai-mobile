@@ -1,14 +1,19 @@
 import LogoutModal from '@/components/profile/logout-modal';
+import ProfilePhotoSheet from '@/components/profile/profile-photo-sheet';
 import { biometricService } from '@/lib/biometric-service';
+import { profileService } from '@/lib/profile-service';
 import { useAuthStore } from '@/store/auth-store';
+import { useEmailReportsStore } from '@/store/email-reports-store';
 import styles from '@/stylesheets/profile-stylesheet';
 import type { User } from '@/type';
 import { getFullImageUrl } from '@/utils/image-url';
-import { Feather } from '@expo/vector-icons';
+import { Feather, Fontisto } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Alert, Image, Platform, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Platform, Switch, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 
 interface ProfileContentProps {
   user: User | null;
@@ -17,12 +22,26 @@ interface ProfileContentProps {
 const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
   const router = useRouter();
   const { signOut } = useAuthStore();
+  const { frequency } = useEmailReportsStore();
   const [biometricEnabled, setBiometricEnabled] = useState(false);
   const [biometricAvailable, setBiometricAvailable] = useState(false);
   const [loadingBiometric, setLoadingBiometric] = useState(true);
-  const [pushNotificationsEnabled, setPushNotificationsEnabled] = useState(true);
-  const [emailReportsEnabled, setEmailReportsEnabled] = useState(false);
+  // const [pushNotificationsEnabled, setPushNotificationsEnabled] = useState(true);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
+  const [photoSheetVisible, setPhotoSheetVisible] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const { token } = useAuthStore();
+
+  const getFrequencyLabel = () => {
+    if (!frequency) return null;
+    const labels: Record<string, string> = {
+      weekly: 'Weekly',
+      monthly: 'Monthly',
+      quarterly: 'Quarterly',
+      never: 'Never',
+    };
+    return labels[frequency] || null;
+  };
 
   // Load biometric status
   useEffect(() => {
@@ -60,15 +79,155 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
     setLogoutModalVisible(false);
   };
 
+  const requestPermissions = async () => {
+    if (Platform.OS !== 'web') {
+      const { status: cameraStatus } = await ImagePicker.requestCameraPermissionsAsync();
+      const { status: mediaLibraryStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+      if (cameraStatus !== 'granted' || mediaLibraryStatus !== 'granted') {
+        Toast.show({
+          type: 'warning',
+          text1: 'Permissions Required',
+          text2: 'Camera and media library permissions are required to change your profile photo.',
+        });
+        return false;
+      }
+    }
+    return true;
+  };
+
+  const handleTakePhoto = async () => {
+    const hasPermission = await requestPermissions();
+    if (!hasPermission || !token) return;
+
+    try {
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        const asset = result.assets[0];
+        if (asset.fileSize && asset.fileSize > 3 * 1024 * 1024) {
+          Toast.show({
+            type: 'error',
+            text1: 'Error',
+            text2: 'Image size must be less than 3MB. Please choose a smaller image.',
+          });
+          return;
+        }
+        await uploadImage(asset.uri);
+      }
+    } catch {
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to take photo. Please try again.',
+      });
+    }
+  };
+
+  const handleChoosePhoto = async () => {
+    const hasPermission = await requestPermissions();
+    if (!hasPermission || !token) return;
+
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        const asset = result.assets[0];
+        if (asset.fileSize && asset.fileSize > 3 * 1024 * 1024) {
+          Toast.show({
+            type: 'error',
+            text1: 'Error',
+            text2: 'Image size must be less than 3MB. Please choose a smaller image.',
+          });
+          return;
+        }
+        await uploadImage(asset.uri);
+      }
+    } catch {
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to select image. Please try again.',
+      });
+    }
+  };
+
+  const uploadImage = async (imageUri: string) => {
+    if (!token) return;
+
+    setIsUploadingImage(true);
+    try {
+      const imageUrl = await profileService.uploadProfileImage(imageUri, token);
+      const currentUser = useAuthStore.getState().user;
+      if (currentUser) {
+        const updatedUser = {
+          ...currentUser,
+          profileImage: imageUrl,
+        };
+        useAuthStore.setState({ user: updatedUser });
+      }
+      Toast.show({
+        type: 'success',
+        text1: 'Success',
+        text2: 'Profile photo updated successfully',
+      });
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: error instanceof Error ? error.message : 'Failed to upload image. Please try again.',
+      });
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
+
+  const handleDeletePhoto = async () => {
+    if (!token) return;
+
+    try {
+      await profileService.deleteProfileImage(token);
+      const currentUser = useAuthStore.getState().user;
+      if (currentUser) {
+        const updatedUser = {
+          ...currentUser,
+          profileImage: undefined,
+        };
+        useAuthStore.setState({ user: updatedUser });
+      }
+      Toast.show({
+        type: 'success',
+        text1: 'Success',
+        text2: 'Profile photo deleted successfully',
+      });
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: error instanceof Error ? error.message : 'Failed to delete profile photo. Please try again.',
+      });
+    }
+  };
+
   const handleBiometricToggle = async (value: boolean) => {
     if (!biometricAvailable) {
-      Alert.alert(
-        'Biometrics Not Available',
-        Platform.OS === 'ios'
+      Toast.show({
+        type: 'warning',
+        text1: 'Biometrics Not Available',
+        text2: Platform.OS === 'ios'
           ? 'Face ID is not available on this device. Please set up Face ID in your device settings.'
           : 'Fingerprint authentication is not available on this device. Please set up fingerprint in your device settings.',
-        [{ text: 'OK' }]
-      );
+      });
       return;
     }
 
@@ -84,40 +243,40 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
         if (result.success) {
           await biometricService.enable();
           setBiometricEnabled(true);
-          Alert.alert(
-            'Biometrics Enabled',
-            Platform.OS === 'ios'
+          Toast.show({
+            type: 'success',
+            text1: 'Biometrics Enabled',
+            text2: Platform.OS === 'ios'
               ? 'Face ID login has been enabled. Your credentials will be saved securely.'
               : 'Fingerprint login has been enabled. Your credentials will be saved securely.',
-            [{ text: 'OK' }]
-          );
+          });
         } else if (result.error === 'user_cancel') {
           // User cancelled, do nothing
           return;
         } else {
-          Alert.alert(
-            'Authentication Failed',
-            'Biometric authentication failed. Please try again.',
-            [{ text: 'OK' }]
-          );
+          Toast.show({
+            type: 'error',
+            text1: 'Authentication Failed',
+            text2: 'Biometric authentication failed. Please try again.',
+          });
         }
       } else {
         // Disable biometrics
         await biometricService.disable();
         setBiometricEnabled(false);
-        Alert.alert(
-          'Biometrics Disabled',
-          'Biometric login has been disabled and saved credentials have been removed.',
-          [{ text: 'OK' }]
-        );
+        Toast.show({
+          type: 'success',
+          text1: 'Biometrics Disabled',
+          text2: 'Biometric login has been disabled and saved credentials have been removed.',
+        });
       }
     } catch (error) {
       console.error('Error toggling biometric:', error);
-      Alert.alert(
-        'Error',
-        'Failed to update biometric settings. Please try again.',
-        [{ text: 'OK' }]
-      );
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to update biometric settings. Please try again.',
+      });
     }
   };
 
@@ -137,28 +296,32 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
                 <Text style={styles.avatarInitials}>
                   {user?.fullName && user.fullName.trim()
                     ? user.fullName
-                        .trim()
-                        .split(' ')
-                        .filter(n => n.length > 0)
-                        .map(n => n[0])
-                        .join('')
-                        .toUpperCase()
-                        .slice(0, 2)
+                      .trim()
+                      .split(' ')
+                      .filter(n => n.length > 0)
+                      .map(n => n[0])
+                      .join('')
+                      .toUpperCase()
+                      .slice(0, 2)
                     : user?.email && user.email.trim()
-                    ? user.email[0].toUpperCase()
-                    : 'U'}
+                      ? user.email[0].toUpperCase()
+                      : 'U'}
                 </Text>
               </View>
             )}
-            <View style={styles.editIconContainer}>
+            <TouchableOpacity
+              style={styles.editIconContainer}
+              onPress={() => setPhotoSheetVisible(true)}
+              activeOpacity={0.7}
+            >
               <Feather name="edit-2" size={16} color="white" />
-            </View>
+            </TouchableOpacity>
           </View>
           <View style={styles.userInfoContainer}>
-            <Text style={styles.userName}>
+            <Text style={styles.userName} numberOfLines={1} ellipsizeMode="tail">
               {user?.fullName || 'User Name'}
             </Text>
-            <Text style={styles.userEmail}>
+            <Text style={styles.userEmail} numberOfLines={1} ellipsizeMode="tail">
               {user?.email || 'user@example.com'}
             </Text>
           </View>
@@ -217,7 +380,7 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
 
         <View style={styles.settingsList}>
           <Text style={styles.sectionHeading}>Preferences</Text>
-          <View style={styles.settingsItem}>
+          {/* <View style={styles.settingsItem}>
             <View style={styles.settingsItemLeft}>
               <Feather name="bell" size={20} color="#1A2373" />
               <Text style={styles.settingsItemText}>Push Notifications</Text>
@@ -228,22 +391,22 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
               trackColor={{ false: '#767577', true: '#FF5A3D' }}
               thumbColor="#ffffff"
             />
-          </View>
-          <View style={styles.settingsItem}>
+          </View> */}
+          <TouchableOpacity style={styles.settingsItem} onPress={() => router.push('/(settings)/email-reports')}>
             <View style={styles.settingsItemLeft}>
               <Feather name="mail" size={20} color="#1A2373" />
               <Text style={styles.settingsItemText}>Email Reports</Text>
             </View>
-            <Switch
-              value={emailReportsEnabled}
-              onValueChange={setEmailReportsEnabled}
-              trackColor={{ false: '#767577', true: '#FF5A3D' }}
-              thumbColor="#ffffff"
-            />
-          </View>
+            <View style={styles.settingsItemRight}>
+              {getFrequencyLabel() && (
+                <Text style={styles.frequencyText}>{getFrequencyLabel()}</Text>
+              )}
+              <Feather name="chevron-right" size={16} color="#1A2373" />
+            </View>
+          </TouchableOpacity>
           <TouchableOpacity style={styles.settingsItem} onPress={() => router.push('/(settings)/language')}>
             <View style={styles.settingsItemLeft}>
-              <Feather name="globe" size={20} color="#1A2373" />
+              <Fontisto name="language" size={20} color="#1A2373" />
               <Text style={styles.settingsItemText}>Language</Text>
             </View>
             <Feather name="chevron-right" size={16} color="#1A2373" />
@@ -284,6 +447,15 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
         visible={logoutModalVisible}
         onClose={handleLogoutCancel}
         onConfirm={handleLogoutConfirm}
+      />
+
+      <ProfilePhotoSheet
+        visible={photoSheetVisible}
+        onClose={() => setPhotoSheetVisible(false)}
+        onTakePhoto={handleTakePhoto}
+        onChoosePhoto={handleChoosePhoto}
+        onDeletePhoto={handleDeletePhoto}
+        hasPhoto={!!(user?.profileImage && user.profileImage.trim())}
       />
     </SafeAreaView>
   );

@@ -17,7 +17,6 @@ export default StyleSheet.create({
 
   title: {
     fontSize: 24,
-    fontWeight: "700",
     marginBottom: 10,
   },
 
@@ -44,7 +43,6 @@ export default StyleSheet.create({
 
   email: { 
     color: "#FF6A45", 
-    fontWeight: "600" ,
     fontFamily: "RethinkSans-SemiBold",
 },
 
@@ -61,7 +59,6 @@ export default StyleSheet.create({
     borderWidth: 1.5,
   },
 
-  otpText: { fontSize: 18, fontWeight: "600" },
 
   resendText: {
     color: "#777",
@@ -100,7 +97,6 @@ resendContainer: {
   },
   continueBtnText: {
     fontSize: 16,
-    fontWeight: "700",
     textAlign: "center",
   },
 });
