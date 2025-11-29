@@ -73,10 +73,10 @@ const DeleteConfirmationSheet: React.FC<DeleteConfirmationSheetProps> = ({
             >
               <View style={styles.modalHeader}>
                 <View style={styles.dragHandle} />
+                <Text style={styles.title}>Delete Url</Text>
               </View>
 
               <View style={styles.contentContainer}>
-                <Text style={styles.title}>Delete Url</Text>
                 <Text style={styles.subtitle}>
                   Are you sure you want to delete this scan? This action cannot be undone.
                 </Text>
@@ -130,6 +130,7 @@ const styles = {
     backgroundColor: '#D1D5DB',
     borderRadius: 2,
     marginTop: 8,
+    marginBottom: 20,
   },
   contentContainer: {
     marginBottom: 32,
@@ -138,7 +139,7 @@ const styles = {
     fontSize: 20,
     fontFamily: 'RethinkSans-Bold',
     color: '#111827',
-    marginBottom: 12,
+    textAlign: 'center',
   },
   subtitle: {
     fontSize: 14,

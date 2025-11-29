@@ -79,11 +79,10 @@ const EditUrlSheet: React.FC<EditUrlSheetProps> = ({
             >
               <View style={styles.modalHeader}>
                 <View style={styles.dragHandle} />
+                <Text style={styles.title}>Edit URL</Text>
               </View>
 
               <View style={styles.contentContainer}>
-                <Text style={styles.title}>Edit URL</Text>
-
                 <View style={styles.inputContainer}>
                   <Text style={styles.inputLabel}>Current Website URL</Text>
                   <TextInput
@@ -161,6 +160,7 @@ const styles = {
     backgroundColor: '#D1D5DB',
     borderRadius: 2,
     marginTop: 8,
+    marginBottom: 20,
   },
   contentContainer: {
     marginBottom: 32,
@@ -169,7 +169,7 @@ const styles = {
     fontSize: 20,
     fontFamily: 'RethinkSans-Bold',
     color: '#111827',
-    marginBottom: 24,
+    textAlign: 'center',
   },
   inputContainer: {
     marginBottom: 20,
