@@ -1,58 +1,64 @@
-import styles from '@/stylesheets/hire-request-stylesheet';
 import IssueCard from '@/components/issue-card';
+import { LoadingButton } from '@/components/ui/loading-button';
+import { useAuth } from '@/hooks/use-auth';
+import { apiClient } from '@/lib/api-client';
 import { useSelectedIssuesStore } from '@/store/audit-summary-selected-issue-store';
+import { useAuditInfoStore } from '@/store/audit-website-details-store';
+import styles from '@/stylesheets/hire-request-stylesheet';
 import { Feather } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const ISSUE_LIST = [
-    {
-        id: "Loading-speed",
-        title: "Loading speed",
-        score: String(Math.floor(Math.random() * 71) + 30),
-        description:
-            "Your website takes longer than average to load, which can affect user experience and SEO.",
-    },
-    {
-        id: "Mobile-friendly",
-        title: "Mobile Friendly",
-        score: String(Math.floor(Math.random() * 71) + 30),
-        description:
-            "Your website takes longer than average to load, which can affect user experience and SEO.",
-    },
-    {
-        id: "Visibility",
-        title: "Visibility",
-        score: String(Math.floor(Math.random() * 71) + 30),
-        description:
-            "Your website takes longer than average to load, which can affect user experience and SEO.",
-    },
-];
-
 const RequestForm = () => {
     const router = useRouter();
-    const { issues, addIssue, clearIssues } = useSelectedIssuesStore();
+    const params = useLocalSearchParams();
+    const { issues, addIssue, clearIssues, availableIssues } = useSelectedIssuesStore();
+    const { user } = useAuth();
+    const { getAuditInfo } = useAuditInfoStore();
     const [additionalNotes, setAdditionalNotes] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const isAllSelected = issues.length === ISSUE_LIST.length;
+    const jobId = Array.isArray(params.jobId) ? params.jobId[0] : params.jobId;
+    const { domain } = getAuditInfo();
+
+    const isAllSelected = issues.length === availableIssues.length;
 
     const handleToggleSelect = () => {
         if (isAllSelected) {
             clearIssues();
         } else {
-            ISSUE_LIST.forEach(issue => addIssue(issue));
+            availableIssues.forEach(issue => addIssue(issue));
         }
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (issues.length === 0) {
             Alert.alert('Error', 'No issues selected');
             return;
         }
-        // Handle form submission with issues and additionalNotes
-        router.push('/confirmation-screen');
+        if (!user?.id || !jobId || !domain) {
+            Alert.alert('Error', 'Missing required information');
+            return;
+        }
+
+        setIsSubmitting(true);
+        try {
+            const payload = {
+                user_id: user.id,
+                job_id: jobId,
+                website: domain,
+                selected_category: issues.map(issue => issue.id),
+            };
+            await apiClient.post('/api/v1/request-form/', payload);
+            router.push('/confirmation-screen');
+        } catch (error) {
+            console.error('Submit error:', error);
+            Alert.alert('Error', 'Failed to submit request. Please try again.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -74,7 +80,7 @@ const RequestForm = () => {
                   Need professional support? Sitelytics connects you with experts who’ll review at no cost. Expect a message from a Sitelytics expert within 24 hours.
                 </Text>
                 <View style={styles.issuesContainer}>
-                  {ISSUE_LIST.map((issue) => (
+                  {availableIssues.map((issue) => (
                     <IssueCard
                       key={issue.id}
                       id={issue.id}
@@ -105,9 +111,13 @@ const RequestForm = () => {
                   onChangeText={setAdditionalNotes}
                   multiline
                 />
-                <TouchableOpacity style={styles.primaryButton} onPress={handleSubmit}>
-                    <Text style={styles.primaryButtonText}>Submit Request</Text>
-                </TouchableOpacity>
+                <LoadingButton
+                    text="Submit Request"
+                    onPress={handleSubmit}
+                    loading={isSubmitting}
+                    buttonStyle={styles.primaryButton}
+                    textStyle={styles.primaryButtonText}
+                />
             </ScrollView>
         </SafeAreaView>
     );

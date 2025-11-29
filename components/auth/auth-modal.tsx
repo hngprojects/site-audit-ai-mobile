@@ -18,9 +18,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 interface AuthModalProps {
   visible: boolean;
   onClose: () => void;
+  redirect?: string;
 }
 
-const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose }) => {
+const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose, redirect }) => {
   const [slideAnim] = useState(new Animated.Value(0));
   const router = useRouter();
   const inset = useSafeAreaInsets();
@@ -46,9 +47,13 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose }) => {
   // Close modal when user successfully authenticates
   useEffect(() => {
     if (isAuthenticated && visible) {
-      onClose();
+      if (redirect) {
+        (router.push as any)({ pathname: redirect });
+      } else {
+        onClose();
+      }
     }
-  }, [isAuthenticated, visible, onClose]);
+  }, [isAuthenticated, visible, onClose, redirect, router]);
 
   const handleGoogleLogin = async () => {
     try {
@@ -67,12 +72,12 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose }) => {
 
   const handleSignUp = () => {
     onClose();
-    router.push({ pathname: '/(auth)/sign-up', params: { redirect: '/(hireRequest)/request-form' } });
+    router.push({ pathname: '/(auth)/sign-up', params: redirect ? { redirect } : {} });
   };
 
   const handleSignIn = () => {
     onClose();
-    router.push({ pathname: '/(auth)/sign-in', params: { redirect: '/(hireRequest)/request-form' } });
+    router.push({ pathname: '/(auth)/sign-in', params: redirect ? { redirect } : {} });
   };
 
   const translateY = slideAnim.interpolate({
