@@ -7,7 +7,7 @@ import { useEmailReportsStore } from '@/store/email-reports-store';
 import styles from '@/stylesheets/profile-stylesheet';
 import type { User } from '@/type';
 import { getFullImageUrl } from '@/utils/image-url';
-import { Feather, Fontisto } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -378,9 +378,9 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.settingsList}>
+        {/* <View style={styles.settingsList}>
           <Text style={styles.sectionHeading}>Preferences</Text>
-          {/* <View style={styles.settingsItem}>
+          <View style={styles.settingsItem}>
             <View style={styles.settingsItemLeft}>
               <Feather name="bell" size={20} color="#1A2373" />
               <Text style={styles.settingsItemText}>Push Notifications</Text>
@@ -391,7 +391,7 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
               trackColor={{ false: '#767577', true: '#FF5A3D' }}
               thumbColor="#ffffff"
             />
-          </View> */}
+          </View>
           <TouchableOpacity style={styles.settingsItem} onPress={() => router.push('/(settings)/email-reports')}>
             <View style={styles.settingsItemLeft}>
               <Feather name="mail" size={20} color="#1A2373" />
@@ -411,7 +411,7 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
             </View>
             <Feather name="chevron-right" size={16} color="#1A2373" />
           </TouchableOpacity>
-        </View>
+        </View> */}
 
         <View style={styles.settingsList}>
           <Text style={styles.sectionHeading}>Help & Support</Text>
