@@ -1,5 +1,7 @@
 import { StyleSheet } from 'react-native';
 
+
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -8,9 +10,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: "#fff",
     gap: 4,
-    marginBottom: 30,
-    marginTop: 30,
-
   },
   loadingContainer: {
     flex: 1,

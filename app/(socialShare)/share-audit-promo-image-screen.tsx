@@ -6,9 +6,13 @@ import * as MediaLibrary from "expo-media-library";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import * as Sharing from "expo-sharing";
 import React, { useRef, useState } from "react";
-import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Platform, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { captureRef } from "react-native-view-shot";
+
+
+
+
 
 
 
@@ -24,39 +28,66 @@ export default function ShareAuditPromoImageScreen() {
 
  
 
-  const takeScreenshotAndShare = async () => {
-    if (!screenshotRef.current) return;
-    setLoading(true)
+const takeScreenshotAndShare = async () => {
+  if (!screenshotRef.current) return;
+  setLoading(true);
 
-    try {
-      const base64 = await captureRef(screenshotRef.current, {
-        format: "png",
-        quality: 1,
-        result: "base64",
-        width: 800,
-        height: 1050,
-      });
+  try {
+    const { status } = await MediaLibrary.requestPermissionsAsync();
+    if (status !== "granted") {
+        alert("Permission needed to save and share image.");
+        return;
+    }
 
-      const filename = `audit-share-${Date.now()}.png`;
+    const base64 = await captureRef(screenshotRef.current, {
+      format: "png",
+      quality: 1,
+      result: "base64",
+      width: 800,
+      height: 1050,
+    });
+
+    const filename = `audit-${Date.now()}.png`;
+    let fileUri = "";
+
+    if (Platform.OS === "android") {
       const file = new File(Paths.cache, filename);
       file.create();
-      file.write(base64, { encoding: "base64" });
+      await file.write(base64, { encoding: "base64" });
 
-      const asset = await MediaLibrary.createAssetAsync(file.uri);
+      fileUri = file.uri;
+
+      const asset = await MediaLibrary.createAssetAsync(fileUri);
       const album = await MediaLibrary.getAlbumAsync("Sitelytics");
       if (album) {
         await MediaLibrary.addAssetsToAlbumAsync([asset], album.id, false);
       } else {
-       await MediaLibrary.createAlbumAsync("Sitelytics", asset, false);
+        await MediaLibrary.createAlbumAsync("Sitelytics", asset, false);
+      }
+    } else {
+      
+      const file = new File(Paths.cache, filename);
+      file.create();
+
+      const binaryString = atob(base64);
+      const len = binaryString.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
       }
 
-      await Sharing.shareAsync(file.uri);
-    } catch (error) {
-      console.log("Share error:", error);
-    } finally {
-        setLoading(false)
+      await file.write(bytes);
+      fileUri = file.uri;
     }
-  };
+
+    await Sharing.shareAsync(fileUri);
+
+  } catch (err) {
+    console.log("Share error:", err);
+  } finally {
+    setLoading(false);
+  }
+};
 
 
 

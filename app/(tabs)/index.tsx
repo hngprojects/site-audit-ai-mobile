@@ -193,10 +193,6 @@ export default function HomeScreen() {
               <Text style={styles.tipText}>
                 Join 2000+ business owners who have improved their sales with Sitelytics
               </Text>
-
-              <TouchableOpacity onPress={() => router.push('/confirmation-screen')}>
-                  <Text> Go To Success Confirmation screen</Text>
-              </TouchableOpacity>
             </View>
           </>
         ) : (
