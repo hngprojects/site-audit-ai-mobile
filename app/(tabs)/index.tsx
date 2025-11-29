@@ -54,15 +54,19 @@ export default function HomeScreen() {
       return;
     }
 
+
     setUrlAvailable(true);
     setErrorMessage('');
     setIsCreating(true);
+
 
     try {
       const trimmedUrl = websiteUrl.trim();
       const normalizedUrl = normalizeUrl(trimmedUrl);
 
       const scanResponse = await startScan(normalizedUrl);
+
+      
 
       setWebsiteUrl('');
 
@@ -189,6 +193,10 @@ export default function HomeScreen() {
               <Text style={styles.tipText}>
                 Join 2000+ business owners who have improved their sales with Sitelytics
               </Text>
+
+              <TouchableOpacity onPress={() => router.push('/confirmation-screen')}>
+                  <Text> Go To Success Confirmation screen</Text>
+              </TouchableOpacity>
             </View>
           </>
         ) : (
