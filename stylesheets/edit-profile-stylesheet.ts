@@ -45,6 +45,30 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     backgroundColor: '#333333',
   },
+  profileImagePlaceholder: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: '#333333',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  profileImageInitials: {
+    fontSize: 32,
+    fontFamily: 'RethinkSans-SemiBold',
+    color: '#FFFFFF',
+  },
+  imageUploadOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    borderRadius: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   editImageButton: {
     position: 'absolute',
     bottom: 0,
@@ -119,6 +143,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#FF5A3D',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  saveButtonDisabled: {
+    opacity: 0.6,
   },
   saveButtonText: {
     fontSize: 16,

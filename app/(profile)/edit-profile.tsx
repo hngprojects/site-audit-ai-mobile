@@ -6,10 +6,10 @@ import { Feather } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Image, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import Toast from 'react-native-toast-message';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 
 const EditProfileContent = () => {
   const router = useRouter();
@@ -20,7 +20,7 @@ const EditProfileContent = () => {
   const [profileImage, setProfileImage] = useState<string | null>(user?.profileImage || null);
   const [isLoading, setIsLoading] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
-  const [errors, setErrors] = useState<{fullName?: string; email?: string; phoneNumber?: string}>({});
+  const [errors, setErrors] = useState<{ fullName?: string; email?: string; phoneNumber?: string }>({});
   const hasInitialized = useRef(false);
 
   // Load fresh profile data when screen is focused
@@ -65,12 +65,23 @@ const EditProfileContent = () => {
   );
 
   const validateForm = () => {
-    const newErrors: {fullName?: string; email?: string; phoneNumber?: string} = {};
+    const newErrors: { fullName?: string; email?: string; phoneNumber?: string } = {};
 
     if (!fullName.trim()) {
       newErrors.fullName = 'Full name is required';
     } else if (fullName.trim().length < 2) {
       newErrors.fullName = 'Full name must be at least 2 characters';
+    } else {
+      // Disallow emojis and punctuation: only allow letters, numbers, and spaces
+      let hasInvalidChars = false;
+      try {
+        hasInvalidChars = /[^\p{L}\p{N}\s]/gu.test(fullName);
+      } catch {
+        hasInvalidChars = /[^A-Za-z0-9 ]/g.test(fullName);
+      }
+      if (hasInvalidChars) {
+        newErrors.fullName = 'Full name can only contain letters, numbers, and spaces';
+      }
     }
 
     if (!email.trim()) {
@@ -114,10 +125,10 @@ const EditProfileContent = () => {
       }
 
       const updatedUser = await profileService.updateProfile(updateData, token);
-      
+
       // Update Zustand store with the latest user data
       useAuthStore.setState({ user: updatedUser });
-      
+
       // Update local state to reflect changes
       setFullName(updatedUser.fullName);
       setEmail(updatedUser.email);
@@ -149,7 +160,7 @@ const EditProfileContent = () => {
     if (Platform.OS !== 'web') {
       const { status: cameraStatus } = await ImagePicker.requestCameraPermissionsAsync();
       const { status: mediaLibraryStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      
+
       if (cameraStatus !== 'granted' || mediaLibraryStatus !== 'granted') {
         Toast.show({
           type: 'warning',
@@ -235,7 +246,7 @@ const EditProfileContent = () => {
     try {
       const imageUrl = await profileService.uploadProfileImage(imageUri, token);
       setProfileImage(imageUrl);
-      
+
       const currentUser = useAuthStore.getState().user;
       if (currentUser) {
         const updatedUser = {
@@ -307,16 +318,16 @@ const EditProfileContent = () => {
                   <Text style={styles.profileImageInitials}>
                     {fullName && fullName.trim()
                       ? fullName
-                          .trim()
-                          .split(' ')
-                          .filter(n => n.length > 0)
-                          .map(n => n[0])
-                          .join('')
-                          .toUpperCase()
-                          .slice(0, 2)
+                        .trim()
+                        .split(' ')
+                        .filter(n => n.length > 0)
+                        .map(n => n[0])
+                        .join('')
+                        .toUpperCase()
+                        .slice(0, 2)
                       : email && email.trim()
-                      ? email[0].toUpperCase()
-                      : 'U'}
+                        ? email[0].toUpperCase()
+                        : 'U'}
                   </Text>
                 </View>
               )}
@@ -349,7 +360,7 @@ const EditProfileContent = () => {
                 value={fullName}
                 onChangeText={(text: string) => {
                   setFullName(text);
-                  if (errors.fullName) setErrors({...errors, fullName: undefined});
+                  if (errors.fullName) setErrors({ ...errors, fullName: undefined });
                 }}
                 placeholder="Enter your full name"
                 placeholderTextColor="#B9B9B9"
@@ -362,14 +373,11 @@ const EditProfileContent = () => {
               <TextInput
                 style={[styles.input, errors.email && styles.inputError]}
                 value={email}
-                onChangeText={(text: string) => {
-                  setEmail(text);
-                  if (errors.email) setErrors({...errors, email: undefined});
-                }}
                 placeholder="Enter your email"
                 placeholderTextColor="#B9B9B9"
                 keyboardType="email-address"
                 autoCapitalize="none"
+                editable={false}
               />
               {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
             </View>
@@ -381,7 +389,7 @@ const EditProfileContent = () => {
                 value={phoneNumber}
                 onChangeText={(text: string) => {
                   setPhoneNumber(text);
-                  if (errors.phoneNumber) setErrors({...errors, phoneNumber: undefined});
+                  if (errors.phoneNumber) setErrors({ ...errors, phoneNumber: undefined });
                 }}
                 placeholder="Enter your phone number (optional)"
                 placeholderTextColor="#B9B9B9"
