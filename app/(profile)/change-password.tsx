@@ -189,7 +189,7 @@ const ChangePasswordContent = () => {
 
 export default function ChangePassword() {
   const [isLoaded, setIsLoaded] = useState(false);
-
+  const { t } = useTranslation();
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoaded(true);
