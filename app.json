@@ -4,7 +4,7 @@
     "slug": "sitelytics",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/logo_thumbnail.png",
     "scheme": "siteauditaife",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -57,10 +57,10 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "9669fbe1-08a2-4584-879e-10b3a80cc7"
+        "projectId": "9669fbe1-08a2-4584-879e-10b3a80cc7e0"
       }
     },
     "privacy": "unlisted",
-    "owner": "peliah"
+    "owner": "pelz"
   }
 }

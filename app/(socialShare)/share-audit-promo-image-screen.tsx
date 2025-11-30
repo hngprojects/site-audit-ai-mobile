@@ -1,5 +1,6 @@
 import { PromotionalImage } from "@/components/promotional-image";
 import styles from "@/stylesheets/share-audit-promo-image-screen-stylesheet";
+import { useTranslation } from "@/utils/translations";
 import { Feather } from "@expo/vector-icons";
 import { File, Paths } from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
@@ -8,6 +9,7 @@ import * as Sharing from "expo-sharing";
 import { useRef, useState } from "react";
 import { ActivityIndicator, Platform, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 import { captureRef } from "react-native-view-shot";
 
 

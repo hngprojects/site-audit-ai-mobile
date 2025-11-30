@@ -69,7 +69,10 @@ export default function ReportDashboard() {
 
 
       //navigate to  fix/hire professional
-      router.push("/(hireRequest)/hire-request");
+      router.push({
+        pathname: "/(hireRequest)/hire-request",
+        params: jobId ? { jobId } : {},
+      });
     } catch (error) {
       console.log(error)
     }

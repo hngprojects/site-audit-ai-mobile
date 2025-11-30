@@ -3,20 +3,27 @@ import AuthModal from '@/components/auth/auth-modal';
 import { useAuditInfoStore } from '@/store/audit-website-details-store';
 import { useAuthStore } from '@/store/auth-store';
 import { Feather } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const HireRequest = () => {
     const router = useRouter();
+    const params = useLocalSearchParams();
     const { isAuthenticated } = useAuthStore();
     const { auditInfo } = useAuditInfoStore();
     const [modalVisible, setModalVisible] = useState(false);
 
+    // Get job_id from route params if available
+    const jobId = Array.isArray(params.jobId) ? params.jobId[0] : params.jobId;
+
     const handleReviewPress = () => {
         if (isAuthenticated) {
-            router.push('/(hireRequest)/request-form');
+            router.push({
+                pathname: '/(hireRequest)/request-form',
+                params: jobId ? { jobId } : {},
+            });
         } else {
             setModalVisible(true);
         }

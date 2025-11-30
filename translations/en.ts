@@ -51,6 +51,8 @@ export const en = {
   'profile.deleteAccount': 'Delete Account',
   'profile.contactSupport': 'Contact Support',
   'profile.faq': 'FAQ',
+  'profile.logoutConfirmationTitle': 'Confirm Logout',
+  'profile.logoutConfirmationMessage': 'Are you sure you want to log out?',
 
   // Auth
   'auth.signIn': 'Sign In',

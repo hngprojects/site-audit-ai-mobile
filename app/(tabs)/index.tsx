@@ -8,7 +8,6 @@ import { getPersistentDeviceInfo } from "@/utils/device-id";
 import { useTranslation } from "@/utils/translations";
 import { normalizeUrl, validateWebsiteUrl } from "@/utils/url-validation";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import Octicons from "@expo/vector-icons/Octicons";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
@@ -67,10 +66,10 @@ export default function HomeScreen() {
       const trimmedUrl = websiteUrl.trim();
       const normalizedUrl = normalizeUrl(trimmedUrl);
       console.log(normalizedUrl);
-      if (isAuthenticated) {
-        const site = await createSite(normalizedUrl);
-        console.log(site);
-      }
+      // if (isAuthenticated) {
+      //   const site = await createSite(normalizedUrl);
+      //   console.log(site);
+      // }
       const scanResponse = await startScan(normalizedUrl);
 
 
@@ -115,7 +114,7 @@ export default function HomeScreen() {
       style={styles.container}>
 
       <TouchableOpacity style={styles.notificationContainer} onPress={() => router.push('/(main)/notifications')}>
-        <Octicons name="bell" size={24} color="black" />
+        {/* <Octicons name="bell" size={24} color="black" /> */}
       </TouchableOpacity>
 
 
