@@ -3,13 +3,17 @@ import { useAuthStore } from '@/store/auth-store';
 
 export const startScan = async (url: string, topN: number = 15): Promise<{ job_id: string; status: string; message: string }> => {
   const token = useAuthStore.getState().token;
-  if (!token) {
-    throw new Error('Authentication required. Please sign in.');
-  }
+  // if (!token) {
+  //   throw new Error('Authentication required. Please sign in.');
+  // }
 
-  // Set the token in the apiClient headers
+  // Set the token in the apiClient headers if token is available
   const { apiClient } = await import('@/lib/api-client');
-  apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+ if (token) {
+    apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  } else {
+    delete apiClient.defaults.headers.common['Authorization'];
+  }
 
   return await scanService.startScan(url, topN);
 };
@@ -27,26 +31,34 @@ export const getScanStatus = async (jobId: string): Promise<{
   completed_at?: string;
 }> => {
   const token = useAuthStore.getState().token;
-  if (!token) {
-    throw new Error('Authentication required. Please sign in.');
-  }
+  // if (!token) {
+  //   throw new Error('Authentication required. Please sign in.');
+  // }
 
   // Set the token in the apiClient headers
   const { apiClient } = await import('@/lib/api-client');
-  apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+if (token) {
+    apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  } else {
+    delete apiClient.defaults.headers.common['Authorization'];
+  }
 
   return await scanService.getScanStatus(jobId);
 };
 
 export const getScanResult = async (jobId: string): Promise<ScanResult> => {
   const token = useAuthStore.getState().token;
-  if (!token) {
-    throw new Error('Authentication required. Please sign in.');
-  }
+  // if (!token) {
+  //   throw new Error('Authentication required. Please sign in.');
+  // }
 
   // Set the token in the apiClient headers
   const { apiClient } = await import('@/lib/api-client');
-  apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+if (token) {
+    apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  } else {
+    delete apiClient.defaults.headers.common['Authorization'];
+  }
 
   return await scanService.getScanResult(jobId);
 };
