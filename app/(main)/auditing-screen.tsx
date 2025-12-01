@@ -34,7 +34,7 @@ const AuditingScreen = () => {
     setDomain(websiteUrl)
     // If we have a jobId, poll for existing scan status
     if (jobId) {
-      let statusInterval: number;
+      let statusInterval: NodeJS.Timeout;
 
       const pollStatus = async () => {
         try {
@@ -95,7 +95,7 @@ const AuditingScreen = () => {
 
       startNewScan();
     }
-  }, [jobId, router, websiteUrl, params.isReRun, scanSteps.length]);
+  }, [jobId, router, websiteUrl, params.isReRun, scanSteps.length, setDomain]);
 
   useEffect(() => {
     Animated.timing(animatedWidth, {

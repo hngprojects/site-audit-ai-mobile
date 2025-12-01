@@ -33,7 +33,7 @@ export default function ReportDashboard() {
   const [emptyModalTextInput, setEmptyModalTextInput] = useState<boolean>(false)
   const [scanResult, setScanResult] = useState<any>(null);
 
-  const { addIssue, clearIssues } = useSelectedIssuesStore();
+  const { addIssue, clearIssues, setIssues } = useSelectedIssuesStore();
 
   const { issues } = useSelectedIssuesStore();
 
@@ -134,6 +134,7 @@ const hireAPro = () => {
         try {
           const result = await getScanResult(jobId);
           setScanResult(result);
+          setIssues(result.issues.map(issue => ({ ...issue, score: String(issue.score) })));
 
           // Set audit info for details page
           setAuditInfo({
@@ -148,7 +149,7 @@ const hireAPro = () => {
       };
       fetchResult();
     }
-  }, [jobId, url, setAuditInfo]);
+  }, [jobId, url, setAuditInfo, setIssues]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
