@@ -1,7 +1,7 @@
-import styles from '@/stylesheets/hire-request-stylesheet';
 import AuthModal from '@/components/auth/auth-modal';
 import { useAuditInfoStore } from '@/store/audit-website-details-store';
 import { useAuthStore } from '@/store/auth-store';
+import styles from '@/stylesheets/hire-request-stylesheet';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
@@ -66,7 +66,7 @@ const HireRequest = () => {
           </TouchableOpacity>
         </View>
       </View>
-      <AuthModal visible={modalVisible} onClose={() => setModalVisible(false)} />
+      <AuthModal visible={modalVisible} onClose={() => setModalVisible(false)} redirect="/(hireRequest)/request-form" />
     </SafeAreaView>
   )
 }
