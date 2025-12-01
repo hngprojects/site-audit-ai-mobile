@@ -121,7 +121,38 @@ const ForgotPassword = () => {
         </>
         )}
 
-        {verificationEmail && (
+        {}
+
+        {Platform.OS === 'android' ? (
+            verificationEmail && (
+            <View style = {styles.VerificationContainer}>
+                <View style={styles.outerGlowCircle} />
+                <View style={styles.androidGlowCircle} />
+                 <Feather name="mail" size={40} color="#d32f2f" style={styles.Icon}/>
+
+                 <Text style={{
+                    ...styles.checkyourmail}}>
+                    Check your email
+                 </Text>
+                 <Text style={styles.subText}>
+                   We&#39;ve sent a password code to your email
+                   address, pls check your inbox
+                 </Text>
+
+
+                    <TouchableOpacity
+                        onPress={() => router.push('/(auth)/otp-verification')}
+                        style={[styles.continueButton, {marginTop: 140 }]}
+                    >
+                            <Text style={styles.continueText}>
+                                Continue
+                            </Text>
+                    </TouchableOpacity>
+            </View>
+
+        )
+        ) : (
+            verificationEmail && (
             <View style = {styles.VerificationContainer}>
                 <View style={styles.outerGlowCircle} />
                 <View style={styles.glowCircle} />
@@ -139,7 +170,7 @@ const ForgotPassword = () => {
 
                     <TouchableOpacity
                         onPress={() => router.push('/(auth)/otp-verification')}
-                        style={[styles.continueButton, Platform.OS === 'ios' ? {marginTop: 220 } : {marginTop: 140 }]}
+                        style={[styles.continueButton, {marginTop: 220 } ]}
                     >
                             <Text style={styles.continueText}>
                                 Continue
@@ -147,6 +178,7 @@ const ForgotPassword = () => {
                     </TouchableOpacity>
             </View>
 
+        )
         )}
 
     </View>
