@@ -128,7 +128,7 @@ const ForgotPassword = () => {
             <View style = {styles.VerificationContainer}>
                 <View style={styles.outerGlowCircle} />
                 <View style={styles.androidGlowCircle} />
-                 <Feather name="mail" size={40} color="#d32f2f" style={styles.Icon}/>
+                 <Feather name="mail" size={40} color="#d32f2f" style={styles.androidIcon}/>
 
                  <Text style={{
                     ...styles.checkyourmail}}>
@@ -155,8 +155,8 @@ const ForgotPassword = () => {
             verificationEmail && (
             <View style = {styles.VerificationContainer}>
                 <View style={styles.outerGlowCircle} />
-                <View style={styles.glowCircle} />
-                 <Feather name="mail" size={40} color="#d32f2f" style={styles.Icon}/>
+                <View style={styles.   iosGlowCircle} />
+                 <Feather name="mail" size={40} color="#d32f2f" style={styles.iosIcon}/>
 
                  <Text style={{
                     ...styles.checkyourmail}}>

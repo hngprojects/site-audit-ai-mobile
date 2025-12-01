@@ -69,9 +69,9 @@ const styles = StyleSheet.create({
         shadowRadius: 40,
         elevation: 20,
     },
-    glowCircle: {
+    iosGlowCircle: {
         position: "absolute",
-        top:240,
+        top:200,
         width: 80,
         height: 80,
         backgroundColor: "#d32f2f",
@@ -97,7 +97,12 @@ const styles = StyleSheet.create({
         shadowRadius: 40,
         elevation: 20,
     },
-    Icon: {
+    androidIcon: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop:220
+    },
+    iosIcon: {
         justifyContent: 'center',
         alignItems: 'center',
         marginTop:220
