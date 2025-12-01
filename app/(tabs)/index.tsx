@@ -5,9 +5,9 @@ import { useAuthStore } from "@/store/auth-store";
 import { useSitesStore } from "@/store/sites-store";
 import styles from "@/stylesheets/homeScreenStylesheet";
 import { getPersistentDeviceInfo } from "@/utils/device-id";
+import { useTranslation } from "@/utils/translations";
 import { normalizeUrl, validateWebsiteUrl } from "@/utils/url-validation";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import Octicons from "@expo/vector-icons/Octicons";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
@@ -17,6 +17,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 
 export default function HomeScreen() {
+  const { t } = useTranslation();
   const [websiteUrl, setWebsiteUrl] = useState<string>('');
   const [urlAvailable, setUrlAvailable] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string>('');
@@ -65,13 +66,13 @@ export default function HomeScreen() {
       const trimmedUrl = websiteUrl.trim();
       const normalizedUrl = normalizeUrl(trimmedUrl);
       console.log(normalizedUrl);
-      if (isAuthenticated) {
-        const site = await createSite(normalizedUrl);
-        console.log(site);
-      }
+      // if (isAuthenticated) {
+      //   const site = await createSite(normalizedUrl);
+      //   console.log(site);
+      // }
       const scanResponse = await startScan(normalizedUrl);
 
-      
+
 
       setWebsiteUrl('');
 
@@ -84,7 +85,7 @@ export default function HomeScreen() {
       });
     } catch (error) {
       setUrlAvailable(false);
-      setErrorMessage(error instanceof Error ? error.message : 'Failed to start scan. Please try again.');
+      setErrorMessage(error instanceof Error ? error.message : t('home.failedToStart'));
     } finally {
       setIsCreating(false);
     }
@@ -105,19 +106,22 @@ export default function HomeScreen() {
     return "Failed";
   };
 
+  // Note: Status values are kept as English strings for type safety
+  // They are translated in the AuditResultCard component
+
   return (
     <SafeAreaView
       style={styles.container}>
 
       <TouchableOpacity style={styles.notificationContainer} onPress={() => router.push('/(main)/notifications')}>
-        <Octicons name="bell" size={24} color="black" />
+        {/* <Octicons name="bell" size={24} color="black" /> */}
       </TouchableOpacity>
 
 
       <View style={styles.headingSection}>
-        <Text style={styles.title}>Improve your website with a quick scan</Text>
+        <Text style={styles.title}>{t('home.title')}</Text>
         <Text style={styles.sub}>
-          Quick AI review with clear action steps
+          {t('home.subtitle')}
         </Text>
       </View>
 
@@ -131,7 +135,7 @@ export default function HomeScreen() {
               style={styles.webIcon}
             />
             <TextInput
-              placeholder="Enter your website URL"
+              placeholder={t('home.enterUrl')}
               placeholderTextColor={"#A0A0A0"}
               style={styles.placeholderText}
               value={websiteUrl ? websiteUrl.toLowerCase() : ''}
@@ -150,7 +154,7 @@ export default function HomeScreen() {
               style={styles.webIcon}
             />
             <TextInput
-              placeholder="Enter your website URL"
+              placeholder={t('home.enterUrl')}
               placeholderTextColor={"#A0A0A0"}
               style={styles.androidPlaceholderText}
               value={websiteUrl ? websiteUrl.toLowerCase() : ''}
@@ -176,11 +180,11 @@ export default function HomeScreen() {
         {isCreating ? (
           <ActivityIndicator size="small" color="#fff" />
         ) : (
-          <Text style={styles.runButtonText}>Start Scan</Text>
+          <Text style={styles.runButtonText}>{t('home.startScan')}</Text>
         )}
       </TouchableOpacity>
 
-      <Text style={styles.sectionTitle}>Recent audits</Text>
+      <Text style={styles.sectionTitle}>{t('home.recentAudits')}</Text>
 
       <ScrollView showsVerticalScrollIndicator={false}>
         {isLoading ? (
@@ -196,7 +200,7 @@ export default function HomeScreen() {
                 <MaterialCommunityIcons name="lightbulb-on-10" size={24} color="black" />
               </View>
               <Text style={styles.tipText}>
-                Join 2000+ business owners who have improved their sales with Sitelytics
+                {t('home.tip')}
               </Text>
             </View>
           </>

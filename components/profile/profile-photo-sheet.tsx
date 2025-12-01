@@ -1,3 +1,4 @@
+import { useTranslation } from '@/utils/translations';
 import { Feather } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
 import {
@@ -28,6 +29,7 @@ const ProfilePhotoSheet: React.FC<ProfilePhotoSheetProps> = ({
     onDeletePhoto,
     hasPhoto,
 }) => {
+    const { t } = useTranslation();
     const [slideAnim] = useState(new Animated.Value(0));
     const insets = useSafeAreaInsets();
 
@@ -89,7 +91,7 @@ const ProfilePhotoSheet: React.FC<ProfilePhotoSheetProps> = ({
                         >
                             <View style={styles.modalHeader}>
                                 <View style={styles.dragHandle} />
-                                <Text style={styles.title}>Edit Profile Picture</Text>
+                                <Text style={styles.title}>{t('photoSheet.title')}</Text>
                             </View>
 
                             {/* First Section */}
@@ -99,7 +101,7 @@ const ProfilePhotoSheet: React.FC<ProfilePhotoSheetProps> = ({
                                     onPress={handleTakePhoto}
                                     activeOpacity={0.7}
                                 >
-                                    <Text style={styles.optionText}>Take photo</Text>
+                                    <Text style={styles.optionText}>{t('photoSheet.takePhoto')}</Text>
                                     <Feather name="camera" size={20} color="#1A2373" />
                                 </TouchableOpacity>
 
@@ -108,7 +110,7 @@ const ProfilePhotoSheet: React.FC<ProfilePhotoSheetProps> = ({
                                     onPress={handleChoosePhoto}
                                     activeOpacity={0.7}
                                 >
-                                    <Text style={styles.optionText}>Choose photo</Text>
+                                    <Text style={styles.optionText}>{t('photoSheet.choosePhoto')}</Text>
                                     <Feather name="image" size={20} color="#1A2373" />
                                 </TouchableOpacity>
                             </View>
@@ -121,7 +123,7 @@ const ProfilePhotoSheet: React.FC<ProfilePhotoSheetProps> = ({
                                         onPress={handleDeletePhoto}
                                         activeOpacity={0.7}
                                     >
-                                        <Text style={styles.deleteOptionText}>Delete photo</Text>
+                                        <Text style={styles.deleteOptionText}>{t('photoSheet.deletePhoto')}</Text>
                                         <Feather name="trash-2" size={20} color="#D32F2F" />
                                     </TouchableOpacity>
                                 )}
@@ -131,7 +133,7 @@ const ProfilePhotoSheet: React.FC<ProfilePhotoSheetProps> = ({
                                     onPress={onClose}
                                     activeOpacity={0.7}
                                 >
-                                    <Text style={styles.optionText}>Cancel</Text>
+                                    <Text style={styles.optionText}>{t('common.cancel')}</Text>
                                     <Feather name="x" size={20} color="#1A2373" />
                                 </TouchableOpacity>
                             </View>

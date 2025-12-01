@@ -1,5 +1,6 @@
 import { supportService } from '@/lib/support-service';
 import styles from '@/stylesheets/email-support-stylesheet';
+import { useTranslation } from '@/utils/translations';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
@@ -8,6 +9,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
 const EmailSupportContent = () => {
+  const { t } = useTranslation();
   const router = useRouter();
   const [email, setEmail] = useState('user@gmail.com');
   const [subject, setSubject] = useState('');
@@ -27,8 +29,8 @@ const EmailSupportContent = () => {
     if (!trimmedEmail) {
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: 'Please enter your email address',
+        text1: t('common.error'),
+        text2: t('emailSupport.emailRequired'),
       });
       return;
     }
@@ -36,8 +38,8 @@ const EmailSupportContent = () => {
     if (!isValidEmail(trimmedEmail)) {
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: 'Please enter a valid email address',
+        text1: t('common.error'),
+        text2: t('emailSupport.invalidEmail'),
       });
       return;
     }
@@ -45,8 +47,8 @@ const EmailSupportContent = () => {
     if (!trimmedSubject) {
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: 'Please enter a subject',
+        text1: t('common.error'),
+        text2: t('emailSupport.subjectRequired'),
       });
       return;
     }
@@ -54,8 +56,8 @@ const EmailSupportContent = () => {
     if (!trimmedMessage) {
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: 'Please enter your message',
+        text1: t('common.error'),
+        text2: t('emailSupport.messageRequired'),
       });
       return;
     }
@@ -69,15 +71,15 @@ const EmailSupportContent = () => {
       });
       Toast.show({
         type: 'success',
-        text1: 'Success',
-        text2: 'Your email has been sent successfully',
+        text1: t('common.success'),
+        text2: t('emailSupport.sentSuccess'),
       });
       setTimeout(() => router.back(), 1500);
     } catch (error) {
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: error instanceof Error ? error.message : 'Failed to send email. Please try again.',
+        text1: t('common.error'),
+        text2: error instanceof Error ? error.message : t('emailSupport.sendError'),
       });
     } finally {
       setIsLoading(false);
@@ -90,7 +92,7 @@ const EmailSupportContent = () => {
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
           <Feather name="arrow-left" size={24} color="#1A2373" />
         </TouchableOpacity>
-        <Text style={styles.headerText}>Email Support</Text>
+        <Text style={styles.headerText}>{t('emailSupport.title')}</Text>
       </View>
       <ScrollView
         style={styles.scrollContainer}
@@ -102,12 +104,12 @@ const EmailSupportContent = () => {
           <Text style={styles.subtitle}>Send us an email and we will respond within 24 hours</Text> */}
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Your Email</Text>
+            <Text style={styles.label}>{t('emailSupport.yourEmail')}</Text>
             <TextInput
               style={styles.input}
               value={email}
               onChangeText={setEmail}
-              placeholder="user@gmail.com"
+              placeholder={t('emailSupport.emailPlaceholder')}
               placeholderTextColor="#999"
               keyboardType="email-address"
               autoCapitalize="none"
@@ -116,23 +118,23 @@ const EmailSupportContent = () => {
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Subject</Text>
+            <Text style={styles.label}>{t('emailSupport.subject')}</Text>
             <TextInput
               style={styles.input}
               value={subject}
               onChangeText={setSubject}
-              placeholder="e.g Inquiry"
+              placeholder={t('emailSupport.subjectPlaceholder')}
               placeholderTextColor="#999"
             />
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Message</Text>
+            <Text style={styles.label}>{t('emailSupport.message')}</Text>
             <TextInput
               style={[styles.input, styles.messageInput]}
               value={message}
               onChangeText={setMessage}
-              placeholder="Type your message here..."
+              placeholder={t('emailSupport.messagePlaceholder')}
               placeholderTextColor="#999"
               multiline
               numberOfLines={6}
@@ -148,7 +150,7 @@ const EmailSupportContent = () => {
             {isLoading ? (
               <ActivityIndicator size="small" color="#fff" />
             ) : (
-              <Text style={styles.sendButtonText}>Send Message</Text>
+              <Text style={styles.sendButtonText}>{t('emailSupport.sendMessage')}</Text>
             )}
           </TouchableOpacity>
         </View>

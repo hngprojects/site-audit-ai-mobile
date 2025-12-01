@@ -1,4 +1,5 @@
 import styles from "@/stylesheets/auditing-error-screen-stylesheet";
+import { useTranslation } from '@/utils/translations';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
@@ -10,6 +11,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 
 export default function WebsiteDown() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const params = useLocalSearchParams();
@@ -43,16 +45,16 @@ export default function WebsiteDown() {
           />
         </View>
 
-        <Text style={styles.title}>Oops! URL Didn&apos;t Load</Text>
+        <Text style={styles.title}>{t('auditingError.title')}</Text>
 
         <Text style={styles.bodyPrimary}>
-          A broken or unreachable link prevented us from scanning this website..
+          {t('auditingError.description')}
         </Text>
 
         {/* <Text style={styles.bodyHighlight}>But don&apos;t worry, we can help you.</Text> */}
 
         <Text style={styles.bodySecondary}>
-          Please verify the URL and try once more.
+          {t('auditingError.verifyUrl')}
         </Text>
       </View>
 
@@ -61,7 +63,7 @@ export default function WebsiteDown() {
           style={styles.tryAgainButton}
           onPress={onTryAgain}
         >
-          <Text style={styles.tryAgainButtonText}>Try Again</Text>
+          <Text style={styles.tryAgainButtonText}>{t('auditingError.tryAgain')}</Text>
         </TouchableOpacity>
       </View>
     </View>

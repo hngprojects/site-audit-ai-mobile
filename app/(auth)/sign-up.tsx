@@ -1,6 +1,7 @@
 import { LoadingButton } from '@/components/ui/loading-button';
 import { useAuth } from '@/hooks/use-auth';
 import styles from '@/stylesheets/sign-up-stylesheet';
+import { useTranslation } from '@/utils/translations';
 import Feather from '@expo/vector-icons/Feather';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
@@ -31,6 +32,7 @@ const isPasswordValid = (validation: PasswordValidation): boolean => {
 };
 
 const SignUp = () => {
+  const { t } = useTranslation();
   const router = useRouter();
   const params = useLocalSearchParams();
   const { signUp, signInWithGoogle, isLoading, error, clearError, isAuthenticated } = useAuth();
@@ -55,7 +57,7 @@ const SignUp = () => {
     if (error) {
       Toast.show({
         type: 'error',
-        text1: 'Sign Up Error',
+        text1: t('auth.signUpError'),
         text2: error,
       });
       clearError();
@@ -69,25 +71,25 @@ const SignUp = () => {
 
     // Validation
     if (!email.trim()) {
-      setLocalError('Email is required');
+      setLocalError(t('auth.emailRequired'));
       return;
     }
 
     if (!password.trim()) {
-      setLocalError('Password is required');
+      setLocalError(t('auth.passwordRequired'));
       return;
     }
 
     // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.trim())) {
-      setLocalError('Please enter a valid email address');
+      setLocalError(t('auth.invalidEmail'));
       return;
     }
 
     // Password validation
     if (!isPasswordComplete) {
-      setLocalError('Please ensure your password meets all requirements');
+      setLocalError(t('auth.passwordRequirementsNotMet'));
       return;
     }
 
@@ -134,10 +136,10 @@ const SignUp = () => {
           }
         />
 
-        <Text style={{ ...styles.textInputLabel }}>Email</Text>
+        <Text style={{ ...styles.textInputLabel }}>{t('auth.email')}</Text>
 
         <TextInput
-          placeholder="user@gmail.com"
+          placeholder={t('auth.emailPlaceholder')}
           style={styles.textInput}
           placeholderTextColor="#dfdfdfff"
           value={email}
@@ -151,7 +153,7 @@ const SignUp = () => {
           editable={!isLoading}
         />
 
-        <Text style={{ ...styles.textInputLabel }}>Password</Text>
+        <Text style={{ ...styles.textInputLabel }}>{t('auth.password')}</Text>
 
         <View
           style={{
@@ -164,7 +166,7 @@ const SignUp = () => {
           }}
         >
           <TextInput
-            placeholder="Enter your password"
+            placeholder={t('auth.passwordPlaceholder')}
             style={styles.passwordTextInput}
             placeholderTextColor="#dfdfdfff"
             value={password}
@@ -192,7 +194,7 @@ const SignUp = () => {
 
         {showPasswordRequirements && password.length > 0 && (
           <View style={styles.passwordRequirements}>
-            <Text style={styles.requirementsTitle}>Password must contain:</Text>
+            <Text style={styles.requirementsTitle}>{t('auth.passwordMustContain')}</Text>
             <View style={styles.requirementItem}>
               <Feather
                 name={passwordValidation.hasMinLength ? 'check-circle' : 'circle'}
@@ -205,7 +207,7 @@ const SignUp = () => {
                   passwordValidation.hasMinLength && styles.requirementTextValid,
                 ]}
               >
-                At least 8 characters
+                {t('auth.passwordRequirementMinLength')}
               </Text>
             </View>
             <View style={styles.requirementItem}>
@@ -220,7 +222,7 @@ const SignUp = () => {
                   passwordValidation.hasUppercase && styles.requirementTextValid,
                 ]}
               >
-                One uppercase letter
+                {t('auth.passwordRequirementUppercase')}
               </Text>
             </View>
             <View style={styles.requirementItem}>
@@ -235,7 +237,7 @@ const SignUp = () => {
                   passwordValidation.hasLowercase && styles.requirementTextValid,
                 ]}
               >
-                One lowercase letter
+                {t('auth.passwordRequirementLowercase')}
               </Text>
             </View>
             <View style={styles.requirementItem}>
@@ -250,7 +252,7 @@ const SignUp = () => {
                   passwordValidation.hasNumber && styles.requirementTextValid,
                 ]}
               >
-                One number
+                {t('auth.passwordRequirementNumber')}
               </Text>
             </View>
             <View style={styles.requirementItem}>
@@ -265,7 +267,7 @@ const SignUp = () => {
                   passwordValidation.hasSpecialChar && styles.requirementTextValid,
                 ]}
               >
-                One special character
+                {t('auth.passwordRequirementSpecial')}
               </Text>
             </View>
           </View>
@@ -279,14 +281,14 @@ const SignUp = () => {
           onPress={handleSignUp}
           loading={isLoading}
           disabled={isLoading}
-          text="Sign Up"
+          text={t('auth.signUp')}
           buttonStyle={styles.signUpButton}
           textStyle={styles.signUpText}
         />
 
         <View style={styles.orDivider}>
           <View style={styles.orDividerLine} />
-          <Text style={styles.orDividerText}>OR</Text>
+          <Text style={styles.orDividerText}>{t('common.or')}</Text>
           <View style={styles.orDividerLine} />
         </View>
 
@@ -299,7 +301,7 @@ const SignUp = () => {
             source={require('../../assets/images/google.png')}
             style={styles.socialIcon}
           />
-          <Text style={styles.socialButtonText}>Continue with Google</Text>
+          <Text style={styles.socialButtonText}>{t('auth.continueGoogle')}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -310,14 +312,14 @@ const SignUp = () => {
             source={require('../../assets/images/apple.png')}
             style={styles.appleIcon}
           />
-          <Text style={styles.socialButtonText}>Continue with Apple</Text>
+          <Text style={styles.socialButtonText}>{t('auth.continueApple')}</Text>
         </TouchableOpacity>
 
         <View style={styles.accountLinkContainer}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-            <Text style={styles.accountLinkText}>Already have an account? </Text>
+            <Text style={styles.accountLinkText}>{t('auth.haveAccount')} </Text>
             <TouchableOpacity onPress={() => router.push('/(auth)/sign-in')}>
-              <Text style={styles.accountLinkButton}>Sign in</Text>
+              <Text style={styles.accountLinkButton}>{t('auth.signIn')}</Text>
             </TouchableOpacity>
           </View>
         </View>

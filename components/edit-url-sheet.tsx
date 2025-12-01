@@ -1,3 +1,4 @@
+import { useTranslation } from '@/utils/translations';
 import React, { useEffect, useState } from 'react';
 import {
   Animated,
@@ -25,6 +26,7 @@ const EditUrlSheet: React.FC<EditUrlSheetProps> = ({
   currentUrl,
   isLoading = false,
 }) => {
+  const { t } = useTranslation();
   const [slideAnim] = useState(new Animated.Value(0));
   const [newUrl, setNewUrl] = useState('');
   const insets = useSafeAreaInsets();
@@ -79,12 +81,12 @@ const EditUrlSheet: React.FC<EditUrlSheetProps> = ({
             >
               <View style={styles.modalHeader}>
                 <View style={styles.dragHandle} />
-                <Text style={styles.title}>Edit URL</Text>
+                <Text style={styles.title}>{t('editUrlSheet.title')}</Text>
               </View>
 
               <View style={styles.contentContainer}>
                 <View style={styles.inputContainer}>
-                  <Text style={styles.inputLabel}>Current Website URL</Text>
+                  <Text style={styles.inputLabel}>{t('editUrlSheet.currentUrl')}</Text>
                   <TextInput
                     style={[styles.input, styles.inputReadOnly]}
                     value={currentUrl}
@@ -94,12 +96,12 @@ const EditUrlSheet: React.FC<EditUrlSheetProps> = ({
                 </View>
 
                 <View style={styles.inputContainer}>
-                  <Text style={styles.inputLabel}>New Website URL</Text>
+                  <Text style={styles.inputLabel}>{t('editUrlSheet.newUrl')}</Text>
                   <TextInput
                     style={styles.input}
                     value={newUrl}
                     onChangeText={setNewUrl}
-                    placeholder="Enter new URL"
+                    placeholder={t('editUrlSheet.enterUrl')}
                     placeholderTextColor="#9CA3AF"
                     autoCapitalize="none"
                     autoCorrect={false}
@@ -116,7 +118,7 @@ const EditUrlSheet: React.FC<EditUrlSheetProps> = ({
                   disabled={isLoading || !newUrl.trim()}
                 >
                   <Text style={styles.scanButtonText}>
-                    {isLoading ? 'Scanning...' : 'Scan'}
+                    {isLoading ? t('editUrlSheet.scanning') : t('editUrlSheet.scan')}
                   </Text>
                 </TouchableOpacity>
 
@@ -126,7 +128,7 @@ const EditUrlSheet: React.FC<EditUrlSheetProps> = ({
                   activeOpacity={0.8}
                   disabled={isLoading}
                 >
-                  <Text style={styles.cancelButtonText}>Cancel</Text>
+                  <Text style={styles.cancelButtonText}>{t('common.cancel')}</Text>
                 </TouchableOpacity>
               </View>
             </Animated.View>
