@@ -8,6 +8,7 @@ import {
   Image,
   Keyboard,
   Modal,
+  Platform,
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
@@ -138,16 +139,18 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose, redirect }) => 
                   <Text style={styles.socialButtonText}>Continue with Google</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity
-                  style={styles.socialButton}
-                  onPress={handleAppleLogin}
-                >
-                  <Image
-                    source={require('../../assets/images/apple.png')}
-                    style={styles.appleIcon}
-                  />
-                  <Text style={styles.socialButtonText}>Continue with Apple</Text>
-                </TouchableOpacity>
+                  {Platform.OS === "ios" && (
+                  <TouchableOpacity
+                    style={styles.socialButton}
+                    onPress={handleAppleLogin}
+                  >
+                    <Image
+                      source={require('../../assets/images/apple.png')}
+                      style={styles.appleIcon}
+                    />
+                    <Text style={styles.socialButtonText}>Continue with Apple</Text>
+                  </TouchableOpacity>
+                  )}
 
                 <TouchableOpacity
                   style={styles.socialButton}

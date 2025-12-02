@@ -69,9 +69,9 @@ const styles = StyleSheet.create({
         shadowRadius: 40,
         elevation: 20,
     },
-    glowCircle: {
+    iosGlowCircle: {
         position: "absolute",
-        top:240,
+        top:200,
         width: 80,
         height: 80,
         backgroundColor: "#d32f2f",
@@ -83,10 +83,29 @@ const styles = StyleSheet.create({
         shadowRadius: 40,
         elevation: 20,
     },
-    Icon: {
+    androidGlowCircle: {
+        position: "absolute",
+        top:200,
+        width: 80,
+        height: 80,
+        backgroundColor: "#d32f2f",
+        borderRadius: 60,
+        opacity: 0.25,
+        shadowColor: "#e64e4e34",
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 1,
+        shadowRadius: 40,
+        elevation: 20,
+    },
+    androidIcon: {
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop:260
+        marginTop:220
+    },
+    iosIcon: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop:220
     },
     checkyourmail: {
         color: "#000",
