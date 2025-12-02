@@ -1,6 +1,6 @@
 import { apiClient, formatErrorMessage, isAxiosError } from '@/lib/api-client';
-import { googleAuthService } from '@/lib/google-auth-service';
 import { appleAuthService } from '@/lib/apple-auth-service';
+import { googleAuthService } from '@/lib/google-auth-service';
 import type { AuthResponse, SignInCredentials, SignUpCredentials } from '@/type';
 
 export const MIN_PASSWORD_LENGTH = 6;
@@ -334,10 +334,11 @@ export const authService = {
       });
 
       const responseData = response.data;
+      console.log('responseData', responseData);
 
-      // Extract token from response.data.access_token
-      const token = responseData.data?.access_token;
-      const apiUser = responseData.data?.user;
+      // Extract token from response - API returns access_token at top level
+      const token = responseData.access_token || responseData.data?.access_token;
+      const apiUser = responseData.user || responseData.data?.user;
 
       if (!apiUser || !token) {
         throw new Error('Invalid response from server');
@@ -389,9 +390,9 @@ export const authService = {
 
       const responseData = response.data;
 
-      // Extract token from response.data.access_token
-      const token = responseData.data?.access_token;
-      const apiUser = responseData.data?.user;
+      // Extract token from response - API returns access_token at top level
+      const token = responseData.access_token || responseData.data?.access_token;
+      const apiUser = responseData.user || responseData.data?.user;
 
       if (!apiUser || !token) {
         throw new Error('Invalid response from server');
