@@ -7,22 +7,26 @@ import { useAuth } from '@/hooks/use-auth';
 import styles from '@/stylesheets/profile-stylesheet';
 import { useFocusEffect } from '@react-navigation/native';
 import React, { useCallback, useEffect, useState } from 'react';
-import { ScrollView } from 'react-native';
+import { ScrollView, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const Profile = () => {
   const { isAuthenticated, isInitialized, user } = useAuth();
   const [modalVisible, setModalVisible] = useState(false);
 
-  useFocusEffect(
-    useCallback(() => {
-      if (isInitialized && !isAuthenticated) {
+  const handleAuthModal = () => {
+     if (isInitialized && !isAuthenticated) {
         setModalVisible(true);
       } else if (isAuthenticated) {
         console.log(user);
         
         setModalVisible(false);
       }
+  }
+
+  useFocusEffect(
+    useCallback(() => {
+     handleAuthModal()
     }, [isAuthenticated, isInitialized, user])
   );
 
@@ -54,7 +58,13 @@ const Profile = () => {
           {isAuthenticated && user ? (
             <ProfileContent user={user} />
           ) : (
+            <>
             <ProfileEmptyState />
+
+            <TouchableOpacity style={styles.signUpsignInBtn} onPress={handleAuthModal}>
+              <Text style={styles.authText}>Sign Up / Sign In</Text>
+            </TouchableOpacity>
+            </>
           )}
         </ScrollView>
       </SafeAreaView>

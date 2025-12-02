@@ -8,6 +8,7 @@ import {
   Image,
   Keyboard,
   Modal,
+  Platform,
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
@@ -18,9 +19,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 interface AuthModalProps {
   visible: boolean;
   onClose: () => void;
+  redirect?: string;
 }
 
-const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose }) => {
+const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose, redirect }) => {
   const [slideAnim] = useState(new Animated.Value(0));
   const router = useRouter();
   const inset = useSafeAreaInsets();
@@ -46,9 +48,13 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose }) => {
   // Close modal when user successfully authenticates
   useEffect(() => {
     if (isAuthenticated && visible) {
-      onClose();
+      if (redirect) {
+        (router.push as any)({ pathname: redirect });
+      } else {
+        onClose();
+      }
     }
-  }, [isAuthenticated, visible, onClose]);
+  }, [isAuthenticated, visible, onClose, redirect, router]);
 
   const handleGoogleLogin = async () => {
     try {
@@ -67,7 +73,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose }) => {
 
   const handleSignIn = () => {
     onClose();
-    router.push({ pathname: '/(auth)/sign-in', params: { redirect: '/(hireRequest)/request-form' } });
+    router.push({ pathname: '/(auth)/sign-in', params: redirect ? { redirect } : {} });
   };
 
   const translateY = slideAnim.interpolate({
@@ -128,16 +134,19 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose }) => {
                   <Text style={styles.socialButtonText}>Continue with Google</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity
-                  style={styles.socialButton}
-                  onPress={handleAppleLogin}
-                >
-                  <Image
-                    source={require('../../assets/images/apple.png')}
-                    style={styles.appleIcon}
-                  />
-                  <Text style={styles.socialButtonText}>Continue with Apple</Text>
-                </TouchableOpacity>
+                {Platform.OS === "ios" && (
+                  <TouchableOpacity
+                    style={styles.socialButton}
+                    onPress={handleAppleLogin}
+                  >
+                    <Image
+                      source={require('../../assets/images/apple.png')}
+                      style={styles.appleIcon}
+                    />
+                    <Text style={styles.socialButtonText}>Continue with Apple</Text>
+                  </TouchableOpacity>
+                )}
+
 
                 <TouchableOpacity
                   style={styles.socialButton}

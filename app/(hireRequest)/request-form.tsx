@@ -1,7 +1,7 @@
 import { getScanResult } from '@/actions/scan-actions';
 import IssueCard from '@/components/issue-card';
+import { LoadingButton } from '@/components/ui/loading-button';
 import { requestFormService } from '@/lib/request-form-service';
-import type { ScanResult } from '@/lib/scan-service';
 import { useSelectedIssuesStore } from '@/store/audit-summary-selected-issue-store';
 import { useAuditInfoStore } from '@/store/audit-website-details-store';
 import { useAuthStore } from '@/store/auth-store';
@@ -18,45 +18,39 @@ const RequestForm = () => {
   const { t } = useTranslation();
   const router = useRouter();
   const params = useLocalSearchParams();
-  const { issues, addIssue, clearIssues } = useSelectedIssuesStore();
-  const { auditInfo, setAuditInfo } = useAuditInfoStore();
+  const { issues, addIssue, clearIssues, availableIssues, setIssues } = useSelectedIssuesStore();
+  const { auditInfo, getAuditInfo } = useAuditInfoStore();
   const { user } = useAuthStore();
   const [additionalNotes, setAdditionalNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [scanResult, setScanResult] = useState<ScanResult | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Get job_id from route params
   const jobId = Array.isArray(params.jobId) ? params.jobId[0] : params.jobId || '';
 
   // Get website from audit info store
-  const website = auditInfo.domain || '';
+  const website = auditInfo?.domain || getAuditInfo()?.domain || '';
 
-  // Get real issues from scan result
-  const ISSUE_LIST = scanResult?.issues || [];
-
-  // Fetch scan result on mount
+  // Fetch scan result if availableIssues is empty and we have a jobId
   useEffect(() => {
     const fetchScanResult = async () => {
-      if (!jobId) {
-        setIsLoading(false);
+      // If we already have available issues, don't fetch
+      if (availableIssues.length > 0 || !jobId) {
         return;
       }
 
       try {
         setIsLoading(true);
         const result = await getScanResult(jobId);
-        setScanResult(result);
 
-        // Update audit info if not already set
-        if (!auditInfo.domain && result.url) {
-          setAuditInfo({
-            domain: result.url,
-            status: result.status,
-            score: String(result.overall_score),
-            scanDate: result.scanned_at ? new Date(result.scanned_at).toLocaleDateString() : '',
-          });
-        }
+        // Set available issues from scan result
+        setIssues(result.issues.map(issue => ({
+          id: issue.id,
+          title: issue.title,
+          score: String(issue.score),
+          status: result.status || 'Warning',
+          description: issue.description,
+        })));
       } catch (error) {
         console.error('Failed to fetch scan result:', error);
         Toast.show({
@@ -70,23 +64,17 @@ const RequestForm = () => {
     };
 
     fetchScanResult();
-  }, [jobId, setAuditInfo]);
+  }, [jobId, availableIssues.length, setIssues, t]);
 
-  const isAllSelected = issues.length === ISSUE_LIST.length && ISSUE_LIST.length > 0;
+  const isAllSelected = issues.length === availableIssues.length && availableIssues.length > 0;
 
   const handleToggleSelect = () => {
     if (isAllSelected) {
       clearIssues();
     } else {
-      // Add all issues from scan result
-      ISSUE_LIST.forEach((issue) => {
-        addIssue({
-          id: issue.id,
-          title: issue.title,
-          score: String(issue.score),
-          status: scanResult?.status || 'Warning',
-          description: issue.description,
-        });
+      // Add all issues from available issues
+      availableIssues.forEach((issue) => {
+        addIssue(issue);
       });
     }
   };
@@ -175,15 +163,14 @@ const RequestForm = () => {
           <Text style={styles.headerText}>{t('requestForm.title')}</Text>
         </View>
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <ActivityIndicator size="large" />
-          <Text style={{ marginTop: 16 }}>Loading scan results...</Text>
+          <ActivityIndicator size="large" color="#1A2373" />
         </View>
       </SafeAreaView>
     );
   }
 
   // Show error state if no issues available
-  if (!ISSUE_LIST || ISSUE_LIST.length === 0) {
+  if (!availableIssues || availableIssues.length === 0) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
@@ -226,16 +213,17 @@ const RequestForm = () => {
           {t('requestForm.subtitle')}
         </Text>
         <View style={styles.issuesContainer}>
-          {ISSUE_LIST.map((issue) => {
+          {availableIssues.map((issue) => {
             // Determine status based on score
-            const issueStatus = issue.score >= 80 ? 'Good' : issue.score >= 50 ? 'Warning' : 'Critical';
+            const scoreNum = parseInt(issue.score || '0', 10);
+            const issueStatus = scoreNum >= 80 ? 'Good' : scoreNum >= 50 ? 'Warning' : 'Critical';
 
             return (
               <IssueCard
                 key={issue.id}
                 id={issue.id}
                 title={issue.title}
-                score={String(issue.score)}
+                score={issue.score || '0'}
                 description={issue.description}
                 status={issueStatus}
                 onPressDetails={() =>
@@ -244,7 +232,7 @@ const RequestForm = () => {
                     params: {
                       id: issue.id,
                       title: issue.title,
-                      score: String(issue.score),
+                      score: issue.score || '0',
                       description: issue.description,
                       status: issueStatus,
                     },
@@ -262,17 +250,13 @@ const RequestForm = () => {
           onChangeText={setAdditionalNotes}
           multiline
         />
-        <TouchableOpacity
-          style={[styles.primaryButton, isSubmitting && { opacity: 0.6 }]}
+        <LoadingButton
+          text={t('requestForm.submitRequest')}
           onPress={handleSubmit}
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? (
-            <ActivityIndicator color="#FFFFFF" />
-          ) : (
-            <Text style={styles.primaryButtonText}>{t('requestForm.submitRequest')}</Text>
-          )}
-        </TouchableOpacity>
+          loading={isSubmitting}
+          buttonStyle={styles.primaryButton}
+          textStyle={styles.primaryButtonText}
+        />
       </ScrollView>
     </SafeAreaView>
   );

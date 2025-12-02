@@ -73,7 +73,7 @@ const HireRequest = () => {
           </TouchableOpacity>
         </View>
       </View>
-      <AuthModal visible={modalVisible} onClose={() => setModalVisible(false)} />
+      <AuthModal visible={modalVisible} onClose={() => setModalVisible(false)} redirect="/(hireRequest)/request-form" />
     </SafeAreaView>
   )
 }

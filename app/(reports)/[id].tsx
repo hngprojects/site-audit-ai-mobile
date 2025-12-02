@@ -5,7 +5,7 @@ import { Status } from '@/type';
 import { AntDesign, Feather, Ionicons } from '@expo/vector-icons';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -17,13 +17,26 @@ const SingleIssueDetailScreen = () => {
     const router = useRouter();
 
     const { getAuditInfo } = useAuditInfoStore();
-    const { addIssue } = useSelectedIssuesStore();
+    const { addIssue, availableIssues } = useSelectedIssuesStore();
 
     const { domain, status, score, scanDate,} = getAuditInfo();
 
     const params = useLocalSearchParams();
 
-    const { id, title, score: miniscore, description, status: ministatus, businessBenefits: _businessBenefits, impactMessage: _impactMessage } = params;
+    const { id, businessBenefits: _businessBenefits, impactMessage: _impactMessage } = params;
+
+    const businessBenefitsStr = Array.isArray(_businessBenefits) ? _businessBenefits[0] : _businessBenefits;
+    const impactMessageStr = Array.isArray(_impactMessage) ? _impactMessage[0] : _impactMessage;
+
+    const issue = useMemo(() => availableIssues.find(iss => iss.id === id), [availableIssues, id]);
+
+    const title = issue?.title || 'Unknown';
+    const miniscore = issue?.score || '0';
+    const description = issue?.description || 'No description';
+    const ministatus = issue?.status || 'Warning';
+
+    const businessBenefits = businessBenefitsStr ? JSON.parse(businessBenefitsStr) : [];
+    const impactMessage = impactMessageStr || '';
 
     console.log(id, ministatus)
 
@@ -233,9 +246,9 @@ const rawDescription = Array.isArray(params.description) ? params.description[0]
   <Text style={{
     ...styles.whatThisWillDoText
   }}>
-    • Lower conversions for your website{"\n"}
-    • Poor user experience{"\n"}
-    • People leaving your website early
+    {businessBenefits.length > 0 ? businessBenefits.map((benefit: string, index: number) => (
+      `• ${benefit}${index < businessBenefits.length - 1 ? '\n' : ''}`
+    )).join('') : '• Lower conversions for your website\n• Poor user experience\n• People leaving your website early'}
   </Text>
 
   {/* PROBLEMS */}
@@ -299,9 +312,9 @@ const rawDescription = Array.isArray(params.description) ? params.description[0]
   <Text style={{
     ...styles.suggestionText
   }}>
-    {ministatus === 'UX' ? 'Improve user interface design and navigation structure to enhance user experience.' :
+    {impactMessage || (ministatus === 'UX' ? 'Improve user interface design and navigation structure to enhance user experience.' :
      ministatus === 'Performance' ? 'Optimize images, enable compression, and improve server response times for better performance.' :
-     'Fix meta tags, improve content structure, and enhance internal linking for better SEO.'}
+     'Fix meta tags, improve content structure, and enhance internal linking for better SEO.')}
   </Text>
 
   {/* Continue Button */}
