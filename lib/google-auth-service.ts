@@ -290,14 +290,35 @@
 // };
 
 
-import {
-  GoogleSignin,
-  isErrorWithCode,
-  isSuccessResponse,
-  statusCodes,
-} from '@react-native-google-signin/google-signin';
 import Constants from 'expo-constants';
-import { Platform } from 'react-native';
+
+// Check if we're in Expo Go - conditionally import Google Sign-In
+const isExpoGo = Constants.executionEnvironment === 'storeClient';
+
+let GoogleSignin: any = null;
+let isErrorWithCode: any = null;
+let isSuccessResponse: any = null;
+let statusCodes: any = null;
+let Platform: any = null;
+
+// Conditionally import native modules only when not in Expo Go
+if (!isExpoGo) {
+  try {
+    const googleSigninModule = require('@react-native-google-signin/google-signin');
+    const platformModule = require('react-native');
+
+    GoogleSignin = googleSigninModule.GoogleSignin;
+    isErrorWithCode = googleSigninModule.isErrorWithCode;
+    isSuccessResponse = googleSigninModule.isSuccessResponse;
+    statusCodes = googleSigninModule.statusCodes;
+    Platform = platformModule.Platform;
+  } catch (error) {
+    console.error('Failed to import Google Sign-In modules:', error);
+  }
+} else {
+  // Mock Platform for Expo Go
+  Platform = { OS: 'unknown' };
+}
 
 // Platform-specific Google OAuth Client IDs
 // IMPORTANT: All three should be from the SAME Google Cloud project
@@ -305,16 +326,18 @@ const GOOGLE_IOS_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID;
 const GOOGLE_ANDROID_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID;
 const GOOGLE_WEB_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID;
 
-// Validate configuration
-if (!GOOGLE_WEB_CLIENT_ID) {
-  console.error('❌ EXPO_PUBLIC_GOOGLE_CLIENT_ID is required');
-  throw new Error('EXPO_PUBLIC_GOOGLE_CLIENT_ID environment variable is not set. Please add it to your .env file or eas.json build profile.');
-}
-if (!GOOGLE_IOS_CLIENT_ID && Platform.OS === 'ios') {
-  console.warn('⚠️ EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID not set (required for iOS)');
-}
-if (!GOOGLE_ANDROID_CLIENT_ID && Platform.OS === 'android') {
-  console.warn('⚠️ EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID not set (recommended for debugging)');
+// Validate configuration (only when not in Expo Go)
+if (!isExpoGo) {
+  if (!GOOGLE_WEB_CLIENT_ID) {
+    console.error('❌ EXPO_PUBLIC_GOOGLE_CLIENT_ID is required');
+    throw new Error('EXPO_PUBLIC_GOOGLE_CLIENT_ID environment variable is not set. Please add it to your .env file or eas.json build profile.');
+  }
+  if (!GOOGLE_IOS_CLIENT_ID && Platform.OS === 'ios') {
+    console.warn('⚠️ EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID not set (required for iOS)');
+  }
+  if (!GOOGLE_ANDROID_CLIENT_ID && Platform.OS === 'android') {
+    console.warn('⚠️ EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID not set (recommended for debugging)');
+  }
 }
 
 // Initialize Google Sign-In configuration
@@ -325,7 +348,7 @@ let isConfigured = false;
  * This must be called before using signIn()
  */
 function configureGoogleSignIn() {
-  if (isConfigured) {
+  if (isConfigured || isExpoGo) {
     return;
   }
 
@@ -374,9 +397,15 @@ function configureGoogleSignIn() {
   }
   console.log('====================================');
 
-  GoogleSignin.configure(config);
+  if (GoogleSignin) {
+    GoogleSignin.configure(config);
+  }
   isConfigured = true;
 }
+
+/**
+ * Alternative Google Sign-In using expo-auth-session (works in Expo Go)
+ */
 
 /**
  * Google Authentication Service
@@ -388,21 +417,19 @@ export const googleAuthService = {
    * @returns The id_token from Google
    */
   async signIn(): Promise<string> {
-    try {
-      // Check if we're in Expo Go (not supported)
-      const isExpoGo = Constants.executionEnvironment === 'storeClient';
-      if (isExpoGo) {
-        throw new Error(
-          'Native Google Sign-In requires a development build.\n\n' +
-          'Expo Go does not support native modules like @react-native-google-signin/google-signin.\n\n' +
-          'To use this feature:\n' +
-          '1. Create a development build: eas build --profile development --platform android\n' +
-          '2. Install the development build on your device\n' +
-          '3. Run: npx expo start --dev-client\n\n' +
-          'Alternatively, use expo-auth-session for Expo Go compatibility.'
-        );
-      }
+    // Check if Google Sign-In is available (not in Expo Go)
+    if (!GoogleSignin) {
+      throw new Error(
+        'Google Sign-In is not available in Expo Go.\n\n' +
+        'To test Google Sign-In:\n' +
+        '1. Create a development build: eas build --profile development --platform android\n' +
+        '2. Install the development build on your device\n' +
+        '3. Run: npx expo start --dev-client\n\n' +
+        'This is a limitation of Expo Go, which doesn\'t support native modules.'
+      );
+    }
 
+    try {
       // Configure Google Sign-In if not already configured
       configureGoogleSignIn();
 
@@ -487,7 +514,7 @@ export const googleAuthService = {
       console.error('❌ Google sign-in error:', error);
 
       // Use library's utility function to check if error has a code property
-      if (isErrorWithCode(error)) {
+      if (isErrorWithCode && isErrorWithCode(error)) {
         switch (error.code) {
           case statusCodes.SIGN_IN_CANCELLED:
             throw new Error('Sign-in was cancelled by the user.');
@@ -590,6 +617,11 @@ export const googleAuthService = {
    * Sign out from Google
    */
   async signOut(): Promise<void> {
+    if (!GoogleSignin) {
+      console.warn('Google Sign-In not available in Expo Go');
+      return;
+    }
+
     try {
       await GoogleSignin.signOut();
       console.log('✅ Successfully signed out from Google');
@@ -603,6 +635,11 @@ export const googleAuthService = {
    * Revoke access and sign out
    */
   async revokeAccess(): Promise<void> {
+    if (!GoogleSignin) {
+      console.warn('Google Sign-In not available in Expo Go');
+      return;
+    }
+
     try {
       await GoogleSignin.revokeAccess();
       console.log('✅ Successfully revoked Google access');
@@ -616,6 +653,14 @@ export const googleAuthService = {
    * Get the current platform
    */
   getPlatform(): 'ios' | 'android' {
+    // Import Platform dynamically if not already imported
+    if (!Platform) {
+      try {
+        Platform = require('react-native').Platform;
+      } catch {
+        return 'android'; // fallback
+      }
+    }
     return Platform.OS === 'ios' ? 'ios' : 'android';
   },
 
@@ -624,15 +669,6 @@ export const googleAuthService = {
    * Note: This requires a development build, not Expo Go
    */
   isAvailable(): boolean {
-    const isExpoGo = Constants.executionEnvironment === 'storeClient';
-    if (isExpoGo) {
-      console.warn(
-        '⚠️ Native Google Sign-In requires a development build.\n' +
-        'Expo Go does not support native modules.\n' +
-        'Please create a development build using: eas build --profile development --platform android'
-      );
-      return false;
-    }
-    return true;
+    return !!GoogleSignin;
   },
 };

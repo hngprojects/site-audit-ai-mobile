@@ -16,13 +16,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 6,
     paddingHorizontal: 16,
+    justifyContent: 'center',
   },
   backButton: {
-    marginRight: 16,
-  },
-  titleContainer: {
-    flex: 1,
-    alignItems: 'center',
+    position: 'absolute',
+    left: 16,
   },
   headerTitle: {
     fontSize: 20,

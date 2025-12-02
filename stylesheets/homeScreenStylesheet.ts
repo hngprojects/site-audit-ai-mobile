@@ -141,4 +141,25 @@ export default StyleSheet.create({
     fontSize: 16,
     fontFamily: "RethinkSans-SemiBold"
   },
+
+  notificationBadge: {
+    position: "absolute",
+    top: -5,
+    right: -5,
+    backgroundColor: "#FF5A3D",
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: "#fff",
+  },
+
+  badgeText: {
+    color: "#fff",
+    fontSize: 12,
+    fontFamily: "RethinkSans-Bold",
+    textAlign: "center",
+  },
 });

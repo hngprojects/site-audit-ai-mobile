@@ -1,18 +1,28 @@
 import AuthModal from '@/components/auth/auth-modal';
 import ProfileContent from '@/components/profile/profile-content';
-import ProfileEmptyState from '@/components/profile/profile-empty-state';
 import ProfileHeader from '@/components/profile/profile-header';
 // import ProfileSkeleton from '@/components/profile/profile-skeleton';
 import { useAuth } from '@/hooks/use-auth';
 import styles from '@/stylesheets/profile-stylesheet';
 import { useFocusEffect } from '@react-navigation/native';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const Profile = () => {
   const { isAuthenticated, isInitialized, user } = useAuth();
   const [modalVisible, setModalVisible] = useState(false);
+
+  // Create a mock user for unauthenticated users to show the profile interface
+  const mockUser = {
+    id: 'mock',
+    fullName: '',
+    email: '',
+    createdAt: new Date().toISOString(),
+    profileImage: undefined,
+  };
+
+  const displayUser = isAuthenticated ? user : mockUser;
 
   useFocusEffect(
     useCallback(() => {
@@ -51,14 +61,10 @@ const Profile = () => {
           contentContainerStyle={{ paddingBottom: 50 }}
         >
           <ProfileHeader text="Profile" />
-          {isAuthenticated && user ? (
-            <ProfileContent user={user} />
-          ) : (
-            <ProfileEmptyState />
-          )}
+          <ProfileContent user={displayUser} />
         </ScrollView>
       </SafeAreaView>
-      <AuthModal visible={modalVisible && !isAuthenticated} onClose={closeModal} />
+      <AuthModal visible={modalVisible && !isAuthenticated} onClose={closeModal} dismissible={false} />
     </>
   );
 };

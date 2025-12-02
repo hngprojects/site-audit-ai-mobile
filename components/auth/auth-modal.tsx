@@ -14,18 +14,21 @@ import {
   View
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { googleAuthService } from '../../lib/google-auth-service';
+import { appleAuthService } from '../../lib/apple-auth-service';
 
 interface AuthModalProps {
   visible: boolean;
   onClose: () => void;
   redirect?: string;
+  dismissible?: boolean;
 }
 
-const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose, redirect }) => {
+const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose, redirect, dismissible = true }) => {
   const [slideAnim] = useState(new Animated.Value(0));
   const router = useRouter();
   const inset = useSafeAreaInsets();
-  const { signInWithGoogle, isLoading, isAuthenticated } = useAuth();
+  const { signInWithGoogle, signInWithApple, isLoading, isAuthenticated } = useAuth();
 
   useEffect(() => {
     if (visible) {
@@ -65,9 +68,14 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose, redirect }) => 
     }
   };
 
-  const handleAppleLogin = () => {
-    console.log('Apple login pressed');
-    onClose();
+  const handleAppleLogin = async () => {
+    try {
+      await signInWithApple();
+      // Modal will close automatically when isAuthenticated becomes true
+    } catch (error) {
+      // Error is handled by the store and shown via Alert
+      console.error('Apple sign-in error:', error);
+    }
   };
 
   const handleSignIn = () => {
@@ -82,7 +90,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose, redirect }) => 
 
   const handleOverlayPress = () => {
     Keyboard.dismiss();
-    onClose();
+    if (dismissible) {
+      onClose();
+    }
   };
 
   return (
@@ -117,32 +127,41 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose, redirect }) => 
               </View>
 
               <View style={styles.buttonsContainer}>
-                <TouchableOpacity
-                  style={[styles.socialButton, isLoading && { opacity: 0.6 }]}
-                  onPress={handleGoogleLogin}
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <ActivityIndicator size="small" color="#1c1c1c" style={{ marginRight: 12 }} />
-                  ) : (
-                    <Image
-                      source={require('../../assets/images/google.png')}
-                      style={styles.socialIcon}
-                    />
-                  )}
-                  <Text style={styles.socialButtonText}>Continue with Google</Text>
-                </TouchableOpacity>
+                {googleAuthService.isAvailable() && (
+                  <TouchableOpacity
+                    style={[styles.socialButton, isLoading && { opacity: 0.6 }]}
+                    onPress={handleGoogleLogin}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <ActivityIndicator size="small" color="#1c1c1c" style={{ marginRight: 12 }} />
+                    ) : (
+                      <Image
+                        source={require('../../assets/images/google.png')}
+                        style={styles.socialIcon}
+                      />
+                    )}
+                    <Text style={styles.socialButtonText}>Continue with Google</Text>
+                  </TouchableOpacity>
+                )}
 
-                <TouchableOpacity
-                  style={styles.socialButton}
-                  onPress={handleAppleLogin}
-                >
-                  <Image
-                    source={require('../../assets/images/apple.png')}
-                    style={styles.appleIcon}
-                  />
-                  <Text style={styles.socialButtonText}>Continue with Apple</Text>
-                </TouchableOpacity>
+                {appleAuthService.isAvailable() && (
+                  <TouchableOpacity
+                    style={[styles.socialButton, isLoading && { opacity: 0.6 }]}
+                    onPress={handleAppleLogin}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <ActivityIndicator size="small" color="#1c1c1c" style={{ marginRight: 12 }} />
+                    ) : (
+                      <Image
+                        source={require('../../assets/images/apple.png')}
+                        style={styles.appleIcon}
+                      />
+                    )}
+                    <Text style={styles.socialButtonText}>Continue with Apple</Text>
+                  </TouchableOpacity>
+                )}
 
                 <TouchableOpacity
                   style={styles.socialButton}

@@ -2,15 +2,16 @@ import { resendResetToken } from '@/actions/auth-actions';
 import styles from "@/stylesheets/otpVerificationStylesheet";
 import { useResetPasswordEmailStore } from "@/zustardStore/resetPasswordEmailStore";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import { ActivityIndicator, Keyboard, KeyboardAvoidingView, Platform, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
-import Toast from 'react-native-toast-message';
 import { OtpInput } from "react-native-otp-entry";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Toast from 'react-native-toast-message';
 
 const OTPVerification = () => {
   const router = useRouter();
+  const params = useLocalSearchParams();
   const insets = useSafeAreaInsets();
 
   const [otpCode, setOtpCode] = useState<string>('');
@@ -18,21 +19,49 @@ const OTPVerification = () => {
   const [invalidOtp, setInvalidOtp] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [resending, setResending] = useState<boolean>(false);
-  
 
-  const emailWeSentYourCode = useResetPasswordEmailStore((state) => state.passwordRecoveryEmail);
+  // Get mode and email from params
+  const mode = params.mode as string || 'reset'; // 'reset' or 'signup'
+  const emailFromParams = params.email as string;
+
+  // Always call hooks at the top level
+  const passwordRecoveryEmail = useResetPasswordEmailStore((state) => state.passwordRecoveryEmail);
   const setOtpToken = useResetPasswordEmailStore((state) => state.setOtpToken);
 
-  const confirmCode = () => {
+  const emailWeSentYourCode = mode === 'reset'
+    ? passwordRecoveryEmail
+    : emailFromParams;
+
+  const confirmCode = async () => {
     setLoading(true);
     try {
+      if (mode === 'reset') {
+        // Password reset flow
         setOtpToken(otpCode);
-        router.push("./new-password")
-        
+        router.push("./new-password");
+      } else if (mode === 'signup') {
+        // Signup verification flow - verify OTP and sign in
+        // TODO: Implement signup OTP verification API call
+        // For now, show success message
+        Toast.show({
+          type: 'success',
+          text1: 'Success',
+          text2: 'Email verified successfully! You can now sign in.',
+        });
+        // Navigate back to sign in
+        setTimeout(() => {
+          router.replace('/(auth)/sign-in');
+        }, 2000);
+      }
     } catch (error) {
         console.error('Error in confirmCode:', error);
-        setInvalidOtp(true)
-        setOtpFilled(false)
+        setInvalidOtp(true);
+        setOtpFilled(false);
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: 'Invalid verification code. Please try again.',
+        });
     } finally {
         setLoading(false);
     }
@@ -43,19 +72,29 @@ const OTPVerification = () => {
       Toast.show({
         type: 'error',
         text1: 'Error',
-        text2: 'Email not found. Please start the password reset process again.',
+        text2: `Email not found. Please start the ${mode === 'reset' ? 'password reset' : 'sign up'} process again.`,
       });
       return;
     }
 
     setResending(true);
     try {
-      await resendResetToken(emailWeSentYourCode);
-      Toast.show({
-        type: 'success',
-        text1: 'Success',
-        text2: 'Reset code has been resent to your email.',
-      });
+      if (mode === 'reset') {
+        await resendResetToken(emailWeSentYourCode);
+        Toast.show({
+          type: 'success',
+          text1: 'Success',
+          text2: 'Reset code has been resent to your email.',
+        });
+      } else if (mode === 'signup') {
+        // TODO: Implement signup resend API call
+        // For now, show a message
+        Toast.show({
+          type: 'info',
+          text1: 'Info',
+          text2: 'Please check your email for the verification code.',
+        });
+      }
       setOtpCode('');
       setOtpFilled(false);
       setInvalidOtp(false);
@@ -100,7 +139,7 @@ const OTPVerification = () => {
       <Text style={styles.subTitle}>
         We&apos;ve sent a 6-digit code to{" "}
         <Text style={styles.email}>{emailWeSentYourCode}</Text>. Enter it
-        below to confirm your email.
+        below to {mode === 'reset' ? 'reset your password' : 'verify your account'}.
       </Text>
 
     

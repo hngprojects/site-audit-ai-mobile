@@ -346,6 +346,30 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     paddingHorizontal: 10,
   },
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  overlayContent: {
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    paddingHorizontal: 24,
+    paddingVertical: 16,
+    borderRadius: 12,
+    maxWidth: 280,
+  },
+  overlayText: {
+    color: 'white',
+    fontSize: 16,
+    fontFamily: 'RethinkSans-Medium',
+    textAlign: 'center',
+  },
 });
 
 export default styles;

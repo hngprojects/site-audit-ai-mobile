@@ -282,51 +282,53 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
 
   return (
     <SafeAreaView edges={['top']} style={styles.profileContent}>
-      <View style={styles.profilePictureContainer}>
-        <View style={styles.profileInfoContainer}>
-          <View style={styles.avatarContainer}>
-            {user?.profileImage && user.profileImage.trim() ? (
-              <Image
-                source={{ uri: getFullImageUrl(user.profileImage) || '' }}
-                style={styles.avatarImage}
-                resizeMode="cover"
-              />
-            ) : (
-              <View style={styles.avatarPlaceholder}>
-                <Text style={styles.avatarInitials}>
-                  {user?.fullName && user.fullName.trim()
-                    ? user.fullName
-                      .trim()
-                      .split(' ')
-                      .filter(n => n.length > 0)
-                      .map(n => n[0])
-                      .join('')
-                      .toUpperCase()
-                      .slice(0, 2)
-                    : user?.email && user.email.trim()
-                      ? user.email[0].toUpperCase()
-                      : 'U'}
-                </Text>
-              </View>
-            )}
-            <TouchableOpacity
-              style={styles.editIconContainer}
-              onPress={() => setPhotoSheetVisible(true)}
-              activeOpacity={0.7}
-            >
-              <Feather name="edit-2" size={16} color="white" />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.userInfoContainer}>
-            <Text style={styles.userName} numberOfLines={1} ellipsizeMode="tail">
-              {user?.fullName || 'User Name'}
-            </Text>
-            <Text style={styles.userEmail} numberOfLines={1} ellipsizeMode="tail">
-              {user?.email || 'user@example.com'}
-            </Text>
+      {user && (
+        <View style={styles.profilePictureContainer}>
+          <View style={styles.profileInfoContainer}>
+            <View style={styles.avatarContainer}>
+              {user?.profileImage && user.profileImage.trim() ? (
+                <Image
+                  source={{ uri: getFullImageUrl(user.profileImage) || '' }}
+                  style={styles.avatarImage}
+                  resizeMode="cover"
+                />
+              ) : (
+                <View style={styles.avatarPlaceholder}>
+                  <Text style={styles.avatarInitials}>
+                    {user?.fullName && user.fullName.trim()
+                      ? user.fullName
+                        .trim()
+                        .split(' ')
+                        .filter(n => n.length > 0)
+                        .map(n => n[0])
+                        .join('')
+                        .toUpperCase()
+                        .slice(0, 2)
+                      : user?.email && user.email.trim()
+                        ? user.email[0].toUpperCase()
+                        : 'U'}
+                  </Text>
+                </View>
+              )}
+              <TouchableOpacity
+                style={styles.editIconContainer}
+                onPress={() => setPhotoSheetVisible(true)}
+                activeOpacity={0.7}
+              >
+                <Feather name="edit-2" size={16} color="white" />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.userInfoContainer}>
+              <Text style={styles.userName} numberOfLines={1} ellipsizeMode="tail">
+                {user?.fullName || 'User Name'}
+              </Text>
+              <Text style={styles.userEmail} numberOfLines={1} ellipsizeMode="tail">
+                {user?.email || 'user@example.com'}
+              </Text>
+            </View>
           </View>
         </View>
-      </View>
+      )}
 
       <View style={styles.accountSettingsContainer}>
         <View style={styles.settingsList}>

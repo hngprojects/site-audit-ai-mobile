@@ -1,6 +1,7 @@
 import { startScan } from "@/actions/scan-actions";
 import AuditResultCard from "@/components/auditResultCard";
 import EmptyState from "@/components/homeScreenEmptyState";
+import { getUnreadCount } from "@/service/notifications";
 import { useAuthStore } from "@/store/auth-store";
 import { useSitesStore } from "@/store/sites-store";
 import styles from "@/stylesheets/homeScreenStylesheet";
@@ -9,7 +10,7 @@ import { normalizeUrl, validateWebsiteUrl } from "@/utils/url-validation";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Octicons from "@expo/vector-icons/Octicons";
 import { router } from "expo-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -21,11 +22,25 @@ export default function HomeScreen() {
   const [urlAvailable, setUrlAvailable] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [isCreating, setIsCreating] = useState<boolean>(false);
+  const [unreadCount, setUnreadCount] = useState<number>(0);
   const { isAuthenticated } = useAuthStore();
   const { sites, isLoading, fetchSites, createSite } = useSitesStore();
 
+  const fetchUnreadCount = useCallback(async () => {
+    if (isAuthenticated) {
+      try {
+        const count = await getUnreadCount();
+        setUnreadCount(count);
+      } catch (error) {
+        console.error('Failed to fetch unread count:', error);
+        setUnreadCount(0);
+      }
+    }
+  }, [isAuthenticated]);
+
   useEffect(() => {
     fetchSites();
+    fetchUnreadCount();
 
     const testDeviceId = async () => {
       const info = await getPersistentDeviceInfo();
@@ -34,7 +49,7 @@ export default function HomeScreen() {
 
     testDeviceId();
 
-  }, [fetchSites]);
+  }, [fetchSites, fetchUnreadCount]);
 
 
 
@@ -109,9 +124,18 @@ export default function HomeScreen() {
     <SafeAreaView
       style={styles.container}>
 
-      <TouchableOpacity style={styles.notificationContainer} onPress={() => router.push('/(main)/notifications')}>
-        <Octicons name="bell" size={24} color="black" />
-      </TouchableOpacity>
+      {isAuthenticated && (
+        <TouchableOpacity style={styles.notificationContainer} onPress={() => router.push('/(main)/notifications')}>
+          <View>
+            <Octicons name="bell" size={24} color="black" />
+            {unreadCount > 0 && (
+              <View style={styles.notificationBadge}>
+                <Text style={styles.badgeText}>{unreadCount > 99 ? '99+' : unreadCount.toString()}</Text>
+              </View>
+            )}
+          </View>
+        </TouchableOpacity>
+      )}
 
 
       <View style={styles.headingSection}>

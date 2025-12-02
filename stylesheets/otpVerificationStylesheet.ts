@@ -23,15 +23,17 @@ export default StyleSheet.create({
    headerSection: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 25
+        marginBottom: 25,
+        justifyContent: 'center',
     },
     backarrow: {
-        marginRight: 75,
-        marginLeft: 15,
+        position: 'absolute',
+        left: 16,
     },
     headerText: {
          fontSize: 20,
-        fontFamily: "RethinkSans-Bold"
+        fontFamily: "RethinkSans-Bold",
+        textAlign: 'center',
     },
   subTitle: {
     fontSize: 14,
@@ -57,6 +59,12 @@ export default StyleSheet.create({
     height: 45,
     borderRadius: 8,
     borderWidth: 1.5,
+  },
+
+  otpText: {
+    fontSize: 18,
+    fontFamily: "RethinkSans-Bold",
+    color: "#333",
   },
 
 

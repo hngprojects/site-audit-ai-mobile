@@ -43,6 +43,8 @@
       ],
       "expo-secure-store",
       "expo-web-browser",
+      "expo-notifications",
+      "expo-apple-authentication",
       [
         "@react-native-google-signin/google-signin",
         {
@@ -61,7 +63,6 @@
       }
     },
     "privacy": "unlisted",
-    "owner": "peliah",
-    "owner": "yhoungbrown"
+    "owner": "sugar_dev"
   }
 }
