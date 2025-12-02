@@ -16,7 +16,6 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { googleAuthService } from '../../lib/google-auth-service';
-import { appleAuthService } from '../../lib/apple-auth-service';
 
 interface AuthModalProps {
   visible: boolean;

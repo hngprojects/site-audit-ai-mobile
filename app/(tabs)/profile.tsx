@@ -1,5 +1,6 @@
 import AuthModal from '@/components/auth/auth-modal';
 import ProfileContent from '@/components/profile/profile-content';
+import ProfileEmptyState from '@/components/profile/profile-empty-state';
 import ProfileHeader from '@/components/profile/profile-header';
 // import ProfileSkeleton from '@/components/profile/profile-skeleton';
 import { useAuth } from '@/hooks/use-auth';

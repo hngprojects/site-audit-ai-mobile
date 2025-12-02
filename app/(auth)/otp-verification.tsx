@@ -56,16 +56,16 @@ const OTPVerification = () => {
         }, 2000);
       }
     } catch (error) {
-        console.error('Error in confirmCode:', error);
-        setInvalidOtp(true);
-        setOtpFilled(false);
-        Toast.show({
-          type: 'error',
-          text1: 'Error',
-          text2: 'Invalid verification code. Please try again.',
-        });
+      console.error('Error in confirmCode:', error);
+      setInvalidOtp(true);
+      setOtpFilled(false);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Invalid verification code. Please try again.',
+      });
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   }
 
@@ -104,105 +104,107 @@ const OTPVerification = () => {
 
   return (
     <TouchableWithoutFeedback
-    onPress={Keyboard.dismiss}
+      onPress={Keyboard.dismiss}
     >
-     <KeyboardAvoidingView
+      <KeyboardAvoidingView
         behavior={"padding"}
         style={{
           ...styles.container,
-          paddingTop: insets.top , 
+          paddingTop: insets.top,
           paddingBottom: insets.bottom - 30
         }}
       >
-        <View style= {styles.headerSection}>
-            <TouchableOpacity 
+        <View style={styles.headerSection}>
+          <TouchableOpacity
             onPress={router.back}
             style={styles.backarrow}>
-                 <Ionicons name="arrow-back" size={24} color="black" />
-            </TouchableOpacity>
+            <Ionicons name="arrow-back" size={24} color="black" />
+          </TouchableOpacity>
 
-            <Text style={styles.headerText}>
-                {t('otp.verification')}
-            </Text>
-            
+          <Text style={styles.headerText}>
+            {t('otp.verification')}
+          </Text>
+
         </View>
 
 
-      <Text style={styles.subTitle}>
-        {t('otp.codeSent')}{" "}
-        <Text style={styles.email}>{emailWeSentYourCode}</Text>. {t('otp.enterCode')}
-      </Text>
-
-    
-      <OtpInput
-        numberOfDigits={6}
-        focusColor={"#FF6A45"}
-        theme={{
-          containerStyle: styles.otpContainer,
-          pinCodeContainerStyle:{ 
-            ...styles.otpBox, 
-            borderColor: invalidOtp ?  "#d32f2f":"#DDD"
-        },
-          pinCodeTextStyle: styles.otpText, 
-        }}
-        onTextChange={(text) => {
-          setOtpCode(text);
-          setInvalidOtp(false);
-        }}
-        onFilled={(text) => {
-          setOtpCode(text);
-          setOtpFilled(true);
-        }}
-      />
-
-      {invalidOtp && (
-        <Text style={styles.invalidCode}>
-            {t('otp.invalidCode')}
+        <Text style={styles.subTitle}>
+          {t('otp.codeSent')}{" "}
+          <Text style={styles.email}>{emailWeSentYourCode}</Text>. {t('otp.enterCode')}
         </Text>
-      )}
 
-      <View style={styles.resendContainer}>
-        <Text style={styles.resendText}>
-            {t('otp.didntReceive')}
-        </Text>
-        <TouchableOpacity 
-          onPress={handleResend}
-          disabled={resending}
-        >
-             <Text style={styles.resend}>
-               {resending ? t('otp.resending') : t('otp.resend')}
-             </Text>
-        </TouchableOpacity>
-      </View>
-      
 
-      {loading ? (
-        <ActivityIndicator 
-          size="large" 
-          color="#ff5a3d" 
-          style={{marginTop: 420}} 
+        <OtpInput
+          numberOfDigits={6}
+          focusColor={"#FF6A45"}
+          theme={{
+            containerStyle: styles.otpContainer,
+            pinCodeContainerStyle: {
+              ...styles.otpBox,
+              borderColor: invalidOtp ? "#d32f2f" : "#DDD"
+            },
+            pinCodeTextStyle: styles.otpText,
+          }}
+          onTextChange={(text) => {
+            setOtpCode(text);
+            setInvalidOtp(false);
+          }}
+          onFilled={(text) => {
+            setOtpCode(text);
+            setOtpFilled(true);
+          }}
         />
-      ) : (
-        <View style={Platform.OS === 'ios' ? {...styles.iosButtonView} : {...styles.buttonView}}>
+
+        {invalidOtp && (
+          <Text style={styles.invalidCode}>
+            {t('otp.invalidCode')}
+          </Text>
+        )}
+
+        <View style={styles.resendContainer}>
+          <Text style={styles.resendText}>
+            {t('otp.didntReceive')}
+          </Text>
           <TouchableOpacity
-            disabled={!otpFilled}
-            style={{...styles.continueBtnActive,
-              backgroundColor: !otpFilled ? "#e0e1e2" : "#FF6A45",
-            }}
-            onPress={confirmCode}
+            onPress={handleResend}
+            disabled={resending}
           >
-            <Text style={{...styles.continueBtnText,
-                 color: !otpFilled ? "#b9b9b9" : "#FFF",
-            }}>
-              {t('common.continue')}
+            <Text style={styles.resend}>
+              {resending ? t('otp.resending') : t('otp.resend')}
             </Text>
           </TouchableOpacity>
         </View>
-      )}
+
+
+        {loading ? (
+          <ActivityIndicator
+            size="large"
+            color="#ff5a3d"
+            style={{ marginTop: 420 }}
+          />
+        ) : (
+          <View style={Platform.OS === 'ios' ? { ...styles.iosButtonView } : { ...styles.buttonView }}>
+            <TouchableOpacity
+              disabled={!otpFilled}
+              style={{
+                ...styles.continueBtnActive,
+                backgroundColor: !otpFilled ? "#e0e1e2" : "#FF6A45",
+              }}
+              onPress={confirmCode}
+            >
+              <Text style={{
+                ...styles.continueBtnText,
+                color: !otpFilled ? "#b9b9b9" : "#FFF",
+              }}>
+                {t('common.continue')}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
   );
 }
 
 
-export default  OTPVerification;
+export default OTPVerification;
