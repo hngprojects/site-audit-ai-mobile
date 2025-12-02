@@ -8,6 +8,7 @@ import {
   Image,
   Keyboard,
   Modal,
+  Platform,
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,

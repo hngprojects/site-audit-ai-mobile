@@ -12,7 +12,6 @@ import Toast from 'react-native-toast-message';
 import { toastConfig } from '@/components/custom-toast';
 import { useAuthGuard } from '@/hooks/use-auth-guard';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { initializeNotifications } from '@/lib/notification-handler';
 
 // Prevent the splash screen from auto-hiding before fonts are loaded
 SplashScreen.preventAutoHideAsync();
@@ -47,12 +46,12 @@ export default function RootLayout() {
       SplashScreen.hideAsync();
 
       // Initialize notifications
-      initializeNotifications().then(cleanup => {
-        // Store cleanup function if needed for app unmount
-        return cleanup;
-      }).catch(error => {
-        console.error('Failed to initialize notifications:', error);
-      });
+      // initializeNotifications().then(cleanup => {
+      //   // Store cleanup function if needed for app unmount
+      //   return cleanup;
+      // }).catch(error => {
+      //   console.error('Failed to initialize notifications:', error);
+      // });
     }
   }, [fontsLoaded, fontError]);
 

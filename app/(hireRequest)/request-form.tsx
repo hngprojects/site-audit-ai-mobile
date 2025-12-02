@@ -1,131 +1,265 @@
+import { getScanResult } from '@/actions/scan-actions';
 import IssueCard from '@/components/issue-card';
 import { LoadingButton } from '@/components/ui/loading-button';
-import { useAuth } from '@/hooks/use-auth';
-import { apiClient } from '@/lib/api-client';
+import { requestFormService } from '@/lib/request-form-service';
 import { useSelectedIssuesStore } from '@/store/audit-summary-selected-issue-store';
 import { useAuditInfoStore } from '@/store/audit-website-details-store';
+import { useAuthStore } from '@/store/auth-store';
 import styles from '@/stylesheets/hire-request-stylesheet';
+import { useTranslation } from '@/utils/translations';
 import { Feather } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useState } from 'react';
-import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import Toast from 'react-native-toast-message';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 
 const RequestForm = () => {
-    const router = useRouter();
-    const params = useLocalSearchParams();
-    const { issues, addIssue, clearIssues, availableIssues } = useSelectedIssuesStore();
-    const { user } = useAuth();
-    const { getAuditInfo } = useAuditInfoStore();
-    const [additionalNotes, setAdditionalNotes] = useState('');
-    const [isSubmitting, setIsSubmitting] = useState(false);
+  const { t } = useTranslation();
+  const router = useRouter();
+  const params = useLocalSearchParams();
+  const { issues, addIssue, clearIssues, availableIssues, setIssues } = useSelectedIssuesStore();
+  const { auditInfo, getAuditInfo } = useAuditInfoStore();
+  const { user } = useAuthStore();
+  const [additionalNotes, setAdditionalNotes] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-    const jobId = Array.isArray(params.jobId) ? params.jobId[0] : params.jobId;
-    const { domain } = getAuditInfo();
+  // Get job_id from route params
+  const jobId = Array.isArray(params.jobId) ? params.jobId[0] : params.jobId || '';
 
-    const isAllSelected = issues.length === availableIssues.length;
+  // Get website from audit info store
+  const website = auditInfo?.domain || getAuditInfo()?.domain || '';
 
-    const handleToggleSelect = () => {
-        if (isAllSelected) {
-            clearIssues();
-        } else {
-            availableIssues.forEach(issue => addIssue(issue));
-        }
+  // Fetch scan result if availableIssues is empty and we have a jobId
+  useEffect(() => {
+    const fetchScanResult = async () => {
+      // If we already have available issues, don't fetch
+      if (availableIssues.length > 0 || !jobId) {
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        const result = await getScanResult(jobId);
+
+        // Set available issues from scan result
+        setIssues(result.issues.map(issue => ({
+          id: issue.id,
+          title: issue.title,
+          score: String(issue.score),
+          status: result.status || 'Warning',
+          description: issue.description,
+        })));
+      } catch (error) {
+        console.error('Failed to fetch scan result:', error);
+        Toast.show({
+          type: 'error',
+          text1: t('common.error'),
+          text2: 'Failed to load scan results. Please try again.',
+        });
+      } finally {
+        setIsLoading(false);
+      }
     };
 
-    const handleSubmit = async () => {
-        if (issues.length === 0) {
-            Toast.show({
-              type: 'error',
-              text1: 'Error',
-              text2: 'No issues selected',
-            });
-            return;
-        }
-        if (!user?.id || !jobId || !domain) {
-            Alert.alert('Error', 'Missing required information');
-            return;
-        }
+    fetchScanResult();
+  }, [jobId, availableIssues.length, setIssues, t]);
 
-        setIsSubmitting(true);
-        try {
-            const payload = {
-                user_id: user.id,
-                job_id: jobId,
-                website: domain,
-                selected_category: issues.map(issue => issue.id),
-            };
-            await apiClient.post('/api/v1/request-form/', payload);
-            router.push('/confirmation-screen');
-        } catch (error) {
-            console.error('Submit error:', error);
-            Alert.alert('Error', 'Failed to submit request. Please try again.');
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
+  const isAllSelected = issues.length === availableIssues.length && availableIssues.length > 0;
 
+  const handleToggleSelect = () => {
+    if (isAllSelected) {
+      clearIssues();
+    } else {
+      // Add all issues from available issues
+      availableIssues.forEach((issue) => {
+        addIssue(issue);
+      });
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (issues.length === 0) {
+      Toast.show({
+        type: 'error',
+        text1: t('common.error'),
+        text2: t('requestForm.noIssues'),
+      });
+      return;
+    }
+
+    // Validate required data
+    if (!user?.id) {
+      Toast.show({
+        type: 'error',
+        text1: t('common.error'),
+        text2: 'Please sign in to submit a request',
+      });
+      return;
+    }
+
+    if (!website) {
+      Toast.show({
+        type: 'error',
+        text1: t('common.error'),
+        text2: 'Website URL is required',
+      });
+      return;
+    }
+
+    if (!jobId) {
+      Toast.show({
+        type: 'error',
+        text1: t('common.error'),
+        text2: 'Job ID is required',
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Map selected issues to category array (using issue IDs)
+      const selectedCategories = issues.map(issue => issue.id);
+
+      // Submit request form
+      await requestFormService.submitRequestForm({
+        user_id: user.id,
+        job_id: jobId,
+        website: website,
+        selected_category: selectedCategories,
+      });
+
+      // Show success message
+      Toast.show({
+        type: 'success',
+        text1: t('common.success'),
+        text2: 'Request submitted successfully',
+      });
+
+      // Navigate to confirmation screen
+      router.push('/confirmation-screen');
+    } catch (error) {
+      console.error('Error submitting request form:', error);
+      Toast.show({
+        type: 'error',
+        text1: t('common.error'),
+        text2: error instanceof Error ? error.message : 'Failed to submit request. Please try again.',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (isLoading) {
     return (
-        <SafeAreaView style={styles.container}>
-            <View style={styles.header}>
-                <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-                    <Feather name="arrow-left" size={24} color="#1A2373" />
-                </TouchableOpacity>
-                <Text style={styles.headerText}>Request Form</Text>
-                <TouchableOpacity style={styles.selectButton} onPress={handleToggleSelect}>
-                    <Text style={styles.selectButtonText}>{isAllSelected ? 'Deselect' : 'Select'}</Text>
-                </TouchableOpacity>
-            </View>
-            <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
-                <Text style={styles.mainTitle}>
-                  Confirm your review
-                </Text>
-                <Text style={styles.subtitle}>
-                  Need professional support? Sitelytics connects you with experts who’ll review at no cost. Expect a message from a Sitelytics expert within 24 hours.
-                </Text>
-                <View style={styles.issuesContainer}>
-                  {availableIssues.map((issue) => (
-                    <IssueCard
-                      key={issue.id}
-                      id={issue.id}
-                      title={issue.title}
-                      score={issue.score}
-                      description={issue.description}
-                      status="Good" // Default status, IssueCard calculates based on score
-                      onPressDetails={() =>
-                        router.push({
-                          pathname: "/[id]",
-                          params: {
-                            id: issue.id,
-                            title: issue.title,
-                            score: issue.score,
-                            description: issue.description,
-                            status: "Good",
-                          },
-                        })
-                      }
-                    />
-                  ))}
-                </View>
-                <Text style={styles.additionalNotesLabel}>Additional Notes</Text>
-                <TextInput
-                  style={styles.textInput}
-                  placeholder="Tell us more about your specific need"
-                  value={additionalNotes}
-                  onChangeText={setAdditionalNotes}
-                  multiline
-                />
-                <LoadingButton
-                    text="Submit Request"
-                    onPress={handleSubmit}
-                    loading={isSubmitting}
-                    buttonStyle={styles.primaryButton}
-                    textStyle={styles.primaryButtonText}
-                />
-            </ScrollView>
-        </SafeAreaView>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+            <Feather name="arrow-left" size={24} color="#1A2373" />
+          </TouchableOpacity>
+          <Text style={styles.headerText}>{t('requestForm.title')}</Text>
+        </View>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color="#1A2373" />
+        </View>
+      </SafeAreaView>
     );
+  }
+
+  // Show error state if no issues available
+  if (!availableIssues || availableIssues.length === 0) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+            <Feather name="arrow-left" size={24} color="#1A2373" />
+          </TouchableOpacity>
+          <Text style={styles.headerText}>{t('requestForm.title')}</Text>
+        </View>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
+          <Text style={{ textAlign: 'center', fontSize: 16, color: '#666' }}>
+            No scan results available. Please run a scan first.
+          </Text>
+          <TouchableOpacity
+            style={[styles.primaryButton, { marginTop: 20 }]}
+            onPress={() => router.back()}
+          >
+            <Text style={styles.primaryButtonText}>Go Back</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+          <Feather name="arrow-left" size={24} color="#1A2373" />
+        </TouchableOpacity>
+        <Text style={styles.headerText}>{t('requestForm.title')}</Text>
+        <TouchableOpacity style={styles.selectButton} onPress={handleToggleSelect}>
+          <Text style={styles.selectButtonText}>{isAllSelected ? t('requestForm.deselect') : t('requestForm.select')}</Text>
+        </TouchableOpacity>
+      </View>
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
+        <Text style={styles.mainTitle}>
+          {t('requestForm.confirmReview')}
+        </Text>
+        <Text style={styles.subtitle}>
+          {t('requestForm.subtitle')}
+        </Text>
+        <View style={styles.issuesContainer}>
+          {availableIssues.map((issue) => {
+            // Determine status based on score
+            const scoreNum = parseInt(issue.score || '0', 10);
+            const issueStatus = scoreNum >= 80 ? 'Good' : scoreNum >= 50 ? 'Warning' : 'Critical';
+
+            return (
+              <IssueCard
+                key={issue.id}
+                id={issue.id}
+                title={issue.title}
+                score={issue.score || '0'}
+                description={issue.description}
+                status={issueStatus}
+                onPressDetails={() =>
+                  router.push({
+                    pathname: "/[id]",
+                    params: {
+                      id: issue.id,
+                      title: issue.title,
+                      score: issue.score || '0',
+                      description: issue.description,
+                      status: issueStatus,
+                    },
+                  })
+                }
+              />
+            );
+          })}
+        </View>
+        <Text style={styles.additionalNotesLabel}>{t('requestForm.additionalNotes')}</Text>
+        <TextInput
+          style={styles.textInput}
+          placeholder={t('requestForm.placeholder')}
+          value={additionalNotes}
+          onChangeText={setAdditionalNotes}
+          multiline
+        />
+        <LoadingButton
+          text={t('requestForm.submitRequest')}
+          onPress={handleSubmit}
+          loading={isSubmitting}
+          buttonStyle={styles.primaryButton}
+          textStyle={styles.primaryButtonText}
+        />
+      </ScrollView>
+    </SafeAreaView>
+  );
 };
 
 export default RequestForm;
+

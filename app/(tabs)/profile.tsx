@@ -33,7 +33,7 @@ const Profile = () => {
         
         setModalVisible(false);
       }
-    }, [isAuthenticated, isInitialized, user])
+    }, [isInitialized, isAuthenticated, user])
   );
 
   useEffect(() => {

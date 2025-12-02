@@ -42,7 +42,7 @@ function initializeGoogleSignIn(): void {
     return;
   }
 
-  // Validate web client ID is available
+  // Validate web client ID is available (required for all platforms)
   if (!WEB_OAUTH_CLIENT_ID) {
     const errorMsg =
       'Google Sign-In configuration error: EXPO_PUBLIC_GOOGLE_CLIENT_ID is not set.\n\n' +
@@ -51,7 +51,17 @@ function initializeGoogleSignIn(): void {
     throw new Error(errorMsg);
   }
 
-  // Build configuration object with different approach
+  // For Android: Validate that Android client ID is set (used for package name matching)
+  if (Platform.OS === 'android' && !ANDROID_OAUTH_CLIENT_ID) {
+    console.warn(
+      '⚠️ EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID is not set.\n' +
+      'Android OAuth Client ID should be configured in Google Cloud Console with:\n' +
+      '- Package name: com.peliah.sitelytics\n' +
+      '- SHA-1 certificate fingerprint\n' +
+      'The webClientId will use the Web Client ID, which is correct.'
+    );
+  }
+
   const signInConfig: {
     webClientId: string;
     iosClientId?: string;
@@ -59,7 +69,8 @@ function initializeGoogleSignIn(): void {
     forceCodeForRefreshToken?: boolean;
     scopes?: string[];
   } = {
-    // Web client ID is required and used for Android
+    // Always use Web Client ID for webClientId parameter (standard approach)
+    // The Android client ID is matched automatically via package name + SHA-1
     webClientId: WEB_OAUTH_CLIENT_ID,
     // Disable offline access - we only need id_token
     offlineAccess: false,
@@ -85,13 +96,17 @@ function initializeGoogleSignIn(): void {
   // Log configuration for debugging
   console.log('=== Google Sign-In Configuration ===');
   console.log('Platform:', Platform.OS);
-  console.log('Web Client ID:', WEB_OAUTH_CLIENT_ID.substring(0, 30) + '...');
-  if (Platform.OS === 'ios' && IOS_OAUTH_CLIENT_ID) {
+  console.log('Web Client ID (webClientId):', WEB_OAUTH_CLIENT_ID.substring(0, 30) + '...');
+  if (Platform.OS === 'android') {
+    if (ANDROID_OAUTH_CLIENT_ID) {
+      console.log('Android Client ID (for package matching):', ANDROID_OAUTH_CLIENT_ID.substring(0, 30) + '...');
+      console.log('Note: Android OAuth Client ID must be configured in Google Cloud Console');
+      console.log('      with package name: com.peliah.sitelytics and SHA-1 fingerprint');
+    } else {
+      console.log('⚠️ Android Client ID not set - ensure it\'s configured in Google Cloud Console');
+    }
+  } else if (Platform.OS === 'ios' && IOS_OAUTH_CLIENT_ID) {
     console.log('iOS Client ID:', IOS_OAUTH_CLIENT_ID.substring(0, 30) + '...');
-  }
-  if (Platform.OS === 'android' && ANDROID_OAUTH_CLIENT_ID) {
-    console.log('Android Client ID (reference):', ANDROID_OAUTH_CLIENT_ID.substring(0, 30) + '...');
-    console.log('Note: Android uses webClientId and matches via package name + SHA-1');
   }
   console.log('===================================');
 
@@ -208,19 +223,25 @@ export const googleAuthService = {
 
       console.log('🚀 Starting Google Sign-In...');
 
-      // Check if user is already signed in
+      // Always sign out first to ensure we get a fresh token
+      // This prevents using expired cached tokens
       try {
         const currentUser = await GoogleSignin.getCurrentUser();
-        if (currentUser?.idToken) {
-          console.log('✅ User already signed in, using existing id_token');
-          return currentUser.idToken;
+        if (currentUser) {
+          console.log('⚠️ User already signed in, signing out to get fresh token...');
+          try {
+            await GoogleSignin.signOut();
+            console.log('✅ Signed out successfully, will proceed with fresh sign-in');
+          } catch (signOutError) {
+            console.log('⚠️ Sign-out error (ignoring, will proceed anyway):', signOutError);
+          }
         }
       } catch {
-        // Not signed in, continue with sign-in flow
-        console.log('User not signed in, starting sign-in flow...');
+        // Not signed in or error checking, continue with sign-in flow
+        console.log('User not signed in, starting fresh sign-in flow...');
       }
 
-      // Perform sign-in
+      // Perform sign-in (this will show the Google sign-in UI)
       const signInResponse = await GoogleSignin.signIn();
 
       // Validate response
