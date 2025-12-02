@@ -10,7 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.peliah.sitelytics"
+      "bundleIdentifier": "net.emerj.sitelytics"
     },
     "android": {
       "adaptiveIcon": {
@@ -21,7 +21,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.peliah.sitelytics"
+      "package": "net.emerj.sitelytics"
     },
     "web": {
       "output": "static",
