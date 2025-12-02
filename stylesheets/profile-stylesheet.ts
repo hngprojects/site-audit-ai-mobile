@@ -320,6 +320,22 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     paddingHorizontal: 10,
   },
+ signUpsignInBtn: {
+  width: "100%",
+  height: 50,
+  borderRadius: 10,
+  borderWidth: 1,
+  borderColor: "#FF5A3D",
+  justifyContent: "center",
+  alignItems: "center",
+  marginTop: 20,
+},
+authText: {
+  color: "#FF5A3D",
+  fontSize: 16,
+  fontFamily: "RethinkSans-SemiBold",
+},
+
 });
 
 export default styles;
