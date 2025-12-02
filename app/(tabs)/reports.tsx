@@ -4,6 +4,7 @@ import EditUrlSheet from "@/components/edit-url-sheet";
 import { useSitesStore } from "@/store/sites-store";
 import styles from "@/stylesheets/report-screen-stylesheet";
 import { ReportItemProps, Status } from "@/type";
+import { useTranslation } from "@/utils/translations";
 import { normalizeUrl } from "@/utils/url-validation";
 import { MaterialIcons } from '@expo/vector-icons';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -44,22 +45,24 @@ interface SwipeableRowProps {
 
 const SwipeableRow: React.FC<SwipeableRowProps> = ({ item, url, onDelete, onEdit, onPress }) => {
   const swipeableRef = React.useRef<React.ComponentRef<typeof ReanimatedSwipeable>>(null);
+  const { t } = useTranslation();
 
   const renderRightActions = (_progress: any, _dragX: any) => (
+
     <View style={styles.rightActions}>
       <TouchableOpacity style={styles.editAction} onPress={() => {
         swipeableRef.current?.close();
         onEdit();
       }}>
         <MaterialIcons name="edit" size={20} color="#fff" />
-        <Text style={styles.actionText}>Edit</Text>
+        <Text style={styles.actionText}>{t('common.edit')}</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.deleteAction} onPress={() => {
         swipeableRef.current?.close();
         onDelete();
       }}>
         <MaterialIcons name="delete" size={20} color="#494949" />
-        <Text style={styles.actionTextDelete}>Delete</Text>
+        <Text style={styles.actionTextDelete}>{t('common.delete')}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -97,6 +100,7 @@ const SwipeableRow: React.FC<SwipeableRowProps> = ({ item, url, onDelete, onEdit
 };
 
 const ReportsScreen: React.FC = () => {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const [search, setSearch] = React.useState("");
   const [deleteSheetVisible, setDeleteSheetVisible] = useState(false);
@@ -171,8 +175,8 @@ const ReportsScreen: React.FC = () => {
       deleteSite(itemToDelete.siteId).catch((error) => {
         Toast.show({
           type: 'error',
-          text1: 'Error',
-          text2: error instanceof Error ? error.message : 'Failed to delete report',
+          text1: t('common.error'),
+          text2: error instanceof Error ? error.message : t('reports.deleteError'),
         });
       });
       setItemToDelete(null);
@@ -224,8 +228,8 @@ const ReportsScreen: React.FC = () => {
     } catch (error) {
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: error instanceof Error ? error.message : 'Failed to update URL. Please try again.',
+        text1: t('common.error'),
+        text2: error instanceof Error ? error.message : t('reports.updateError'),
       });
     } finally {
       setIsEditing(false);
@@ -247,13 +251,13 @@ const ReportsScreen: React.FC = () => {
         ]}
       >
         <View style={styles.headerWrap}>
-          <Text style={styles.title}>Report</Text>
+          <Text style={styles.title}>{t('reports.title')}</Text>
         </View>
 
         <View style={styles.searchContainer}>
           <Ionicons name="search" size={24} color="#c0c0c0ff" />
           <TextInput
-            placeholder="Search"
+            placeholder={t('common.search')}
             placeholderTextColor="#9CA3AF"
             style={styles.searchText}
             onChangeText={x => setSearch(x)}
@@ -302,7 +306,7 @@ const ReportsScreen: React.FC = () => {
             ListFooterComponent={<View style={styles.footerSpacer} />}
             ListEmptyComponent={
               <View style={{ paddingVertical: 40, alignItems: 'center' }}>
-                <Text style={{ color: '#9CA3AF', fontSize: 14 }}>No reports found</Text>
+                <Text style={{ color: '#9CA3AF', fontSize: 14 }}>{t('reports.noReports')}</Text>
               </View>
             }
           />
@@ -314,7 +318,7 @@ const ReportsScreen: React.FC = () => {
             onPress={() => router.push('/(tabs)/')}
             activeOpacity={0.8}
           >
-            <Text style={styles.startNewScanText}>Start New Scan</Text>
+            <Text style={styles.startNewScanText}>{t('reports.startNewScan')}</Text>
           </TouchableOpacity>
         </View>
 

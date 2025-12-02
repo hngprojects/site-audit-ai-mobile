@@ -1,6 +1,7 @@
 import { authService, MIN_PASSWORD_LENGTH } from '@/lib/auth-service';
 import { useAuthStore } from '@/store/auth-store';
 import styles from '@/stylesheets/change-password-stylesheet';
+import { useTranslation } from '@/utils/translations';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
@@ -9,6 +10,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
 const ChangePasswordContent = () => {
+  const { t } = useTranslation();
   const router = useRouter();
   const { token } = useAuthStore();
   const [currentPassword, setCurrentPassword] = useState('');
@@ -24,19 +26,19 @@ const ChangePasswordContent = () => {
     const newErrors: { currentPassword?: string; newPassword?: string; confirmPassword?: string } = {};
 
     if (!currentPassword.trim()) {
-      newErrors.currentPassword = 'Current password is required';
+      newErrors.currentPassword = t('changePassword.currentRequired');
     }
 
     if (!newPassword.trim()) {
-      newErrors.newPassword = 'New password is required';
+      newErrors.newPassword = t('changePassword.newRequired');
     } else if (newPassword.length < MIN_PASSWORD_LENGTH) {
-      newErrors.newPassword = `Password must be at least ${MIN_PASSWORD_LENGTH} characters`;
+      newErrors.newPassword = t('changePassword.minLength').replace('{min}', String(MIN_PASSWORD_LENGTH));
     }
 
     if (!confirmPassword.trim()) {
-      newErrors.confirmPassword = 'Please confirm your new password';
+      newErrors.confirmPassword = t('changePassword.confirmRequired');
     } else if (newPassword !== confirmPassword) {
-      newErrors.confirmPassword = "Passwords don't match";
+      newErrors.confirmPassword = t('changePassword.passwordsDontMatch');
     }
 
     setErrors(newErrors);
@@ -52,15 +54,15 @@ const ChangePasswordContent = () => {
 
       Toast.show({
         type: 'success',
-        text1: 'Success',
-        text2: 'Password has been changed successfully',
+        text1: t('common.success'),
+        text2: t('changePassword.updated'),
       });
       setTimeout(() => router.back(), 1500);
     } catch (error) {
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: error instanceof Error ? error.message : 'Failed to update password. Please try again.',
+        text1: t('common.error'),
+        text2: error instanceof Error ? error.message : t('changePassword.updateError'),
       });
     } finally {
       setIsLoading(false);
@@ -82,13 +84,13 @@ const ChangePasswordContent = () => {
           <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
             <Feather name="arrow-left" size={24} color="#1A2373" />
           </TouchableOpacity>
-          <Text style={styles.headerText}>Change Password</Text>
+          <Text style={styles.headerText}>{t('changePassword.title')}</Text>
         </View>
 
         <View style={styles.content}>
           <View style={styles.formSection}>
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Current Password</Text>
+              <Text style={styles.inputLabel}>{t('changePassword.currentPassword')}</Text>
               <View style={styles.passwordInputContainer}>
                 <TextInput
                   style={[styles.input, errors.currentPassword && styles.inputError]}
@@ -97,7 +99,7 @@ const ChangePasswordContent = () => {
                     setCurrentPassword(text);
                     if (errors.currentPassword) setErrors({ ...errors, currentPassword: undefined });
                   }}
-                  placeholder="Enter current password"
+                  placeholder={t('changePassword.enterCurrent')}
                   placeholderTextColor="#B9B9B9"
                   secureTextEntry={!showCurrentPassword}
                 />
@@ -113,7 +115,7 @@ const ChangePasswordContent = () => {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>New Password</Text>
+              <Text style={styles.inputLabel}>{t('changePassword.newPassword')}</Text>
               <View style={styles.passwordInputContainer}>
                 <TextInput
                   style={[styles.input, errors.newPassword && styles.inputError]}
@@ -122,7 +124,7 @@ const ChangePasswordContent = () => {
                     setNewPassword(text);
                     if (errors.newPassword) setErrors({ ...errors, newPassword: undefined });
                   }}
-                  placeholder="Enter new password"
+                  placeholder={t('changePassword.enterNew')}
                   placeholderTextColor="#B9B9B9"
                   secureTextEntry={!showNewPassword}
                 />
@@ -138,7 +140,7 @@ const ChangePasswordContent = () => {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Confirm New Password</Text>
+              <Text style={styles.inputLabel}>{t('changePassword.confirmPassword')}</Text>
               <View style={styles.passwordInputContainer}>
                 <TextInput
                   style={[styles.input, errors.confirmPassword && styles.inputError]}
@@ -147,7 +149,7 @@ const ChangePasswordContent = () => {
                     setConfirmPassword(text);
                     if (errors.confirmPassword) setErrors({ ...errors, confirmPassword: undefined });
                   }}
-                  placeholder="Confirm new password"
+                  placeholder={t('changePassword.confirmNew')}
                   placeholderTextColor="#B9B9B9"
                   secureTextEntry={!showConfirmPassword}
                 />
@@ -172,11 +174,11 @@ const ChangePasswordContent = () => {
               {isLoading ? (
                 <ActivityIndicator size="small" color="#fff" />
               ) : (
-                <Text style={styles.updateButtonText}>Update Password</Text>
+                <Text style={styles.updateButtonText}>{t('changePassword.updatePassword')}</Text>
               )}
             </TouchableOpacity>
             <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
-              <Text style={styles.cancelButtonText}>Cancel</Text>
+              <Text style={styles.cancelButtonText}>{t('common.cancel')}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -187,7 +189,7 @@ const ChangePasswordContent = () => {
 
 export default function ChangePassword() {
   const [isLoaded, setIsLoaded] = useState(false);
-
+  const { t } = useTranslation();
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoaded(true);
@@ -199,7 +201,7 @@ export default function ChangePassword() {
   if (!isLoaded) {
     return (
       <View style={styles.loadingContainer}>
-        <Text>Loading...</Text>
+        <Text>{t('common.loading')}</Text>
       </View>
     );
   }

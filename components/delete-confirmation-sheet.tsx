@@ -1,3 +1,4 @@
+import { useTranslation } from '@/utils/translations';
 import React, { useEffect, useState } from 'react';
 import {
   Animated,
@@ -22,6 +23,7 @@ const DeleteConfirmationSheet: React.FC<DeleteConfirmationSheetProps> = ({
   onConfirm,
   url,
 }) => {
+  const { t } = useTranslation();
   const [slideAnim] = useState(new Animated.Value(0));
   const insets = useSafeAreaInsets();
 
@@ -73,12 +75,12 @@ const DeleteConfirmationSheet: React.FC<DeleteConfirmationSheetProps> = ({
             >
               <View style={styles.modalHeader}>
                 <View style={styles.dragHandle} />
-                <Text style={styles.title}>Delete Url</Text>
+                <Text style={styles.title}>{t('deleteSheet.title')}</Text>
               </View>
 
               <View style={styles.contentContainer}>
                 <Text style={styles.subtitle}>
-                  Are you sure you want to delete this scan? This action cannot be undone.
+                  {t('deleteSheet.message')}
                 </Text>
               </View>
 
@@ -88,7 +90,7 @@ const DeleteConfirmationSheet: React.FC<DeleteConfirmationSheetProps> = ({
                   onPress={onClose}
                   activeOpacity={0.8}
                 >
-                  <Text style={styles.cancelButtonText}>Cancel</Text>
+                  <Text style={styles.cancelButtonText}>{t('common.cancel')}</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -96,7 +98,7 @@ const DeleteConfirmationSheet: React.FC<DeleteConfirmationSheetProps> = ({
                   onPress={handleConfirm}
                   activeOpacity={0.8}
                 >
-                  <Text style={styles.deleteButtonText}>Delete</Text>
+                  <Text style={styles.deleteButtonText}>{t('deleteSheet.confirm')}</Text>
                 </TouchableOpacity>
               </View>
             </Animated.View>

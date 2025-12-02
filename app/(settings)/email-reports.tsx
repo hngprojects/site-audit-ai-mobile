@@ -1,5 +1,6 @@
 import { useEmailReportsStore, type EmailFrequency } from '@/store/email-reports-store';
 import styles from '@/stylesheets/email-reports-stylesheet';
+import { useTranslation } from '@/utils/translations';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
@@ -8,6 +9,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
 const EmailReportsContent = () => {
+  const { t } = useTranslation();
   const router = useRouter();
   const { frequency, setFrequency } = useEmailReportsStore();
   const [selectedFrequency, setSelectedFrequency] = useState<EmailFrequency | null>(frequency);
@@ -17,10 +19,10 @@ const EmailReportsContent = () => {
   }, [frequency]);
 
   const frequencies: { value: EmailFrequency; label: string }[] = [
-    { value: 'weekly', label: 'Weekly' },
-    { value: 'monthly', label: 'Monthly' },
-    { value: 'quarterly', label: 'Quarterly' },
-    { value: 'never', label: 'Never' },
+    { value: 'weekly', label: t('emailReports.weekly') },
+    { value: 'monthly', label: t('emailReports.monthly') },
+    { value: 'quarterly', label: t('emailReports.quarterly') },
+    { value: 'never', label: t('emailReports.never') },
   ];
 
   const handleSave = () => {
@@ -28,8 +30,8 @@ const EmailReportsContent = () => {
       setFrequency(selectedFrequency);
       Toast.show({
         type: 'success',
-        text1: 'Success',
-        text2: 'Email report frequency has been updated successfully',
+        text1: t('common.success'),
+        text2: t('emailReports.updated'),
       });
       router.back();
     }
@@ -41,12 +43,12 @@ const EmailReportsContent = () => {
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
           <Feather name="arrow-left" size={24} color="#1A2373" />
         </TouchableOpacity>
-        <Text style={styles.headerText}>Email Reports</Text>
+        <Text style={styles.headerText}>{t('emailReports.title')}</Text>
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.title}>Schedule automated reports</Text>
-        <Text style={styles.description}>Control how often you receive email reports</Text>
+        <Text style={styles.title}>{t('emailReports.subtitle')}</Text>
+        <Text style={styles.description}>{t('emailReports.description')}</Text>
 
         <View style={styles.optionsGroup}>
           {frequencies.map((frequency, index) => (
@@ -85,7 +87,7 @@ const EmailReportsContent = () => {
               styles.saveButtonText,
               selectedFrequency ? styles.saveButtonTextActive : styles.saveButtonTextInactive,
             ]}>
-              Save
+              {t('common.save')}
             </Text>
           </TouchableOpacity>
         </View>

@@ -1,5 +1,6 @@
 import { resendResetToken } from '@/actions/auth-actions';
 import styles from "@/stylesheets/otpVerificationStylesheet";
+import { useTranslation } from '@/utils/translations';
 import { useResetPasswordEmailStore } from "@/zustardStore/resetPasswordEmailStore";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -10,6 +11,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Toast from 'react-native-toast-message';
 
 const OTPVerification = () => {
+  const { t } = useTranslation();
   const router = useRouter();
   const params = useLocalSearchParams();
   const insets = useSafeAreaInsets();
@@ -71,38 +73,28 @@ const OTPVerification = () => {
     if (!emailWeSentYourCode) {
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: `Email not found. Please start the ${mode === 'reset' ? 'password reset' : 'sign up'} process again.`,
+        text1: t('common.error'),
+        text2: t('otp.emailNotFound'),
       });
       return;
     }
 
     setResending(true);
     try {
-      if (mode === 'reset') {
-        await resendResetToken(emailWeSentYourCode);
-        Toast.show({
-          type: 'success',
-          text1: 'Success',
-          text2: 'Reset code has been resent to your email.',
-        });
-      } else if (mode === 'signup') {
-        // TODO: Implement signup resend API call
-        // For now, show a message
-        Toast.show({
-          type: 'info',
-          text1: 'Info',
-          text2: 'Please check your email for the verification code.',
-        });
-      }
+      await resendResetToken(emailWeSentYourCode);
+      Toast.show({
+        type: 'success',
+        text1: t('common.success'),
+        text2: t('otp.codeResent'),
+      });
       setOtpCode('');
       setOtpFilled(false);
       setInvalidOtp(false);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to resend code. Please try again.';
+      const errorMessage = error instanceof Error ? error.message : t('otp.resendError');
       Toast.show({
         type: 'error',
-        text1: 'Error',
+        text1: t('common.error'),
         text2: errorMessage,
       });
     } finally {
@@ -130,16 +122,15 @@ const OTPVerification = () => {
             </TouchableOpacity>
 
             <Text style={styles.headerText}>
-                Verification
+                {t('otp.verification')}
             </Text>
             
         </View>
 
 
       <Text style={styles.subTitle}>
-        We&apos;ve sent a 6-digit code to{" "}
-        <Text style={styles.email}>{emailWeSentYourCode}</Text>. Enter it
-        below to {mode === 'reset' ? 'reset your password' : 'verify your account'}.
+        {t('otp.codeSent')}{" "}
+        <Text style={styles.email}>{emailWeSentYourCode}</Text>. {t('otp.enterCode')}
       </Text>
 
     
@@ -166,20 +157,20 @@ const OTPVerification = () => {
 
       {invalidOtp && (
         <Text style={styles.invalidCode}>
-            Invalid code, check your email and try again
+            {t('otp.invalidCode')}
         </Text>
       )}
 
       <View style={styles.resendContainer}>
         <Text style={styles.resendText}>
-            Didn&apos;t receive a code?
+            {t('otp.didntReceive')}
         </Text>
         <TouchableOpacity 
           onPress={handleResend}
           disabled={resending}
         >
              <Text style={styles.resend}>
-               {resending ? 'Resending...' : 'Resend'}
+               {resending ? t('otp.resending') : t('otp.resend')}
              </Text>
         </TouchableOpacity>
       </View>
@@ -203,7 +194,7 @@ const OTPVerification = () => {
             <Text style={{...styles.continueBtnText,
                  color: !otpFilled ? "#b9b9b9" : "#FFF",
             }}>
-              Continue
+              {t('common.continue')}
             </Text>
           </TouchableOpacity>
         </View>

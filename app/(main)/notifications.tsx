@@ -2,6 +2,7 @@ import { ThemedText } from '@/components/themed-text';
 import type { Notification } from '@/service/notifications';
 import { deleteNotification, getNotifications, markAllAsRead, markAsRead } from '@/service/notifications';
 import styles from '@/stylesheets/notifications-stylesheet';
+import { useTranslation } from '@/utils/translations';
 import { Feather, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
@@ -9,6 +10,7 @@ import { FlatList, Image, Platform, RefreshControl, TextInput, TouchableOpacity,
 import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
+// import Toast from 'react-native-toast-message';
 
 const SkeletonCard = () => (
   <View style={[styles.card, styles.skeletonCard]}>
@@ -42,7 +44,7 @@ const NotificationItem = ({ item, onMarkRead, onDelete }: { item: Notification; 
           onPress={() => onMarkRead(item.id)}
         >
           <View style={styles.itemIconContainer}>
-              <Ionicons name="notifications-outline" size={24} color="blue" />
+            <Ionicons name="notifications-outline" size={24} color="blue" />
           </View>
 
           <View style={styles.cardContent}>
@@ -85,6 +87,7 @@ const NotificationItem = ({ item, onMarkRead, onDelete }: { item: Notification; 
 };
 
 export default function NotificationsScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -148,8 +151,8 @@ export default function NotificationsScreen() {
       console.error('Mark read error', e);
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: 'Could not mark notification as read',
+        text1: t('common.error'),
+        text2: t('notifications.markReadError'),
       });
     }
   };
@@ -163,16 +166,16 @@ export default function NotificationsScreen() {
         setNotifications((prev) => prev.filter((n) => n.id !== id));
         Toast.show({
           type: 'success',
-          text1: 'Success',
-          text2: 'Notification deleted successfully',
+          text1: t('common.success'),
+          text2: t('notifications.deleteSuccess'),
         });
       }
     } catch (e) {
       console.error('Delete notification error', e);
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: 'Could not delete notification',
+        text1: t('common.error'),
+        text2: t('notifications.deleteError'),
       });
     }
   };
@@ -180,7 +183,7 @@ export default function NotificationsScreen() {
   if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
-        <ThemedText  type="title">Notification</ThemedText>
+        <ThemedText type="title">Notification</ThemedText>
         <View style={styles.loadingPadding}>
           <SkeletonCard />
           <View style={{ height: 8 }} />
@@ -230,20 +233,20 @@ export default function NotificationsScreen() {
         )}
       </View>
 
-      <View style={styles.searchMargin}>
-        <View style={styles.androidSearchContainer}>
-          <MaterialIcons name="search" size={18} color="#9BA1A6" />
-          <TextInput value={search} onChangeText={setSearch} placeholder="Search" placeholderTextColor="#C7C8C9" style={styles.searchInput} />
-        </View>
-      </View>
-      </>
-      )}
+            <View style={styles.searchMargin}>
+              <View style={styles.androidSearchContainer}>
+                <MaterialIcons name="search" size={18} color="#9BA1A6" />
+                <TextInput value={search} onChangeText={setSearch} placeholder={t('common.search')} placeholderTextColor="#C7C8C9" style={styles.searchInput} />
+              </View>
+            </View>
+          </>
+        )}
 
       {error ? (
         <View style={styles.errorPadding}>
           <ThemedText>{error}</ThemedText>
           <TouchableOpacity onPress={load} style={{ marginTop: 12 }}>
-            <ThemedText>Try again</ThemedText>
+            <ThemedText>{t('notifications.tryAgain')}</ThemedText>
           </TouchableOpacity>
         </View>
       ) : (
@@ -263,7 +266,7 @@ export default function NotificationsScreen() {
               <View style={styles.emptyIconContainer}>
                 <Image source={require('@/assets/images/no-message-bell.png')} style={styles.emptyIcon} />
               </View>
-              <ThemedText type="subtitle" style={{ marginTop: 12 }}>No message yet</ThemedText>
+              <ThemedText type="subtitle" style={{ marginTop: 12 }}>{t('notifications.noMessage')}</ThemedText>
             </View>
           )}
         />

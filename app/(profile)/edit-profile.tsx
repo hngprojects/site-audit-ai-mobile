@@ -3,6 +3,7 @@ import { profileService } from '@/lib/profile-service';
 import { useAuthStore } from '@/store/auth-store';
 import styles from '@/stylesheets/edit-profile-stylesheet';
 import { getFullImageUrl } from '@/utils/image-url';
+import { useTranslation } from '@/utils/translations';
 import { Feather } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
@@ -13,6 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
 const EditProfileContent = () => {
+  const { t } = useTranslation();
   const router = useRouter();
   const { user, token } = useAuthStore();
   const [fullName, setFullName] = useState(user?.fullName || '');
@@ -87,9 +89,9 @@ const EditProfileContent = () => {
     const newErrors: { fullName?: string; email?: string; phoneNumber?: string } = {};
 
     if (!fullName.trim()) {
-      newErrors.fullName = 'Full name is required';
+      newErrors.fullName = t('editProfile.nameRequired');
     } else if (fullName.trim().length < 2) {
-      newErrors.fullName = 'Full name must be at least 2 characters';
+      newErrors.fullName = t('editProfile.nameMinLength');
     } else {
       // Disallow emojis and punctuation: only allow letters, numbers, and spaces
       let hasInvalidChars = false;
@@ -99,14 +101,14 @@ const EditProfileContent = () => {
         hasInvalidChars = /[^A-Za-z0-9 ]/g.test(fullName);
       }
       if (hasInvalidChars) {
-        newErrors.fullName = 'Full name can only contain letters, numbers, and spaces';
+        newErrors.fullName = t('editProfile.nameInvalidChars');
       }
     }
 
     if (!email.trim()) {
-      newErrors.email = 'Email is required';
+      newErrors.email = t('auth.emailRequired');
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = 'Incorrect email format';
+      newErrors.email = t('auth.invalidEmail');
     }
 
     if (phoneNumber && phoneNumber.trim()) {
@@ -166,15 +168,15 @@ const EditProfileContent = () => {
 
       Toast.show({
         type: 'success',
-        text1: 'Success',
-        text2: 'Profile has been updated successfully',
+        text1: t('common.success'),
+        text2: t('editProfile.profileUpdated'),
       });
       setTimeout(() => router.back(), 1500);
     } catch (error) {
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: error instanceof Error ? error.message : 'Failed to update profile. Please try again.',
+        text1: t('common.error'),
+        text2: error instanceof Error ? error.message : t('editProfile.updateError'),
       });
     } finally {
       setIsLoading(false);
@@ -193,8 +195,8 @@ const EditProfileContent = () => {
       if (cameraStatus !== 'granted' || mediaLibraryStatus !== 'granted') {
         Toast.show({
           type: 'warning',
-          text1: 'Permissions Required',
-          text2: 'Camera and media library permissions are required to change your profile photo.',
+          text1: t('editProfile.permissionsRequired'),
+          text2: t('editProfile.cameraPermission'),
         });
         return false;
       }
@@ -219,8 +221,8 @@ const EditProfileContent = () => {
         if (asset.fileSize && asset.fileSize > 3 * 1024 * 1024) {
           Toast.show({
             type: 'error',
-            text1: 'Error',
-            text2: 'Image size must be less than 3MB. Please choose a smaller image.',
+            text1: t('common.error'),
+            text2: t('editProfile.imageSizeError'),
           });
           return;
         }
@@ -229,8 +231,8 @@ const EditProfileContent = () => {
     } catch {
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: 'Failed to take photo. Please try again.',
+        text1: t('common.error'),
+        text2: t('editProfile.takePhotoError'),
       });
     }
   };
@@ -252,8 +254,8 @@ const EditProfileContent = () => {
         if (asset.fileSize && asset.fileSize > 3 * 1024 * 1024) {
           Toast.show({
             type: 'error',
-            text1: 'Error',
-            text2: 'Image size must be less than 3MB. Please choose a smaller image.',
+            text1: t('common.error'),
+            text2: t('editProfile.imageSizeError'),
           });
           return;
         }
@@ -262,8 +264,8 @@ const EditProfileContent = () => {
     } catch {
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: 'Failed to select image. Please try again.',
+        text1: t('common.error'),
+        text2: t('editProfile.selectImageError'),
       });
     }
   };
@@ -287,14 +289,14 @@ const EditProfileContent = () => {
 
       Toast.show({
         type: 'success',
-        text1: 'Success',
-        text2: 'Profile photo updated successfully',
+        text1: t('common.success'),
+        text2: t('editProfile.photoUpdated'),
       });
     } catch (error) {
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: error instanceof Error ? error.message : 'Failed to upload image. Please try again.',
+        text1: t('common.error'),
+        text2: error instanceof Error ? error.message : t('editProfile.uploadError'),
       });
     } finally {
       setIsUploadingImage(false);
@@ -326,7 +328,7 @@ const EditProfileContent = () => {
           <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
             <Feather name="arrow-left" size={24} color="#1A2373" />
           </TouchableOpacity>
-          <Text style={styles.headerText}>Edit Profile</Text>
+          <Text style={styles.headerText}>{t('editProfile.title')}</Text>
         </View>
 
         <View style={styles.content}>
@@ -375,7 +377,7 @@ const EditProfileContent = () => {
             </View>
             <TouchableOpacity onPress={handleChangePhoto} disabled={isUploadingImage}>
               <Text style={styles.changePhotoText}>
-                {isUploadingImage ? 'Uploading...' : 'Change Photo'}
+                {isUploadingImage ? t('common.loading') : t('editProfile.changePhoto')}
               </Text>
             </TouchableOpacity>
           </View>
@@ -383,7 +385,7 @@ const EditProfileContent = () => {
           {/* Form Section */}
           <View style={styles.formSection}>
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Full Name</Text>
+              <Text style={styles.inputLabel}>{t('editProfile.fullName')}</Text>
               <TextInput
                 style={[styles.input, errors.fullName && styles.inputError]}
                 value={fullName}
@@ -391,18 +393,18 @@ const EditProfileContent = () => {
                   setFullName(text);
                   if (errors.fullName) setErrors({ ...errors, fullName: undefined });
                 }}
-                placeholder="Enter your full name"
+                placeholder={t('editProfile.enterFullName')}
                 placeholderTextColor="#B9B9B9"
               />
               {errors.fullName && <Text style={styles.errorText}>{errors.fullName}</Text>}
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Email Address</Text>
+              <Text style={styles.inputLabel}>{t('editProfile.email')}</Text>
               <TextInput
                 style={[styles.input, errors.email && styles.inputError]}
                 value={email}
-                placeholder="Enter your email"
+                placeholder={t('editProfile.enterEmail')}
                 placeholderTextColor="#B9B9B9"
                 keyboardType="email-address"
                 autoCapitalize="none"
@@ -521,7 +523,7 @@ const EditProfileContent = () => {
               {isLoading ? (
                 <ActivityIndicator size="small" color="#fff" />
               ) : (
-                <Text style={styles.saveButtonText}>Save Changes</Text>
+                <Text style={styles.saveButtonText}>{t('editProfile.saveChanges')}</Text>
               )}
             </TouchableOpacity>
             <TouchableOpacity
@@ -529,7 +531,7 @@ const EditProfileContent = () => {
               onPress={handleCancel}
               disabled={isLoading || isUploadingImage}
             >
-              <Text style={styles.cancelButtonText}>Cancel</Text>
+              <Text style={styles.cancelButtonText}>{t('common.cancel')}</Text>
             </TouchableOpacity>
           </View>
         </View>
