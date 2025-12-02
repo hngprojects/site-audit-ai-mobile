@@ -21,7 +21,14 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "net.emerj.sitelytics"
+      "package": "net.emerj.sitelytics",
+      "permissions": [
+        "CAMERA",
+        "READ_MEDIA_IMAGES",
+        "READ_MEDIA_VIDEO",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
     },
     "web": {
       "output": "static",
@@ -47,6 +54,21 @@
         "@react-native-google-signin/google-signin",
         {
           "iosUrlScheme": "com.googleusercontent.apps.546863276810-l24ttcjpguld9vpcifolbqk99t8soges"
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you set your profile picture and share audit results.",
+          "cameraPermission": "The app accesses your camera to let you take photos for your profile picture."
+        }
+      ],
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "The app accesses your photos to save and share audit results.",
+          "savePhotosPermission": "The app saves images to your photo library when you share audit results.",
+          "isAccessMediaLocationEnabled": false
         }
       ]
     ],
