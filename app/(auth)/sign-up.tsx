@@ -96,8 +96,26 @@ const SignUp = () => {
     try {
       await signUp(email.trim(), password);
       // Navigation is handled by useEffect when isAuthenticated changes
-    } catch (err) {
-      // Error is handled by the store and shown via Alert
+    } catch (err: any) {
+      // Check if this is a successful signup
+      if (err.isSignupSuccess) {
+        // Show success message and redirect to sign-in page
+        Toast.show({
+          type: 'success',
+          text1: 'Success!',
+          text2: err.message || 'Account created successfully. Please sign in.',
+        });
+        // Redirect to sign-in page after a short delay, preserving the redirect parameter
+        setTimeout(() => {
+          router.replace({
+            pathname: '/(auth)/sign-in',
+            params: params.redirect ? { redirect: params.redirect } : {}
+          });
+        }, 2000);
+        return;
+      }
+
+      // Regular error handling
       console.error('Sign up error:', err);
     }
   };

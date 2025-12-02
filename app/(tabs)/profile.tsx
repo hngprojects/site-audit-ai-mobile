@@ -6,7 +6,7 @@ import ProfileHeader from '@/components/profile/profile-header';
 import { useAuth } from '@/hooks/use-auth';
 import styles from '@/stylesheets/profile-stylesheet';
 import { useFocusEffect } from '@react-navigation/native';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ScrollView, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -15,18 +15,18 @@ const Profile = () => {
   const [modalVisible, setModalVisible] = useState(false);
 
   const handleAuthModal = () => {
-     if (isInitialized && !isAuthenticated) {
-        setModalVisible(true);
-      } else if (isAuthenticated) {
-        console.log(user);
-        
-        setModalVisible(false);
-      }
+    if (isInitialized && !isAuthenticated) {
+      setModalVisible(true);
+    } else if (isAuthenticated) {
+      console.log(user);
+
+      setModalVisible(false);
+    }
   }
 
   useFocusEffect(
     useCallback(() => {
-     handleAuthModal()
+      handleAuthModal()
     }, [isAuthenticated, isInitialized, user])
   );
 
@@ -59,16 +59,16 @@ const Profile = () => {
             <ProfileContent user={user} />
           ) : (
             <>
-            <ProfileEmptyState />
+              <ProfileEmptyState />
 
-            <TouchableOpacity style={styles.signUpsignInBtn} onPress={handleAuthModal}>
-              <Text style={styles.authText}>Sign Up / Sign In</Text>
-            </TouchableOpacity>
+              <TouchableOpacity style={styles.signUpsignInBtn} onPress={handleAuthModal}>
+                <Text style={styles.authText}>Sign Up / Sign In</Text>
+              </TouchableOpacity>
             </>
           )}
         </ScrollView>
       </SafeAreaView>
-      <AuthModal visible={modalVisible && !isAuthenticated} onClose={closeModal} />
+      <AuthModal visible={modalVisible && !isAuthenticated} onClose={closeModal} dismissible={false} />
     </>
   );
 };

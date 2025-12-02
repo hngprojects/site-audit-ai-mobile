@@ -189,7 +189,6 @@ const styles = StyleSheet.create({
     // flex: 1,
     fontSize: 24,
     color: '#111',
-    marginLeft: - 15,
   },
 
   markAllButton: {

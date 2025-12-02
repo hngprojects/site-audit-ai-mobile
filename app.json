@@ -50,6 +50,8 @@
       ],
       "expo-secure-store",
       "expo-web-browser",
+      "expo-notifications",
+      "expo-apple-authentication",
       [
         "@react-native-google-signin/google-signin",
         {

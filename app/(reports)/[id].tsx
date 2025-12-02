@@ -72,8 +72,7 @@ const fgColor =
     : "#D72D2D";
 
 
-const containerWidth = 200; 
-const progressWidth = (numericScore / 100) * containerWidth;
+const progressWidth = `${numericScore}%`;
 
 
 const hireAPro = () => {
@@ -110,12 +109,15 @@ const rawDescription = Array.isArray(params.description) ? params.description[0]
         flex: 1
     }}>
         <ScrollView>
-            <View style={{flexDirection: 'row', alignItems: 'center', gap: 20, marginBottom: 20,  paddingHorizontal: 20, paddingTop: 10, marginTop: 35,}}>
-            <TouchableOpacity onPress={() => router.back()}>
+        <View style={{position: 'relative', marginBottom: 20, paddingHorizontal: 20, paddingTop: 10, marginTop: 35,}}>
+            <TouchableOpacity
+                onPress={() => router.back()}
+                style={{position: 'absolute', left: 20, zIndex: 1}}
+            >
                 <Ionicons name="arrow-back-sharp" size={24} color="black" />
             </TouchableOpacity>
             <Text style={styles.pageTitle}>Audit Summary</Text>
-            </View>
+        </View>
             
             
             <View style={{

@@ -34,3 +34,7 @@ export const signInWithGoogle = async (): Promise<AuthResponse> => {
   return await authService.signInWithGoogle();
 };
 
+export const signInWithApple = async (): Promise<AuthResponse> => {
+  return await authService.signInWithApple();
+};
+

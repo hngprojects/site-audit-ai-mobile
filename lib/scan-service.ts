@@ -1,4 +1,5 @@
 import { apiClient, formatErrorMessage, isAxiosError } from '@/lib/api-client';
+import { useAuthStore } from '@/store/auth-store';
 
 export interface StartScanRequest {
   top_n: number;
@@ -140,15 +141,35 @@ export const scanService = {
       throw new Error('URL is required');
     }
 
+    // Get authentication state (optional)
+    const authState = useAuthStore.getState();
+    const isAuthenticated = authState.isAuthenticated;
+    const token = authState.token;
+    const userId = authState.user?.id;
+
+    // Prepare request payload
+    const payload: any = { url, top_n: topN };
+
+    // Include user_id if authenticated
+    if (isAuthenticated && userId) {
+      payload.user_id = userId;
+    }
+
+    // Prepare headers
+    const headers: any = {
+      'Content-Type': 'application/json',
+    };
+
+    // Include authorization header if authenticated
+    if (isAuthenticated && token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
     try {
       const response = await apiClient.post<StartScanResponse>(
         '/api/v1/scan/start-async',
-        { url, top_n: topN },
-        {
-          headers: {
-            Authorization: `Bearer ${apiClient.defaults.headers.common['Authorization']}`,
-          },
-        }
+        payload,
+        { headers }
       );
       const responseData = response.data;
 
@@ -182,14 +203,25 @@ export const scanService = {
       throw new Error('Job ID is required');
     }
 
+    // Get authentication state (optional)
+    const authState = useAuthStore.getState();
+    const isAuthenticated = authState.isAuthenticated;
+    const token = authState.token;
+
+    // Prepare headers
+    const headers: any = {
+      'Content-Type': 'application/json',
+    };
+
+    // Include authorization header if authenticated
+    if (isAuthenticated && token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
     try {
       const response = await apiClient.get<ScanStatusResponse>(
         `/api/v1/scan/${jobId}/status`,
-        {
-          headers: {
-            Authorization: `Bearer ${apiClient.defaults.headers.common['Authorization']}`,
-          },
-        }
+        { headers }
       );
       const responseData = response.data;
 
@@ -212,14 +244,25 @@ export const scanService = {
       throw new Error('Job ID is required');
     }
 
+    // Get authentication state (optional)
+    const authState = useAuthStore.getState();
+    const isAuthenticated = authState.isAuthenticated;
+    const token = authState.token;
+
+    // Prepare headers
+    const headers: any = {
+      'Content-Type': 'application/json',
+    };
+
+    // Include authorization header if authenticated
+    if (isAuthenticated && token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
     try {
       const response = await apiClient.get<ScanResultResponse>(
         `/api/v1/scan/${jobId}/results`,
-        {
-          headers: {
-            Authorization: `Bearer ${apiClient.defaults.headers.common['Authorization']}`,
-          },
-        }
+        { headers }
       );
       const responseData = response.data;
 

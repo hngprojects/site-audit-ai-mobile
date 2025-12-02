@@ -27,8 +27,7 @@ const style = StyleSheet.create({
   pageTitle: {
     fontSize: 19,
     color: "#111",
-    marginLeft: 50,
-    marginHorizontal: 20,
+    textAlign: 'center',
     fontFamily: "RethinkSans-Bold",
   },
 

@@ -1,12 +1,12 @@
 import { ThemedText } from '@/components/themed-text';
 import type { Notification } from '@/service/notifications';
-import { deleteNotification, getNotifications, markAsRead } from '@/service/notifications';
+import { deleteNotification, getNotifications, markAllAsRead, markAsRead } from '@/service/notifications';
 import styles from '@/stylesheets/notifications-stylesheet';
 import { useTranslation } from '@/utils/translations';
 import { Feather, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { FlatList, Image, Platform, TextInput, TouchableOpacity, View } from 'react-native';
+import { FlatList, Image, Platform, RefreshControl, TextInput, TouchableOpacity, View } from 'react-native';
 import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
@@ -93,6 +93,7 @@ export default function NotificationsScreen() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
 
   const load = useCallback(async () => {
     setIsLoading(true);
@@ -112,18 +113,36 @@ export default function NotificationsScreen() {
     load();
   }, [load]);
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await load();
+    setRefreshing(false);
+  };
+
   const markAllRead = async () => {
     try {
-      // update local state since backend is dummy
-      setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })));
+      const success = await markAllAsRead();
+      if (success) {
+        setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })));
+        Toast.show({
+          type: 'success',
+          text1: 'Success',
+          text2: 'All notifications marked as read',
+        });
+      }
     } catch (e) {
       console.error('Mark all read error', e);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Could not mark all notifications as read',
+      });
     }
   };
 
   const handleMarkRead = async (id: string) => {
     try {
-      const ok = await markAsRead(id);
+      const ok = await markAsRead([id]);
       if (ok) {
         setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, unread: false } : n)));
       }
@@ -234,6 +253,9 @@ export default function NotificationsScreen() {
           renderItem={({ item }) => <NotificationItem item={item} onMarkRead={handleMarkRead} onDelete={handleDelete} />}
           ItemSeparatorComponent={() => <View style={styles.separator} />}
           contentContainerStyle={styles.listContainer}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
           ListEmptyComponent={() => (
             <View style={styles.emptyContainer}>
               <View style={styles.emptyIconContainer}>

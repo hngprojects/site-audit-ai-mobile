@@ -1,3 +1,4 @@
+import { COUNTRIES, PHONE_NUMBER_LENGTHS } from '@/constants/countries';
 import { profileService } from '@/lib/profile-service';
 import { useAuthStore } from '@/store/auth-store';
 import styles from '@/stylesheets/edit-profile-stylesheet';
@@ -8,7 +9,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, Image, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, Modal, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
@@ -23,6 +24,24 @@ const EditProfileContent = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [errors, setErrors] = useState<{ fullName?: string; email?: string; phoneNumber?: string }>({});
+  const [showCountryPicker, setShowCountryPicker] = useState(false);
+  const [countrySearch, setCountrySearch] = useState('');
+  const [selectedCountry, setSelectedCountry] = useState({
+    code: 'NG',
+    name: 'Nigeria',
+    flag: '🇳🇬',
+    dial_code: '+234'
+  });
+
+  // Countries data imported from constants
+
+  // Filter countries based on search
+  const filteredCountries = COUNTRIES.filter(country =>
+    country.name.toLowerCase().includes(countrySearch.toLowerCase()) ||
+    country.dial_code.includes(countrySearch) ||
+    country.code.toLowerCase().includes(countrySearch.toLowerCase())
+  );
+
   const hasInitialized = useRef(false);
 
   // Load fresh profile data when screen is focused
@@ -92,8 +111,18 @@ const EditProfileContent = () => {
       newErrors.email = t('auth.invalidEmail');
     }
 
-    if (phoneNumber && phoneNumber.trim() && !/^\+?[\d\s\-\(\)]+$/.test(phoneNumber)) {
-      newErrors.phoneNumber = t('editProfile.phoneInvalid');
+    if (phoneNumber && phoneNumber.trim()) {
+      // Basic phone number validation - check if it contains only valid characters
+      const phoneRegex = /^[\d\s\-\(\)\+]+$/;
+      const digitsOnly = phoneNumber.replace(/\D/g, '');
+      const maxLength = PHONE_NUMBER_LENGTHS[selectedCountry.code] || PHONE_NUMBER_LENGTHS.default;
+
+      if (!phoneRegex.test(phoneNumber)) {
+        newErrors.phoneNumber = 'Please enter a valid phone number';
+      } else if (digitsOnly.length < 7) {
+        newErrors.phoneNumber = `Phone number is too short for ${selectedCountry.name}`;
+      }
+      // Note: We don't check for "too long" here because maxLength prevents input beyond the limit
     }
 
     setErrors(newErrors);
@@ -385,20 +414,103 @@ const EditProfileContent = () => {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>{t('editProfile.phoneNumber')}</Text>
-              <TextInput
-                style={[styles.input, errors.phoneNumber && styles.inputError]}
-                value={phoneNumber}
-                onChangeText={(text: string) => {
-                  setPhoneNumber(text);
-                  if (errors.phoneNumber) setErrors({ ...errors, phoneNumber: undefined });
-                }}
-                placeholder={t('editProfile.enterPhone')}
-                placeholderTextColor="#B9B9B9"
-                keyboardType="phone-pad"
-              />
+              <Text style={styles.inputLabel}>Phone Number</Text>
+              <View style={[styles.phoneInputContainer, errors.phoneNumber && styles.inputError]}>
+                <TouchableOpacity
+                  style={styles.countryPickerButton}
+                  onPress={() => setShowCountryPicker(true)}
+                  activeOpacity={0.7}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                >
+                  <Text style={styles.countryFlag}>{selectedCountry.flag}</Text>
+                  <Text style={styles.countryCodeText}>{selectedCountry.dial_code}</Text>
+                </TouchableOpacity>
+                <TextInput
+                  style={styles.phoneNumberInput}
+                  value={phoneNumber.replace(selectedCountry.dial_code, '').trim()}
+                  onChangeText={(text) => {
+                    // Remove any non-digit characters
+                    const cleanText = text.replace(/\D/g, '');
+                    const maxLength = PHONE_NUMBER_LENGTHS[selectedCountry.code] || PHONE_NUMBER_LENGTHS.default;
+
+                    // Limit input to maximum length for the selected country
+                    const limitedText = cleanText.slice(0, maxLength);
+                    const fullNumber = selectedCountry.dial_code + limitedText;
+
+                    setPhoneNumber(fullNumber);
+                    if (errors.phoneNumber) setErrors({ ...errors, phoneNumber: undefined });
+                  }}
+                  placeholder="Enter your phone number (optional)"
+                  placeholderTextColor="#B9B9B9"
+                  keyboardType="phone-pad"
+                  maxLength={PHONE_NUMBER_LENGTHS[selectedCountry.code] || PHONE_NUMBER_LENGTHS.default}
+                  editable={true}
+                  selectTextOnFocus={true}
+                />
+              </View>
               {errors.phoneNumber && <Text style={styles.errorText}>{errors.phoneNumber}</Text>}
             </View>
+
+            <Modal
+              visible={showCountryPicker}
+              transparent={true}
+              animationType="fade"
+              onRequestClose={() => setShowCountryPicker(false)}
+            >
+              <TouchableOpacity
+                style={styles.countryModalBackdrop}
+                activeOpacity={1}
+                onPress={() => setShowCountryPicker(false)}
+              >
+                <View style={styles.countryModalContent}>
+                  <View style={styles.countryModalHeader}>
+                    <Text style={styles.countryModalTitle}>Select Country</Text>
+                    <TouchableOpacity
+                      onPress={() => setShowCountryPicker(false)}
+                      style={styles.countryModalClose}
+                    >
+                      <Text style={styles.countryModalCloseText}>✕</Text>
+                    </TouchableOpacity>
+                  </View>
+
+                  <View style={styles.countrySearchContainer}>
+                    <TextInput
+                      style={styles.countrySearchInput}
+                      placeholder="Search countries..."
+                      placeholderTextColor="#B9B9B9"
+                      value={countrySearch}
+                      onChangeText={setCountrySearch}
+                    />
+                  </View>
+
+                  <ScrollView style={styles.countryList} showsVerticalScrollIndicator={false}>
+                    {filteredCountries.map((country) => (
+                      <TouchableOpacity
+                        key={country.code}
+                        style={styles.countryItem}
+                        onPress={() => {
+                          setSelectedCountry(country);
+                          setShowCountryPicker(false);
+                          setCountrySearch('');
+                          // Update phone number with new country code
+                          const currentNumber = phoneNumber.replace(/^\+\d+/, '');
+                          setPhoneNumber(country.dial_code + currentNumber);
+                        }}
+                      >
+                        <Text style={styles.countryFlag}>{country.flag}</Text>
+                        <View style={styles.countryInfo}>
+                          <Text style={styles.countryName}>{country.name}</Text>
+                          <Text style={styles.countryDialCode}>{country.dial_code}</Text>
+                        </View>
+                        {selectedCountry.code === country.code && (
+                          <Text style={styles.countrySelected}>✓</Text>
+                        )}
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                </View>
+              </TouchableOpacity>
+            </Modal>
           </View>
 
           {/* Buttons */}

@@ -17,6 +17,7 @@ export const useAuth = () => {
     error,
     signIn,
     signInWithGoogle,
+    signInWithApple,
     signUp,
     signOut,
     initialize,
@@ -55,6 +56,7 @@ export const useAuth = () => {
     // Actions
     signIn,
     signInWithGoogle,
+    signInWithApple,
     signUp: (email: string, password: string) => signUp(email, password),
     signOut,
     clearError,

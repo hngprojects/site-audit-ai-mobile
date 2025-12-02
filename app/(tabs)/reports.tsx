@@ -139,7 +139,7 @@ const ReportsScreen: React.FC = () => {
     return {
       siteId: site.id,
       url: site.root_url || '',
-      domain,
+      domain: domain || 'N/A', // Ensure domain is always a string
       score: 0,
       status: getStatusFromScore(undefined),
       scanDate: formatDate(site.created_at),
@@ -151,9 +151,19 @@ const ReportsScreen: React.FC = () => {
     .filter((site) => site.status !== 'deleted')
     .map(mapSiteToReportItem);
 
-  const filteredData = reportData.filter(item =>
-    item.domain.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredData = React.useMemo(() => {
+    try {
+      return reportData.filter(item => {
+        const domain = (item.domain || '').toString();
+        const searchTerm = (search || '').toString();
+        return domain.toLowerCase().includes(searchTerm.toLowerCase());
+      });
+    } catch (error) {
+      console.error('Error filtering search results:', error);
+      // Return all data if filtering fails
+      return reportData;
+    }
+  }, [reportData, search]);
 
   const handleDelete = (siteId: string, url: string) => {
     setItemToDelete({ siteId, url });

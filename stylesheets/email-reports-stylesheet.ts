@@ -17,16 +17,17 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 16,
     marginTop: 10,
+    justifyContent: 'center',
   },
   backButton: {
-    marginRight: 16,
+    position: 'absolute',
+    left: 16,
   },
   headerText: {
     fontSize: 20,
     lineHeight: 24,
     color: '#1c1c1c',
     fontFamily: 'RethinkSans-Bold',
-    flex: 1,
     textAlign: 'center',
   },
   scrollContent: {

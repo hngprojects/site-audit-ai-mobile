@@ -24,15 +24,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 6,
     paddingHorizontal: 16,
+    justifyContent: 'center',
   },
   backButton: {
-    marginRight: 16,
+    position: 'absolute',
+    left: 16,
   },
   title: {
     fontSize: 20,
     fontFamily: 'RethinkSans-Bold',
     color: '#1c1c1c',
-    flex: 1,
     textAlign: 'center',
   },
   warningContainer: {

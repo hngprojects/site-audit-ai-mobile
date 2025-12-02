@@ -16,14 +16,36 @@
  * - iOS: Bundle ID matches Google Cloud Console
  */
 
-import {
-  GoogleSignin,
-  isErrorWithCode,
-  isSuccessResponse,
-  statusCodes,
-} from '@react-native-google-signin/google-signin';
+import { GoogleSignin, isErrorWithCode, isSuccessResponse, statusCodes } from '@react-native-google-signin/google-signin';
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
+// Check if we're in Expo Go - conditionally import Google Sign-In
+const isExpoGo = Constants.executionEnvironment === 'storeClient';
+
+// let GoogleSignin: any = null;
+// let isErrorWithCode: any = null;
+// let isSuccessResponse: any = null;
+// let statusCodes: any = null;
+// let Platform: any = null;
+
+// Conditionally import native modules only when not in Expo Go
+if (!isExpoGo) {
+  try {
+    // const googleSigninModule = require('@react-native-google-signin/google-signin');
+    // const platformModule = require('react-native');
+
+    // GoogleSignin = googleSigninModule.GoogleSignin;
+    // isErrorWithCode = googleSigninModule.isErrorWithCode;
+    // isSuccessResponse = googleSigninModule.isSuccessResponse;
+    // statusCodes = googleSigninModule.statusCodes;
+    // Platform = platformModule.Platform;
+  } catch (error) {
+    console.error('Failed to import Google Sign-In modules:', error);
+  }
+} else {
+  // Mock Platform for Expo Go
+  // Platform = { OS: 'unknown' } as any;
+}
 
 // Environment variable names - using different naming convention
 const WEB_OAUTH_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID;
@@ -200,6 +222,10 @@ async function extractIdToken(response: any): Promise<string> {
 }
 
 /**
+ * Alternative Google Sign-In using expo-auth-session (works in Expo Go)
+ */
+
+/**
  * Google Authentication Service
  */
 export const googleAuthService = {
@@ -349,6 +375,11 @@ export const googleAuthService = {
    * Sign out from Google
    */
   async signOut(): Promise<void> {
+    if (!GoogleSignin) {
+      console.warn('Google Sign-In not available in Expo Go');
+      return;
+    }
+
     try {
       await GoogleSignin.signOut();
       console.log('✅ Successfully signed out from Google');
@@ -362,6 +393,11 @@ export const googleAuthService = {
    * Revoke access and sign out
    */
   async revokeAccess(): Promise<void> {
+    if (!GoogleSignin) {
+      console.warn('Google Sign-In not available in Expo Go');
+      return;
+    }
+
     try {
       await GoogleSignin.revokeAccess();
       console.log('✅ Successfully revoked Google access');
@@ -375,6 +411,14 @@ export const googleAuthService = {
    * Get current platform
    */
   getPlatform(): 'ios' | 'android' {
+    // Import Platform dynamically if not already imported
+    // if (!Platform) {
+    //   try {
+    //     // Platform = require('react-native').Platform;
+    //   } catch {
+    //     return 'android'; // fallback
+    //   }
+    // }
     return Platform.OS === 'ios' ? 'ios' : 'android';
   },
 
