@@ -1,4 +1,5 @@
 import { supportService } from '@/lib/support-service';
+import { useAuthStore } from '@/store/auth-store';
 import styles from '@/stylesheets/email-support-stylesheet';
 import { useTranslation } from '@/utils/translations';
 import { Feather } from '@expo/vector-icons';
@@ -11,10 +12,18 @@ import Toast from 'react-native-toast-message';
 const EmailSupportContent = () => {
   const { t } = useTranslation();
   const router = useRouter();
-  const [email, setEmail] = useState('user@gmail.com');
+  const { user } = useAuthStore();
+  const [email, setEmail] = useState(user?.email || '');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  // Update email when user data changes
+  useEffect(() => {
+    if (user?.email) {
+      setEmail(user.email);
+    }
+  }, [user?.email]);
 
   const isValidEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -104,62 +113,62 @@ const EmailSupportContent = () => {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ marginTop: 16, paddingBottom: 100 }}
         >
-        <View style={styles.content}>
-          {/* <Text style={styles.title}>Contact Us</Text>
+          <View style={styles.content}>
+            {/* <Text style={styles.title}>Contact Us</Text>
           <Text style={styles.subtitle}>Send us an email and we will respond within 24 hours</Text> */}
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>{t('emailSupport.yourEmail')}</Text>
-            <TextInput
-              style={styles.input}
-              value={email}
-              onChangeText={setEmail}
-              placeholder={t('emailSupport.emailPlaceholder')}
-              placeholderTextColor="#999"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-          </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>{t('emailSupport.yourEmail')}</Text>
+              <TextInput
+                style={styles.input}
+                value={email}
+                onChangeText={setEmail}
+                placeholder={t('emailSupport.emailPlaceholder')}
+                placeholderTextColor="#999"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+            </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>{t('emailSupport.subject')}</Text>
-            <TextInput
-              style={styles.input}
-              value={subject}
-              onChangeText={setSubject}
-              placeholder={t('emailSupport.subjectPlaceholder')}
-              placeholderTextColor="#999"
-            />
-          </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>{t('emailSupport.subject')}</Text>
+              <TextInput
+                style={styles.input}
+                value={subject}
+                onChangeText={setSubject}
+                placeholder={t('emailSupport.subjectPlaceholder')}
+                placeholderTextColor="#999"
+              />
+            </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>{t('emailSupport.message')}</Text>
-            <TextInput
-              style={[styles.input, styles.messageInput]}
-              value={message}
-              onChangeText={setMessage}
-              placeholder={t('emailSupport.messagePlaceholder')}
-              placeholderTextColor="#999"
-              multiline
-              numberOfLines={6}
-              textAlignVertical="top"
-            />
-          </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>{t('emailSupport.message')}</Text>
+              <TextInput
+                style={[styles.input, styles.messageInput]}
+                value={message}
+                onChangeText={setMessage}
+                placeholder={t('emailSupport.messagePlaceholder')}
+                placeholderTextColor="#999"
+                multiline
+                numberOfLines={6}
+                textAlignVertical="top"
+              />
+            </View>
 
-          <TouchableOpacity
-            style={[styles.sendButton, isLoading && styles.sendButtonDisabled]}
-            onPress={handleSend}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <ActivityIndicator size="small" color="#fff" />
-            ) : (
-              <Text style={styles.sendButtonText}>{t('emailSupport.sendMessage')}</Text>
-            )}
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+            <TouchableOpacity
+              style={[styles.sendButton, isLoading && { opacity: 0.6 }]}
+              onPress={handleSend}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <Text style={styles.sendButtonText}>{t('emailSupport.sendMessage')}</Text>
+              )}
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

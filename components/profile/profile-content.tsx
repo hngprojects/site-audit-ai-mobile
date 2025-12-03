@@ -321,7 +321,7 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
                 {user?.fullName || 'User Name'}
               </Text>
               <Text style={styles.userEmail} numberOfLines={1} ellipsizeMode="tail">
-                {user?.email || 'user@example.com'}
+                {user?.email || ''}
               </Text>
             </View>
           </View>
