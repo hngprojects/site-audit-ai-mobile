@@ -517,4 +517,75 @@ export const fr = {
   'privacyPolicy.sectionContent.sharing.paragraph1': 'Nous ne partageons pas vos informations avec des tiers.',
   'privacyPolicy.sectionContent.security.paragraph1': 'Nous protégeons vos informations avec des mesures de sécurité appropriées.',
   'privacyPolicy.sectionContent.rights.paragraph1': 'Vous avez le droit d\'accéder à vos informations personnelles.',
+
+  // Request Form - Additional
+  'requestForm.noScanResults': 'Aucun résultat d\'analyse disponible. Veuillez d\'abord effectuer une analyse.',
+  'requestForm.goBack': 'Retour',
+  'requestForm.pleaseSignIn': 'Veuillez vous connecter pour soumettre une demande',
+  'requestForm.websiteRequired': 'L\'URL du site Web est requise',
+  'requestForm.jobIdRequired': 'L\'ID du travail est requis',
+  'requestForm.submitSuccess': 'Demande soumise avec succès',
+  'requestForm.submitError': 'Échec de la soumission de la demande. Veuillez réessayer.',
+  'requestForm.loadScanError': 'Échec du chargement des résultats d\'analyse. Veuillez réessayer.',
+
+  // Issue Detail Screen
+  'issueDetail.auditSummary': 'Résumé de l\'audit',
+  'issueDetail.reRunAudit': 'Réexécuter l\'audit',
+  'issueDetail.websiteScore': 'Score du site Web',
+  'issueDetail.scanDate': 'Date d\'analyse',
+  'issueDetail.unknown': 'Inconnu',
+  'issueDetail.noDescription': 'Aucune description',
+  'issueDetail.userExperience': 'Expérience utilisateur',
+  'issueDetail.performance': 'Performance',
+  'issueDetail.seo': 'SEO',
+  'issueDetail.whatThisWouldDo': 'CE QUE cela ferait à votre entreprise',
+  'issueDetail.defaultBenefits': '• Conversions réduites pour votre site Web\n• Mauvaise expérience utilisateur\n• Les gens quittent votre site Web tôt',
+  'issueDetail.problems': 'Problèmes',
+  'issueDetail.problemUX': 'Problèmes avec l\'interface utilisateur et la navigation',
+  'issueDetail.problemPerformance': 'Temps de chargement lents et goulots d\'étranglement de performance',
+  'issueDetail.problemSEO': 'Problèmes avec l\'optimisation des moteurs de recherche',
+  'issueDetail.missingFeatures': 'Les fonctionnalités manquantes peuvent éloigner les clients.',
+  'issueDetail.visualHierarchy': 'Le manque de hiérarchie visuelle rend le contenu important difficile à remarquer.',
+  'issueDetail.suggestions': 'Suggestions',
+  'issueDetail.suggestionUX': 'Améliorez la conception de l\'interface utilisateur et la structure de navigation pour améliorer l\'expérience utilisateur.',
+  'issueDetail.suggestionPerformance': 'Optimisez les images, activez la compression et améliorez les temps de réponse du serveur pour de meilleures performances.',
+  'issueDetail.suggestionSEO': 'Corrigez les balises meta, améliorez la structure du contenu et renforcez les liens internes pour un meilleur SEO.',
+  'issueDetail.continue': 'Continuer',
+
+  // Confirmation Screen
+  'confirmation.requestOnWay': 'Votre demande est en cours!',
+  'confirmation.requestReceived': 'Sitelytics a reçu votre demande et vous répondra dans les 24 heures.',
+  'confirmation.backToHome': 'Retour à l\'accueil',
+
+  // Profile Empty State
+  'profileEmpty.signInToView': 'Veuillez vous connecter pour voir votre profil',
+
+  // Edit Profile - Additional
+  'editProfile.phonePlaceholder': 'Entrez votre numéro de téléphone (optionnel)',
+  'editProfile.selectCountry': 'Sélectionner le pays',
+  'editProfile.searchCountries': 'Rechercher des pays...',
+  'editProfile.phoneTooShort': 'Le numéro de téléphone est trop court pour {country}',
+  'editProfile.chooseOption': 'Choisir une option',
+  'editProfile.chooseFromGallery': 'Choisir dans la galerie',
+  'editProfile.photoDeleted': 'Photo de profil supprimée avec succès',
+  'editProfile.deletePhotoError': 'Échec de la suppression de la photo de profil. Veuillez réessayer.',
+  'editProfile.biometricNotAvailable': 'L\'authentification par empreinte digitale n\'est pas disponible sur cet appareil. Veuillez configurer l\'empreinte digitale dans les paramètres de votre appareil.',
+  'editProfile.faceIdNotAvailable': 'Face ID n\'est pas disponible sur cet appareil. Veuillez configurer Face ID dans les paramètres de votre appareil.',
+  'editProfile.enableFaceId': 'Activer la connexion Face ID',
+  'editProfile.biometricEnabled': 'La connexion par empreinte digitale a été activée. Vos identifiants seront enregistrés en toute sécurité.',
+  'editProfile.faceIdEnabled': 'La connexion Face ID a été activée. Vos identifiants seront enregistrés en toute sécurité.',
+  'editProfile.biometricFailed': 'L\'authentification biométrique a échoué. Veuillez réessayer.',
+  'editProfile.biometricDisabled': 'La connexion biométrique a été désactivée et les identifiants enregistrés ont été supprimés.',
+  'editProfile.biometricUpdateError': 'Échec de la mise à jour des paramètres biométriques. Veuillez réessayer.',
+
+  // Notifications - Additional
+  'notifications.markAllReadSuccess': 'Toutes les notifications ont été marquées comme lues',
+  'notifications.markAllReadError': 'Impossible de marquer toutes les notifications comme lues',
+
+  // Auth - Additional
+  'auth.signUpSuccess': 'Compte créé avec succès. Veuillez vous connecter.',
+  'auth.signInErrorGeneric': 'Échec de la connexion. Veuillez réessayer.',
+  'auth.invalidEmailPassword': 'Email ou mot de passe invalide.',
+  'auth.serverError': 'Erreur du serveur. Veuillez réessayer plus tard.',
+  'auth.signUpErrorGeneric': 'Échec de l\'inscription. Veuillez réessayer.',
 };

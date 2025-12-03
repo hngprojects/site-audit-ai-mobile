@@ -293,7 +293,7 @@ export const de = {
   'notifications.noMessage': 'Noch keine Nachricht',
   'notifications.tryAgain': 'Erneut versuchen',
   'notifications.searchPlaceholder': 'Suchen',
-  'notifications.loadError': 'Benachrichtigungen konnten nicht geladen werden',
+  'notifications.loadError': 'Fehler beim Laden der Benachrichtigungen',
 
   // Email Support
   'emailSupport.title': 'E-Mail-Support',
@@ -512,4 +512,75 @@ export const de = {
   'privacyPolicy.sectionContent.sharing.paragraph1': 'Wir teilen Ihre Informationen nicht mit Dritten.',
   'privacyPolicy.sectionContent.security.paragraph1': 'Wir schützen Ihre Informationen mit angemessenen Sicherheitsmaßnahmen.',
   'privacyPolicy.sectionContent.rights.paragraph1': 'Sie haben das Recht, auf Ihre persönlichen Informationen zuzugreifen.',
+
+  // Request Form - Additional
+  'requestForm.noScanResults': 'Keine Scan-Ergebnisse verfügbar. Bitte führen Sie zuerst einen Scan durch.',
+  'requestForm.goBack': 'Zurück',
+  'requestForm.pleaseSignIn': 'Bitte melden Sie sich an, um eine Anfrage zu senden',
+  'requestForm.websiteRequired': 'Website-URL ist erforderlich',
+  'requestForm.jobIdRequired': 'Job-ID ist erforderlich',
+  'requestForm.submitSuccess': 'Anfrage erfolgreich übermittelt',
+  'requestForm.submitError': 'Fehler beim Senden der Anfrage. Bitte versuchen Sie es erneut.',
+  'requestForm.loadScanError': 'Fehler beim Laden der Scan-Ergebnisse. Bitte versuchen Sie es erneut.',
+
+  // Issue Detail Screen
+  'issueDetail.auditSummary': 'Audit-Zusammenfassung',
+  'issueDetail.reRunAudit': 'Audit erneut ausführen',
+  'issueDetail.websiteScore': 'Website-Punktzahl',
+  'issueDetail.scanDate': 'Scan-Datum',
+  'issueDetail.unknown': 'Unbekannt',
+  'issueDetail.noDescription': 'Keine Beschreibung',
+  'issueDetail.userExperience': 'Benutzererfahrung',
+  'issueDetail.performance': 'Leistung',
+  'issueDetail.seo': 'SEO',
+  'issueDetail.whatThisWouldDo': 'WAS dies für Ihr Unternehmen tun würde',
+  'issueDetail.defaultBenefits': '• Niedrigere Conversion-Raten für Ihre Website\n• Schlechte Benutzererfahrung\n• Menschen verlassen Ihre Website früh',
+  'issueDetail.problems': 'Probleme',
+  'issueDetail.problemUX': 'Probleme mit Benutzeroberfläche und Navigation',
+  'issueDetail.problemPerformance': 'Langsame Ladezeiten und Leistungsengpässe',
+  'issueDetail.problemSEO': 'Probleme mit der Suchmaschinenoptimierung',
+  'issueDetail.missingFeatures': 'Fehlende Funktionen können Kunden abschrecken.',
+  'issueDetail.visualHierarchy': 'Mangelnde visuelle Hierarchie macht wichtige Inhalte schwer zu bemerken.',
+  'issueDetail.suggestions': 'Vorschläge',
+  'issueDetail.suggestionUX': 'Verbessern Sie das Design der Benutzeroberfläche und die Navigationsstruktur, um die Benutzererfahrung zu verbessern.',
+  'issueDetail.suggestionPerformance': 'Optimieren Sie Bilder, aktivieren Sie die Komprimierung und verbessern Sie die Serverantwortzeiten für bessere Leistung.',
+  'issueDetail.suggestionSEO': 'Korrigieren Sie Meta-Tags, verbessern Sie die Inhaltsstruktur und verbessern Sie interne Links für besseres SEO.',
+  'issueDetail.continue': 'Fortfahren',
+
+  // Confirmation Screen
+  'confirmation.requestOnWay': 'Ihre Anfrage ist unterwegs!',
+  'confirmation.requestReceived': 'Sitelytics hat Ihre Anfrage erhalten und wird sich innerhalb von 24 Stunden bei Ihnen melden.',
+  'confirmation.backToHome': 'Zurück zur Startseite',
+
+  // Profile Empty State
+  'profileEmpty.signInToView': 'Bitte melden Sie sich an, um Ihr Profil anzuzeigen',
+
+  // Edit Profile - Additional
+  'editProfile.phonePlaceholder': 'Geben Sie Ihre Telefonnummer ein (optional)',
+  'editProfile.selectCountry': 'Land auswählen',
+  'editProfile.searchCountries': 'Länder suchen...',
+  'editProfile.phoneTooShort': 'Die Telefonnummer ist zu kurz für {country}',
+  'editProfile.chooseOption': 'Option wählen',
+  'editProfile.chooseFromGallery': 'Aus Galerie wählen',
+  'editProfile.photoDeleted': 'Profilfoto erfolgreich gelöscht',
+  'editProfile.deletePhotoError': 'Fehler beim Löschen des Profilfotos. Bitte versuchen Sie es erneut.',
+  'editProfile.biometricNotAvailable': 'Fingerabdruck-Authentifizierung ist auf diesem Gerät nicht verfügbar. Bitte richten Sie den Fingerabdruck in den Geräteeinstellungen ein.',
+  'editProfile.faceIdNotAvailable': 'Face ID ist auf diesem Gerät nicht verfügbar. Bitte richten Sie Face ID in den Geräteeinstellungen ein.',
+  'editProfile.enableFaceId': 'Face ID-Anmeldung aktivieren',
+  'editProfile.biometricEnabled': 'Fingerabdruck-Anmeldung wurde aktiviert. Ihre Anmeldedaten werden sicher gespeichert.',
+  'editProfile.faceIdEnabled': 'Face ID-Anmeldung wurde aktiviert. Ihre Anmeldedaten werden sicher gespeichert.',
+  'editProfile.biometricFailed': 'Biometrische Authentifizierung fehlgeschlagen. Bitte versuchen Sie es erneut.',
+  'editProfile.biometricDisabled': 'Biometrische Anmeldung wurde deaktiviert und gespeicherte Anmeldedaten wurden entfernt.',
+  'editProfile.biometricUpdateError': 'Fehler beim Aktualisieren der biometrischen Einstellungen. Bitte versuchen Sie es erneut.',
+
+  // Notifications - Additional
+  'notifications.markAllReadSuccess': 'Alle Benachrichtigungen als gelesen markiert',
+  'notifications.markAllReadError': 'Alle Benachrichtigungen konnten nicht als gelesen markiert werden',
+
+  // Auth - Additional
+  'auth.signUpSuccess': 'Konto erfolgreich erstellt. Bitte melden Sie sich an.',
+  'auth.signInErrorGeneric': 'Anmeldung fehlgeschlagen. Bitte versuchen Sie es erneut.',
+  'auth.invalidEmailPassword': 'Ungültige E-Mail oder Passwort.',
+  'auth.serverError': 'Serverfehler. Bitte versuchen Sie es später erneut.',
+  'auth.signUpErrorGeneric': 'Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut.',
 };

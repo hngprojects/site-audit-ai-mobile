@@ -103,7 +103,7 @@ export default function NotificationsScreen() {
       setNotifications(data);
     } catch (error) {
       console.error('Notifications load error', error);
-      setError('Failed to load notifications');
+      setError(t('notifications.loadError'));
     } finally {
       setIsLoading(false);
     }
@@ -126,16 +126,16 @@ export default function NotificationsScreen() {
         setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })));
         Toast.show({
           type: 'success',
-          text1: 'Success',
-          text2: 'All notifications marked as read',
+          text1: t('common.success'),
+          text2: t('notifications.markAllReadSuccess'),
         });
       }
     } catch (e) {
       console.error('Mark all read error', e);
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: 'Could not mark all notifications as read',
+        text1: t('common.error'),
+        text2: t('notifications.markAllReadError'),
       });
     }
   };
@@ -182,7 +182,7 @@ export default function NotificationsScreen() {
   if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
-        <ThemedText type="title">Notification</ThemedText>
+        <ThemedText type="title">{t('notifications.title')}</ThemedText>
         <View style={styles.loadingPadding}>
           <SkeletonCard />
           <View style={{ height: 8 }} />

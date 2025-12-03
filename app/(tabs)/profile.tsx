@@ -4,6 +4,7 @@ import ProfileEmptyState from '@/components/profile/profile-empty-state';
 import ProfileHeader from '@/components/profile/profile-header';
 // import ProfileSkeleton from '@/components/profile/profile-skeleton';
 import { useAuth } from '@/hooks/use-auth';
+import { useTranslation } from '@/utils/translations';
 import styles from '@/stylesheets/profile-stylesheet';
 import { useFocusEffect } from '@react-navigation/native';
 import { useCallback, useEffect, useState } from 'react';
@@ -11,6 +12,7 @@ import { ScrollView, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const Profile = () => {
+  const { t } = useTranslation();
   const { isAuthenticated, isInitialized, user } = useAuth();
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -54,7 +56,7 @@ const Profile = () => {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 50 }}
         >
-          <ProfileHeader text="Profile" />
+          <ProfileHeader text={t('profile.edit')} />
           {isAuthenticated && user ? (
             <ProfileContent user={user} />
           ) : (
@@ -62,7 +64,7 @@ const Profile = () => {
               <ProfileEmptyState />
 
               <TouchableOpacity style={styles.signUpsignInBtn} onPress={handleAuthModal}>
-                <Text style={styles.authText}>Sign Up / Sign In</Text>
+                <Text style={styles.authText}>{t('auth.signUp')} / {t('auth.signIn')}</Text>
               </TouchableOpacity>
             </>
           )}

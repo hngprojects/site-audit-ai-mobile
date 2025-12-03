@@ -118,9 +118,9 @@ const EditProfileContent = () => {
       const maxLength = PHONE_NUMBER_LENGTHS[selectedCountry.code] || PHONE_NUMBER_LENGTHS.default;
 
       if (!phoneRegex.test(phoneNumber)) {
-        newErrors.phoneNumber = 'Please enter a valid phone number';
+        newErrors.phoneNumber = t('editProfile.phoneInvalid');
       } else if (digitsOnly.length < 7) {
-        newErrors.phoneNumber = `Phone number is too short for ${selectedCountry.name}`;
+        newErrors.phoneNumber = t('editProfile.phoneTooShort').replace('{country}', selectedCountry.name);
       }
       // Note: We don't check for "too long" here because maxLength prevents input beyond the limit
     }
@@ -307,12 +307,12 @@ const EditProfileContent = () => {
     // For action sheets, we'll keep using Alert for now as Toast doesn't support user interaction
     // But we can show toasts after actions
     Alert.alert(
-      'Change Profile Photo',
-      'Choose an option',
+      t('editProfile.changePhoto'),
+      t('editProfile.chooseOption'),
       [
-        { text: 'Take Photo', onPress: handleTakePhoto },
-        { text: 'Choose from Gallery', onPress: handleChooseFromGallery },
-        { text: 'Cancel', style: 'cancel' }
+        { text: t('photoSheet.takePhoto'), onPress: handleTakePhoto },
+        { text: t('editProfile.chooseFromGallery'), onPress: handleChooseFromGallery },
+        { text: t('common.cancel'), style: 'cancel' }
       ]
     );
   };
@@ -440,7 +440,7 @@ const EditProfileContent = () => {
                     setPhoneNumber(fullNumber);
                     if (errors.phoneNumber) setErrors({ ...errors, phoneNumber: undefined });
                   }}
-                  placeholder="Enter your phone number (optional)"
+                  placeholder={t('editProfile.phonePlaceholder')}
                   placeholderTextColor="#B9B9B9"
                   keyboardType="phone-pad"
                   maxLength={PHONE_NUMBER_LENGTHS[selectedCountry.code] || PHONE_NUMBER_LENGTHS.default}
@@ -464,7 +464,7 @@ const EditProfileContent = () => {
               >
                 <View style={styles.countryModalContent}>
                   <View style={styles.countryModalHeader}>
-                    <Text style={styles.countryModalTitle}>Select Country</Text>
+                    <Text style={styles.countryModalTitle}>{t('editProfile.selectCountry')}</Text>
                     <TouchableOpacity
                       onPress={() => setShowCountryPicker(false)}
                       style={styles.countryModalClose}
@@ -476,7 +476,7 @@ const EditProfileContent = () => {
                   <View style={styles.countrySearchContainer}>
                     <TextInput
                       style={styles.countrySearchInput}
-                      placeholder="Search countries..."
+                      placeholder={t('editProfile.searchCountries')}
                       placeholderTextColor="#B9B9B9"
                       value={countrySearch}
                       onChangeText={setCountrySearch}

@@ -56,7 +56,7 @@ const RequestForm = () => {
         Toast.show({
           type: 'error',
           text1: t('common.error'),
-          text2: 'Failed to load scan results. Please try again.',
+          text2: t('requestForm.loadScanError'),
         });
       } finally {
         setIsLoading(false);
@@ -94,7 +94,7 @@ const RequestForm = () => {
       Toast.show({
         type: 'error',
         text1: t('common.error'),
-        text2: 'Please sign in to submit a request',
+        text2: t('requestForm.pleaseSignIn'),
       });
       return;
     }
@@ -103,7 +103,7 @@ const RequestForm = () => {
       Toast.show({
         type: 'error',
         text1: t('common.error'),
-        text2: 'Website URL is required',
+        text2: t('requestForm.websiteRequired'),
       });
       return;
     }
@@ -112,7 +112,7 @@ const RequestForm = () => {
       Toast.show({
         type: 'error',
         text1: t('common.error'),
-        text2: 'Job ID is required',
+        text2: t('requestForm.jobIdRequired'),
       });
       return;
     }
@@ -135,7 +135,7 @@ const RequestForm = () => {
       Toast.show({
         type: 'success',
         text1: t('common.success'),
-        text2: 'Request submitted successfully',
+        text2: t('requestForm.submitSuccess'),
       });
 
       // Navigate to confirmation screen
@@ -145,7 +145,7 @@ const RequestForm = () => {
       Toast.show({
         type: 'error',
         text1: t('common.error'),
-        text2: error instanceof Error ? error.message : 'Failed to submit request. Please try again.',
+        text2: error instanceof Error ? error.message : t('requestForm.submitError'),
       });
     } finally {
       setIsSubmitting(false);
@@ -181,13 +181,13 @@ const RequestForm = () => {
         </View>
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
           <Text style={{ textAlign: 'center', fontSize: 16, color: '#666' }}>
-            No scan results available. Please run a scan first.
+            {t('requestForm.noScanResults')}
           </Text>
           <TouchableOpacity
             style={[styles.primaryButton, { marginTop: 20 }]}
             onPress={() => router.back()}
           >
-            <Text style={styles.primaryButtonText}>Go Back</Text>
+            <Text style={styles.primaryButtonText}>{t('requestForm.goBack')}</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>

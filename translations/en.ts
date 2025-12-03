@@ -117,7 +117,18 @@ export const en = {
   'editProfile.takePhotoError': 'Failed to take photo. Please try again.',
   'editProfile.selectImageError': 'Failed to select image. Please try again.',
   'editProfile.photoUpdated': 'Profile photo updated successfully',
+  'editProfile.photoDeleted': 'Profile photo deleted successfully',
+  'editProfile.deletePhotoError': 'Failed to delete profile photo. Please try again.',
   'editProfile.uploadError': 'Failed to upload image. Please try again.',
+  'editProfile.biometricNotAvailable': 'Fingerprint authentication is not available on this device. Please set up fingerprint in your device settings.',
+  'editProfile.faceIdNotAvailable': 'Face ID is not available on this device. Please set up Face ID in your device settings.',
+  'editProfile.enableBiometric': 'Enable fingerprint login',
+  'editProfile.enableFaceId': 'Enable Face ID login',
+  'editProfile.biometricEnabled': 'Fingerprint login has been enabled. Your credentials will be saved securely.',
+  'editProfile.faceIdEnabled': 'Face ID login has been enabled. Your credentials will be saved securely.',
+  'editProfile.biometricFailed': 'Biometric authentication failed. Please try again.',
+  'editProfile.biometricDisabled': 'Biometric login has been disabled and saved credentials have been removed.',
+  'editProfile.biometricUpdateError': 'Failed to update biometric settings. Please try again.',
   'editProfile.nameRequired': 'Full name is required',
   'editProfile.nameMinLength': 'Full name must be at least 2 characters',
   'editProfile.nameInvalidChars': 'Full name can only contain letters, numbers, and spaces',
@@ -165,11 +176,14 @@ export const en = {
   // Notifications
   'notifications.title': 'Notifications',
   'notifications.markAllRead': 'Mark all as read',
+  'notifications.markAllReadSuccess': 'All notifications marked as read',
+  'notifications.markAllReadError': 'Could not mark all notifications as read',
   'notifications.markReadError': 'Could not mark notification as read',
   'notifications.deleteSuccess': 'Notification deleted successfully',
   'notifications.deleteError': 'Could not delete notification',
   'notifications.noMessage': 'No message yet',
   'notifications.tryAgain': 'Try again',
+  'notifications.loadError': 'Failed to load notifications',
 
   // Email Support
   'emailSupport.title': 'Email Support',
@@ -337,4 +351,65 @@ export const en = {
   'share.backToHome': 'Back to home',
   'share.permissionNeeded': 'Permission needed to save and share image.',
   'common.share': 'Share',
+
+  // Reports - Additional
+  'reports.selectIssuesForPro': 'Please select the issues you want our professionals to assist you with',
+
+  // Request Form - Additional
+  'requestForm.noScanResults': 'No scan results available. Please run a scan first.',
+  'requestForm.goBack': 'Go Back',
+  'requestForm.pleaseSignIn': 'Please sign in to submit a request',
+  'requestForm.websiteRequired': 'Website URL is required',
+  'requestForm.jobIdRequired': 'Job ID is required',
+  'requestForm.submitSuccess': 'Request submitted successfully',
+  'requestForm.submitError': 'Failed to submit request. Please try again.',
+  'requestForm.loadScanError': 'Failed to load scan results. Please try again.',
+
+  // Issue Detail Screen
+  'issueDetail.auditSummary': 'Audit Summary',
+  'issueDetail.reRunAudit': 'Re-run audit',
+  'issueDetail.websiteScore': 'Website Score',
+  'issueDetail.scanDate': 'Scan Date',
+  'issueDetail.unknown': 'Unknown',
+  'issueDetail.noDescription': 'No description',
+  'issueDetail.userExperience': 'User Experience',
+  'issueDetail.performance': 'Performance',
+  'issueDetail.seo': 'SEO',
+  'issueDetail.whatThisWouldDo': 'WHAT this would do to your business',
+  'issueDetail.defaultBenefits': '• Lower conversions for your website\n• Poor user experience\n• People leaving your website early',
+  'issueDetail.problems': 'Problems',
+  'issueDetail.problemUX': 'Issues with user interface and navigation',
+  'issueDetail.problemPerformance': 'Slow loading times and performance bottlenecks',
+  'issueDetail.problemSEO': 'Problems with search engine optimization',
+  'issueDetail.missingFeatures': 'Missing features may drive customers away.',
+  'issueDetail.visualHierarchy': 'Lack of visual hierarchy makes important content hard to notice.',
+  'issueDetail.suggestions': 'Suggestions',
+  'issueDetail.suggestionUX': 'Improve user interface design and navigation structure to enhance user experience.',
+  'issueDetail.suggestionPerformance': 'Optimize images, enable compression, and improve server response times for better performance.',
+  'issueDetail.suggestionSEO': 'Fix meta tags, improve content structure, and enhance internal linking for better SEO.',
+  'issueDetail.continue': 'Continue',
+
+  // Confirmation Screen
+  'confirmation.requestOnWay': 'Your request is on its way!',
+  'confirmation.requestReceived': 'Sitelytics has received your request and will get back to you within 24 hours.',
+  'confirmation.backToHome': 'Back to home',
+
+  // Profile Empty State
+  'profileEmpty.signInToView': 'Please sign in to view your profile',
+
+  // Edit Profile - Additional
+  'editProfile.phonePlaceholder': 'Enter your phone number (optional)',
+  'editProfile.selectCountry': 'Select Country',
+  'editProfile.searchCountries': 'Search countries...',
+  'editProfile.phoneTooShort': 'Phone number is too short for {country}',
+  'editProfile.chooseOption': 'Choose an option',
+  'editProfile.chooseFromGallery': 'Choose from Gallery',
+
+  // Auth - Additional
+  'auth.signUpSuccess': 'Account created successfully. Please sign in.',
+  'auth.signInErrorGeneric': 'Failed to sign in. Please try again.',
+  'auth.invalidEmailPassword': 'Invalid email or password.',
+  'auth.serverError': 'Server error. Please try again later.',
+  'auth.signUpErrorGeneric': 'Failed to sign up. Please try again.',
+
 };

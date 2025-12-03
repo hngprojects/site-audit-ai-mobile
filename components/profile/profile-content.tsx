@@ -88,8 +88,8 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
       if (cameraStatus !== 'granted' || mediaLibraryStatus !== 'granted') {
         Toast.show({
           type: 'warning',
-          text1: 'Permissions Required',
-          text2: 'Camera and media library permissions are required to change your profile photo.',
+          text1: t('editProfile.permissionsRequired'),
+          text2: t('editProfile.cameraPermission'),
         });
         return false;
       }
@@ -114,8 +114,8 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
         if (asset.fileSize && asset.fileSize > 3 * 1024 * 1024) {
           Toast.show({
             type: 'error',
-            text1: 'Error',
-            text2: 'Image size must be less than 3MB. Please choose a smaller image.',
+            text1: t('common.error'),
+            text2: t('editProfile.imageSizeError'),
           });
           return;
         }
@@ -124,8 +124,8 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
     } catch {
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: 'Failed to take photo. Please try again.',
+        text1: t('common.error'),
+        text2: t('editProfile.takePhotoError'),
       });
     }
   };
@@ -147,8 +147,8 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
         if (asset.fileSize && asset.fileSize > 3 * 1024 * 1024) {
           Toast.show({
             type: 'error',
-            text1: 'Error',
-            text2: 'Image size must be less than 3MB. Please choose a smaller image.',
+            text1: t('common.error'),
+            text2: t('editProfile.imageSizeError'),
           });
           return;
         }
@@ -157,8 +157,8 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
     } catch {
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: 'Failed to select image. Please try again.',
+            text1: t('common.error'),
+            text2: t('editProfile.selectImageError'),
       });
     }
   };
@@ -185,7 +185,7 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
       Toast.show({
         type: 'error',
         text1: t('common.error'),
-        text2: error instanceof Error ? error.message : t('profile.uploadImageError'),
+        text2: error instanceof Error ? error.message : t('editProfile.uploadError'),
       });
     }
   };
@@ -205,14 +205,14 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
       }
       Toast.show({
         type: 'success',
-        text1: 'Success',
-        text2: 'Profile photo deleted successfully',
+          text1: t('common.success'),
+          text2: t('editProfile.photoDeleted'),
       });
     } catch (error) {
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: error instanceof Error ? error.message : 'Failed to delete profile photo. Please try again.',
+        text1: t('common.error'),
+        text2: error instanceof Error ? error.message : t('editProfile.deletePhotoError'),
       });
     }
   };
@@ -221,10 +221,10 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
     if (!biometricAvailable) {
       Toast.show({
         type: 'warning',
-        text1: 'Biometrics Not Available',
+        text1: t('auth.biometricLoginFailed'),
         text2: Platform.OS === 'ios'
-          ? 'Face ID is not available on this device. Please set up Face ID in your device settings.'
-          : 'Fingerprint authentication is not available on this device. Please set up fingerprint in your device settings.',
+          ? t('editProfile.faceIdNotAvailable')
+          : t('editProfile.biometricNotAvailable'),
       });
       return;
     }
@@ -234,8 +234,8 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
         // Enable biometrics - authenticate first to ensure it works
         const result = await biometricService.authenticate(
           Platform.OS === 'ios'
-            ? 'Enable Face ID login'
-            : 'Enable fingerprint login'
+            ? t('editProfile.enableFaceId')
+            : t('editProfile.enableBiometric')
         );
 
         if (result.success) {
@@ -243,10 +243,10 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
           setBiometricEnabled(true);
           Toast.show({
             type: 'success',
-            text1: 'Biometrics Enabled',
+            text1: t('profile.biometric'),
             text2: Platform.OS === 'ios'
-              ? 'Face ID login has been enabled. Your credentials will be saved securely.'
-              : 'Fingerprint login has been enabled. Your credentials will be saved securely.',
+              ? t('editProfile.faceIdEnabled')
+              : t('editProfile.biometricEnabled'),
           });
         } else if (result.error === 'user_cancel') {
           // User cancelled, do nothing
@@ -254,8 +254,8 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
         } else {
           Toast.show({
             type: 'error',
-            text1: 'Authentication Failed',
-            text2: 'Biometric authentication failed. Please try again.',
+            text1: t('auth.biometricLoginFailed'),
+            text2: t('editProfile.biometricFailed'),
           });
         }
       } else {
@@ -264,16 +264,16 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
         setBiometricEnabled(false);
         Toast.show({
           type: 'success',
-          text1: 'Biometrics Disabled',
-          text2: 'Biometric login has been disabled and saved credentials have been removed.',
+          text1: t('profile.biometric'),
+          text2: t('editProfile.biometricDisabled'),
         });
       }
     } catch (error) {
       console.error('Error toggling biometric:', error);
       Toast.show({
         type: 'error',
-        text1: 'Error',
-        text2: 'Failed to update biometric settings. Please try again.',
+        text1: t('common.error'),
+        text2: t('editProfile.biometricUpdateError'),
       });
     }
   };
