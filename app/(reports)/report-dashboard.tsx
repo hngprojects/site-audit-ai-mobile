@@ -1,3 +1,4 @@
+import { submitLead } from "@/actions/leads-actions";
 import { getScanResult } from "@/actions/scan-actions";
 import styles, { reportColors } from "@/stylesheets/report-dashboard-stylesheet";
 import { useTranslation } from "@/utils/translations";
@@ -99,18 +100,27 @@ export default function ReportDashboard() {
   };
 
 
-  const modalContinueButton = () => {
+  const modalContinueButton = async () => {
     if (modalTextInput.trim() === "") {
       setEmptyModalTextInput(true);
       return;
     }
 
-    Toast.show({
-      type: 'success',
-      text1: t('common.success'),
-      text2: t('reportDashboard.emailSent'),
-    });
-    setShowModal(false);
+    try {
+      const response = await submitLead(modalTextInput.trim());
+      Toast.show({
+        type: 'success',
+        text1: t('common.success'),
+        text2: response.message,
+      });
+      setShowModal(false);
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: t('common.error'),
+        text2: 'Failed to submit email. Please try again.',
+      });
+    }
   };
 
 
