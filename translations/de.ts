@@ -389,6 +389,7 @@ export const de = {
   'deleteAccount.resend': 'Erneut senden',
   'deleteAccount.resendIn': 'Code erneut senden in',
   'deleteAccount.verifyAndConfirm': 'Löschung bestätigen und verifizieren',
+  'deleteAccount.deleteError': 'Konto konnte nicht gelöscht werden. Bitte versuchen Sie es erneut.',
   'deleteAccountVerification.title': 'Konto löschen',
   'deleteAccountVerification.mainTitle': 'Identität bestätigen',
   'deleteAccountVerification.subtitle': 'Aus Sicherheitsgründen geben Sie bitte den 6-stelligen Code ein, der an da*********i20@gmail.com gesendet wurde',

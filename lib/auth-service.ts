@@ -429,5 +429,31 @@ export const authService = {
       throw new Error('Failed to sign in with Apple. Please try again.');
     }
   },
+
+  async deleteAccount(token: string): Promise<void> {
+    try {
+      await apiClient.delete(
+        '/api/v1/auth/delete-account',
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+    } catch (error) {
+      if (isAxiosError(error)) {
+        const errorData = error.response?.data || {};
+        if (errorData.message) {
+          throw new Error(errorData.message);
+        }
+        const errorMessage = formatErrorMessage(errorData);
+        throw new Error(errorMessage);
+      }
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Failed to delete account. Please try again.');
+    }
+  },
 };
 

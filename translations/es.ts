@@ -391,6 +391,7 @@ export const es = {
   'deleteAccount.resend': 'Reenviar',
   'deleteAccount.resendIn': 'Reenviar código en',
   'deleteAccount.verifyAndConfirm': 'Verificar y confirmar eliminación',
+  'deleteAccount.deleteError': 'Error al eliminar la cuenta. Por favor, inténtalo de nuevo.',
   'deleteAccountVerification.title': 'Eliminar cuenta',
   'deleteAccountVerification.mainTitle': 'Verifica tu identidad',
   'deleteAccountVerification.subtitle': 'Por razones de seguridad, por favor ingresa el código de 6 dígitos enviado a da*********i20@gmail.com',

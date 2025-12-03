@@ -271,6 +271,7 @@ export const en = {
   'deleteAccount.resend': 'Resend',
   'deleteAccount.resendIn': 'Resend code in',
   'deleteAccount.verifyAndConfirm': 'Verify and Confirm Deletion',
+  'deleteAccount.deleteError': 'Failed to delete account. Please try again.',
 
   // Delete Confirmation Sheet
   'deleteSheet.title': 'Delete Url',
