@@ -8,8 +8,8 @@ import { Feather } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, Image, KeyboardAvoidingView, Modal, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ActivityIndicator, Alert, FlatList, Image, KeyboardAvoidingView, Modal, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
@@ -35,12 +35,18 @@ const EditProfileContent = () => {
 
   // Countries data imported from constants
 
-  // Filter countries based on search
-  const filteredCountries = COUNTRIES.filter(country =>
-    country.name.toLowerCase().includes(countrySearch.toLowerCase()) ||
-    country.dial_code.includes(countrySearch) ||
-    country.code.toLowerCase().includes(countrySearch.toLowerCase())
-  );
+  // Filter countries based on search - memoized for performance
+  const filteredCountries = useMemo(() => {
+    if (!countrySearch.trim()) {
+      return COUNTRIES;
+    }
+    const searchLower = countrySearch.toLowerCase();
+    return COUNTRIES.filter(country =>
+      country.name.toLowerCase().includes(searchLower) ||
+      country.dial_code.includes(countrySearch) ||
+      country.code.toLowerCase().includes(searchLower)
+    );
+  }, [countrySearch]);
 
   const hasInitialized = useRef(false);
 
@@ -94,12 +100,7 @@ const EditProfileContent = () => {
       newErrors.fullName = t('editProfile.nameMinLength');
     } else {
       // Disallow emojis and punctuation: only allow letters, numbers, and spaces
-      let hasInvalidChars = false;
-      try {
-        hasInvalidChars = /[^\p{L}\p{N}\s]/gu.test(fullName);
-      } catch {
-        hasInvalidChars = /[^A-Za-z0-9 ]/g.test(fullName);
-      }
+      const hasInvalidChars = /[^A-Za-z0-9 ]/g.test(fullName);
       if (hasInvalidChars) {
         newErrors.fullName = t('editProfile.nameInvalidChars');
       }
@@ -115,7 +116,6 @@ const EditProfileContent = () => {
       // Basic phone number validation - check if it contains only valid characters
       const phoneRegex = /^[\d\s\-\(\)\+]+$/;
       const digitsOnly = phoneNumber.replace(/\D/g, '');
-      const maxLength = PHONE_NUMBER_LENGTHS[selectedCountry.code] || PHONE_NUMBER_LENGTHS.default;
 
       if (!phoneRegex.test(phoneNumber)) {
         newErrors.phoneNumber = t('editProfile.phoneInvalid');
@@ -329,218 +329,225 @@ const EditProfileContent = () => {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ marginTop: 16, paddingBottom: 100 }}
         >
-        <View style={styles.header}>
-          <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-            <Feather name="arrow-left" size={24} color="#1A2373" />
-          </TouchableOpacity>
-          <Text style={styles.headerText}>{t('editProfile.title')}</Text>
-        </View>
-
-        <View style={styles.content}>
-          {/* Profile Image Section */}
-          <View style={styles.profileImageSection}>
-            <View style={styles.profileImageContainer}>
-              {profileImage && profileImage.trim() ? (
-                <Image
-                  source={{ uri: getFullImageUrl(profileImage) || '' }}
-                  style={styles.profileImage}
-                  resizeMode="cover"
-                  onError={() => {
-                    setProfileImage(null);
-                  }}
-                />
-              ) : (
-                <View style={styles.profileImagePlaceholder}>
-                  <Text style={styles.profileImageInitials}>
-                    {fullName && fullName.trim()
-                      ? fullName
-                        .trim()
-                        .split(' ')
-                        .filter(n => n.length > 0)
-                        .map(n => n[0])
-                        .join('')
-                        .toUpperCase()
-                        .slice(0, 2)
-                      : email && email.trim()
-                        ? email[0].toUpperCase()
-                        : 'U'}
-                  </Text>
-                </View>
-              )}
-              {isUploadingImage && (
-                <View style={styles.imageUploadOverlay}>
-                  <ActivityIndicator size="small" color="#fff" />
-                </View>
-              )}
-              <TouchableOpacity
-                style={styles.editImageButton}
-                onPress={handleChangePhoto}
-                disabled={isUploadingImage}
-              >
-                <Feather name="camera" size={18} color="white" />
-              </TouchableOpacity>
-            </View>
-            <TouchableOpacity onPress={handleChangePhoto} disabled={isUploadingImage}>
-              <Text style={styles.changePhotoText}>
-                {isUploadingImage ? t('common.loading') : t('editProfile.changePhoto')}
-              </Text>
+          <View style={styles.header}>
+            <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+              <Feather name="arrow-left" size={24} color="#1A2373" />
             </TouchableOpacity>
+            <Text style={styles.headerText}>{t('editProfile.title')}</Text>
           </View>
 
-          {/* Form Section */}
-          <View style={styles.formSection}>
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>{t('editProfile.fullName')}</Text>
-              <TextInput
-                style={[styles.input, errors.fullName && styles.inputError]}
-                value={fullName}
-                onChangeText={(text: string) => {
-                  setFullName(text);
-                  if (errors.fullName) setErrors({ ...errors, fullName: undefined });
-                }}
-                placeholder={t('editProfile.enterFullName')}
-                placeholderTextColor="#B9B9B9"
-              />
-              {errors.fullName && <Text style={styles.errorText}>{errors.fullName}</Text>}
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>{t('editProfile.email')}</Text>
-              <TextInput
-                style={[styles.input, errors.email && styles.inputError]}
-                value={email}
-                placeholder={t('editProfile.enterEmail')}
-                placeholderTextColor="#B9B9B9"
-                keyboardType="email-address"
-                autoCapitalize="none"
-                editable={false}
-              />
-              {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Phone Number</Text>
-              <View style={[styles.phoneInputContainer, errors.phoneNumber && styles.inputError]}>
-                <TouchableOpacity
-                  style={styles.countryPickerButton}
-                  onPress={() => setShowCountryPicker(true)}
-                  activeOpacity={0.7}
-                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                >
-                  <Text style={styles.countryFlag}>{selectedCountry.flag}</Text>
-                  <Text style={styles.countryCodeText}>{selectedCountry.dial_code}</Text>
-                </TouchableOpacity>
-                <TextInput
-                  style={styles.phoneNumberInput}
-                  value={phoneNumber.replace(selectedCountry.dial_code, '').trim()}
-                  onChangeText={(text) => {
-                    // Remove any non-digit characters
-                    const cleanText = text.replace(/\D/g, '');
-                    const maxLength = PHONE_NUMBER_LENGTHS[selectedCountry.code] || PHONE_NUMBER_LENGTHS.default;
-
-                    // Limit input to maximum length for the selected country
-                    const limitedText = cleanText.slice(0, maxLength);
-                    const fullNumber = selectedCountry.dial_code + limitedText;
-
-                    setPhoneNumber(fullNumber);
-                    if (errors.phoneNumber) setErrors({ ...errors, phoneNumber: undefined });
-                  }}
-                  placeholder={t('editProfile.phonePlaceholder')}
-                  placeholderTextColor="#B9B9B9"
-                  keyboardType="phone-pad"
-                  maxLength={PHONE_NUMBER_LENGTHS[selectedCountry.code] || PHONE_NUMBER_LENGTHS.default}
-                  editable={true}
-                  selectTextOnFocus={true}
-                />
-              </View>
-              {errors.phoneNumber && <Text style={styles.errorText}>{errors.phoneNumber}</Text>}
-            </View>
-
-            <Modal
-              visible={showCountryPicker}
-              transparent={true}
-              animationType="fade"
-              onRequestClose={() => setShowCountryPicker(false)}
-            >
-              <TouchableOpacity
-                style={styles.countryModalBackdrop}
-                activeOpacity={1}
-                onPress={() => setShowCountryPicker(false)}
-              >
-                <View style={styles.countryModalContent}>
-                  <View style={styles.countryModalHeader}>
-                    <Text style={styles.countryModalTitle}>{t('editProfile.selectCountry')}</Text>
-                    <TouchableOpacity
-                      onPress={() => setShowCountryPicker(false)}
-                      style={styles.countryModalClose}
-                    >
-                      <Text style={styles.countryModalCloseText}>✕</Text>
-                    </TouchableOpacity>
+          <View style={styles.content}>
+            {/* Profile Image Section */}
+            <View style={styles.profileImageSection}>
+              <View style={styles.profileImageContainer}>
+                {profileImage && profileImage.trim() ? (
+                  <Image
+                    source={{ uri: getFullImageUrl(profileImage) || '' }}
+                    style={styles.profileImage}
+                    resizeMode="cover"
+                    onError={() => {
+                      setProfileImage(null);
+                    }}
+                  />
+                ) : (
+                  <View style={styles.profileImagePlaceholder}>
+                    <Text style={styles.profileImageInitials}>
+                      {fullName && fullName.trim()
+                        ? fullName
+                          .trim()
+                          .split(' ')
+                          .filter(n => n.length > 0)
+                          .map(n => n[0])
+                          .join('')
+                          .toUpperCase()
+                          .slice(0, 2)
+                        : email && email.trim()
+                          ? email[0].toUpperCase()
+                          : 'U'}
+                    </Text>
                   </View>
+                )}
+                {isUploadingImage && (
+                  <View style={styles.imageUploadOverlay}>
+                    <ActivityIndicator size="small" color="#fff" />
+                  </View>
+                )}
+                <TouchableOpacity
+                  style={styles.editImageButton}
+                  onPress={handleChangePhoto}
+                  disabled={isUploadingImage}
+                >
+                  <Feather name="camera" size={18} color="white" />
+                </TouchableOpacity>
+              </View>
+              <TouchableOpacity onPress={handleChangePhoto} disabled={isUploadingImage}>
+                <Text style={styles.changePhotoText}>
+                  {isUploadingImage ? t('common.loading') : t('editProfile.changePhoto')}
+                </Text>
+              </TouchableOpacity>
+            </View>
 
-                  <View style={styles.countrySearchContainer}>
-                    <TextInput
-                      style={styles.countrySearchInput}
-                      placeholder={t('editProfile.searchCountries')}
-                      placeholderTextColor="#B9B9B9"
-                      value={countrySearch}
-                      onChangeText={setCountrySearch}
+            {/* Form Section */}
+            <View style={styles.formSection}>
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>{t('editProfile.fullName')}</Text>
+                <TextInput
+                  style={[styles.input, errors.fullName && styles.inputError]}
+                  value={fullName}
+                  onChangeText={(text: string) => {
+                    setFullName(text);
+                    if (errors.fullName) setErrors({ ...errors, fullName: undefined });
+                  }}
+                  placeholder={t('editProfile.enterFullName')}
+                  placeholderTextColor="#B9B9B9"
+                />
+                {errors.fullName && <Text style={styles.errorText}>{errors.fullName}</Text>}
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>{t('editProfile.email')}</Text>
+                <TextInput
+                  style={[styles.input, errors.email && styles.inputError]}
+                  value={email}
+                  placeholder={t('editProfile.enterEmail')}
+                  placeholderTextColor="#B9B9B9"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  editable={false}
+                />
+                {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Phone Number</Text>
+                <View style={[styles.phoneInputContainer, errors.phoneNumber && styles.inputError]}>
+                  <TouchableOpacity
+                    style={styles.countryPickerButton}
+                    onPress={() => setShowCountryPicker(true)}
+                    activeOpacity={0.7}
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                  >
+                    <Text style={styles.countryFlag}>{selectedCountry.flag}</Text>
+                    <Text style={styles.countryCodeText}>{selectedCountry.dial_code}</Text>
+                  </TouchableOpacity>
+                  <TextInput
+                    style={styles.phoneNumberInput}
+                    value={phoneNumber.replace(selectedCountry.dial_code, '').trim()}
+                    onChangeText={(text) => {
+                      // Remove any non-digit characters
+                      const cleanText = text.replace(/\D/g, '');
+                      const maxLength = PHONE_NUMBER_LENGTHS[selectedCountry.code] || PHONE_NUMBER_LENGTHS.default;
+
+                      // Limit input to maximum length for the selected country
+                      const limitedText = cleanText.slice(0, maxLength);
+                      const fullNumber = selectedCountry.dial_code + limitedText;
+
+                      setPhoneNumber(fullNumber);
+                      if (errors.phoneNumber) setErrors({ ...errors, phoneNumber: undefined });
+                    }}
+                    placeholder={t('editProfile.phonePlaceholder')}
+                    placeholderTextColor="#B9B9B9"
+                    keyboardType="phone-pad"
+                    maxLength={PHONE_NUMBER_LENGTHS[selectedCountry.code] || PHONE_NUMBER_LENGTHS.default}
+                    editable={true}
+                    selectTextOnFocus={true}
+                  />
+                </View>
+                {errors.phoneNumber && <Text style={styles.errorText}>{errors.phoneNumber}</Text>}
+              </View>
+
+              <Modal
+                visible={showCountryPicker}
+                transparent={true}
+                animationType="fade"
+                onRequestClose={() => setShowCountryPicker(false)}
+              >
+                <TouchableOpacity
+                  style={styles.countryModalBackdrop}
+                  activeOpacity={1}
+                  onPress={() => setShowCountryPicker(false)}
+                >
+                  <View style={styles.countryModalContent}>
+                    <View style={styles.countryModalHeader}>
+                      <Text style={styles.countryModalTitle}>{t('editProfile.selectCountry')}</Text>
+                      <TouchableOpacity
+                        onPress={() => setShowCountryPicker(false)}
+                        style={styles.countryModalClose}
+                      >
+                        <Text style={styles.countryModalCloseText}>✕</Text>
+                      </TouchableOpacity>
+                    </View>
+
+                    <View style={styles.countrySearchContainer}>
+                      <TextInput
+                        style={styles.countrySearchInput}
+                        placeholder={t('editProfile.searchCountries')}
+                        placeholderTextColor="#B9B9B9"
+                        value={countrySearch}
+                        onChangeText={setCountrySearch}
+                      />
+                    </View>
+
+                    <FlatList
+                      data={filteredCountries}
+                      keyExtractor={(item) => item.code}
+                      style={styles.countryList}
+                      showsVerticalScrollIndicator={false}
+                      initialNumToRender={20}
+                      maxToRenderPerBatch={10}
+                      windowSize={10}
+                      removeClippedSubviews={true}
+                      renderItem={({ item: country }) => (
+                        <TouchableOpacity
+                          style={styles.countryItem}
+                          onPress={() => {
+                            setSelectedCountry(country);
+                            setShowCountryPicker(false);
+                            setCountrySearch('');
+                            // Update phone number with new country code
+                            const currentNumber = phoneNumber.replace(/^\+\d+/, '');
+                            setPhoneNumber(country.dial_code + currentNumber);
+                          }}
+                        >
+                          <Text style={styles.countryFlag}>{country.flag}</Text>
+                          <View style={styles.countryInfo}>
+                            <Text style={styles.countryName}>{country.name}</Text>
+                            <Text style={styles.countryDialCode}>{country.dial_code}</Text>
+                          </View>
+                          {selectedCountry.code === country.code && (
+                            <Text style={styles.countrySelected}>✓</Text>
+                          )}
+                        </TouchableOpacity>
+                      )}
                     />
                   </View>
+                </TouchableOpacity>
+              </Modal>
+            </View>
 
-                  <ScrollView style={styles.countryList} showsVerticalScrollIndicator={false}>
-                    {filteredCountries.map((country) => (
-                      <TouchableOpacity
-                        key={country.code}
-                        style={styles.countryItem}
-                        onPress={() => {
-                          setSelectedCountry(country);
-                          setShowCountryPicker(false);
-                          setCountrySearch('');
-                          // Update phone number with new country code
-                          const currentNumber = phoneNumber.replace(/^\+\d+/, '');
-                          setPhoneNumber(country.dial_code + currentNumber);
-                        }}
-                      >
-                        <Text style={styles.countryFlag}>{country.flag}</Text>
-                        <View style={styles.countryInfo}>
-                          <Text style={styles.countryName}>{country.name}</Text>
-                          <Text style={styles.countryDialCode}>{country.dial_code}</Text>
-                        </View>
-                        {selectedCountry.code === country.code && (
-                          <Text style={styles.countrySelected}>✓</Text>
-                        )}
-                      </TouchableOpacity>
-                    ))}
-                  </ScrollView>
-                </View>
+            {/* Buttons */}
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={[styles.saveButton, (isLoading || isUploadingImage) && styles.saveButtonDisabled]}
+                onPress={handleSave}
+                disabled={isLoading || isUploadingImage}
+              >
+                {isLoading ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <Text style={styles.saveButtonText}>{t('editProfile.saveChanges')}</Text>
+                )}
               </TouchableOpacity>
-            </Modal>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={handleCancel}
+                disabled={isLoading || isUploadingImage}
+              >
+                <Text style={styles.cancelButtonText}>{t('common.cancel')}</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-
-          {/* Buttons */}
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={[styles.saveButton, (isLoading || isUploadingImage) && styles.saveButtonDisabled]}
-              onPress={handleSave}
-              disabled={isLoading || isUploadingImage}
-            >
-              {isLoading ? (
-                <ActivityIndicator size="small" color="#fff" />
-              ) : (
-                <Text style={styles.saveButtonText}>{t('editProfile.saveChanges')}</Text>
-              )}
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={handleCancel}
-              disabled={isLoading || isUploadingImage}
-            >
-              <Text style={styles.cancelButtonText}>{t('common.cancel')}</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
