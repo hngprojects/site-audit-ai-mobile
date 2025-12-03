@@ -76,7 +76,7 @@ const EditUrlSheet: React.FC<EditUrlSheetProps> = ({
       >
         <TouchableWithoutFeedback onPress={onClose}>
           <View style={styles.modalOverlay}>
-            <TouchableWithoutFeedback>
+            <TouchableWithoutFeedback onPress={() => {}}>
               <Animated.View
                 style={[
                   styles.modalContent,

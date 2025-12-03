@@ -21,7 +21,7 @@ const LogoutModal: React.FC<LogoutModalProps> = ({ visible, onClose, onConfirm }
     >
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.logoutModalOverlay}>
-          <TouchableWithoutFeedback>
+          <TouchableWithoutFeedback onPress={() => {}}>
             <View style={styles.logoutModalContent}>
               <View style={styles.logoutIconContainer}>
                 <Feather name="trash-2" size={24} color="#FF5A3D" />

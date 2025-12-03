@@ -1,6 +1,6 @@
 import { useTranslation } from '@/utils/translations';
 import React, { useState, useEffect, useRef } from 'react';
-import { ActivityIndicator, TouchableOpacity, ScrollView, View, Text, TextInput, KeyboardAvoidingView, Platform, Image, Modal, Alert } from 'react-native';
+import { ActivityIndicator, TouchableOpacity, TouchableWithoutFeedback, ScrollView, View, Text, TextInput, KeyboardAvoidingView, Platform, Image, Modal, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -147,31 +147,37 @@ const LiveChatSupportContent = () => {
         </View>
 
       </KeyboardAvoidingView>
-      <Modal visible={showEmojiPicker} animationType="slide" transparent>
-        <View style={styles.emojiPickerContainer}>
-          <View style={styles.emojiPickerHeader}>
-            <Text style={styles.emojiPickerTitle}>{t('liveChat.selectEmoji')}</Text>
-            <TouchableOpacity onPress={() => setShowEmojiPicker(false)} style={styles.closeButton}>
-              <Feather name="x" size={24} color="#666" />
-            </TouchableOpacity>
+      <Modal visible={showEmojiPicker} animationType="slide" transparent onRequestClose={() => setShowEmojiPicker(false)}>
+        <TouchableWithoutFeedback onPress={() => setShowEmojiPicker(false)}>
+          <View style={styles.emojiPickerContainer}>
+            <TouchableWithoutFeedback>
+              <View>
+                <View style={styles.emojiPickerHeader}>
+                  <Text style={styles.emojiPickerTitle}>{t('liveChat.selectEmoji')}</Text>
+                  <TouchableOpacity onPress={() => setShowEmojiPicker(false)} style={styles.closeButton}>
+                    <Feather name="x" size={24} color="#666" />
+                  </TouchableOpacity>
+                </View>
+                <ScrollView contentContainerStyle={styles.emojiScrollView}>
+                  <View style={styles.emojiGrid}>
+                    {emojis.map((emoji, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        onPress={() => {
+                          setNewMessage(prev => prev + emoji);
+                          setShowEmojiPicker(false);
+                        }}
+                        style={styles.emojiButton}
+                      >
+                        <Text style={styles.emoji}>{emoji}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+              </View>
+            </TouchableWithoutFeedback>
           </View>
-          <ScrollView contentContainerStyle={styles.emojiScrollView}>
-            <View style={styles.emojiGrid}>
-              {emojis.map((emoji, index) => (
-                <TouchableOpacity
-                  key={index}
-                  onPress={() => {
-                    setNewMessage(prev => prev + emoji);
-                    setShowEmojiPicker(false);
-                  }}
-                  style={styles.emojiButton}
-                >
-                  <Text style={styles.emoji}>{emoji}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </ScrollView>
-        </View>
+        </TouchableWithoutFeedback>
       </Modal>
     </SafeAreaView>
   );
