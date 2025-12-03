@@ -1,6 +1,6 @@
 import { useTranslation } from '@/utils/translations';
 import React, { useState, useEffect, useRef } from 'react';
-import { ActivityIndicator, TouchableOpacity, ScrollView, View, TextInput, Text } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, TouchableOpacity, ScrollView, View, TextInput, Text } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
@@ -82,11 +82,16 @@ const DeleteAccountVerificationContent = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView
-        style={styles.scrollContainer}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 100 }}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
       >
+        <ScrollView
+          style={styles.scrollContainer}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 100 }}
+        >
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
             <Feather name="arrow-left" size={24} color="#1A2373" />
@@ -150,6 +155,7 @@ const DeleteAccountVerificationContent = () => {
           <Text style={styles.cancelButtonText}>{t('common.cancel')}</Text>
         </TouchableOpacity>
       </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };

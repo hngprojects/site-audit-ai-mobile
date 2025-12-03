@@ -157,8 +157,8 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
     } catch {
       Toast.show({
         type: 'error',
-            text1: t('common.error'),
-            text2: t('editProfile.selectImageError'),
+        text1: t('common.error'),
+        text2: t('editProfile.selectImageError'),
       });
     }
   };
@@ -205,8 +205,8 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ user }) => {
       }
       Toast.show({
         type: 'success',
-          text1: t('common.success'),
-          text2: t('editProfile.photoDeleted'),
+        text1: t('common.success'),
+        text2: t('editProfile.photoDeleted'),
       });
     } catch (error) {
       Toast.show({

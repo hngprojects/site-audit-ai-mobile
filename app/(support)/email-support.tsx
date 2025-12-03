@@ -4,7 +4,7 @@ import { useTranslation } from '@/utils/translations';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
@@ -88,17 +88,22 @@ const EmailSupportContent = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Feather name="arrow-left" size={24} color="#1A2373" />
-        </TouchableOpacity>
-        <Text style={styles.headerText}>{t('emailSupport.title')}</Text>
-      </View>
-      <ScrollView
-        style={styles.scrollContainer}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ marginTop: 16, paddingBottom: 100 }}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
       >
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+            <Feather name="arrow-left" size={24} color="#1A2373" />
+          </TouchableOpacity>
+          <Text style={styles.headerText}>{t('emailSupport.title')}</Text>
+        </View>
+        <ScrollView
+          style={styles.scrollContainer}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ marginTop: 16, paddingBottom: 100 }}
+        >
         <View style={styles.content}>
           {/* <Text style={styles.title}>Contact Us</Text>
           <Text style={styles.subtitle}>Send us an email and we will respond within 24 hours</Text> */}
@@ -155,6 +160,7 @@ const EmailSupportContent = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };

@@ -10,7 +10,7 @@ import { useTranslation } from '@/utils/translations';
 import { Feather } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
@@ -196,16 +196,21 @@ const RequestForm = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Feather name="arrow-left" size={24} color="#1A2373" />
-        </TouchableOpacity>
-        <Text style={styles.headerText}>{t('requestForm.title')}</Text>
-        <TouchableOpacity style={styles.selectButton} onPress={handleToggleSelect}>
-          <Text style={styles.selectButtonText}>{isAllSelected ? t('requestForm.deselect') : t('requestForm.select')}</Text>
-        </TouchableOpacity>
-      </View>
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+      >
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+            <Feather name="arrow-left" size={24} color="#1A2373" />
+          </TouchableOpacity>
+          <Text style={styles.headerText}>{t('requestForm.title')}</Text>
+          <TouchableOpacity style={styles.selectButton} onPress={handleToggleSelect}>
+            <Text style={styles.selectButtonText}>{isAllSelected ? t('requestForm.deselect') : t('requestForm.select')}</Text>
+          </TouchableOpacity>
+        </View>
+        <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
         <Text style={styles.mainTitle}>
           {t('requestForm.confirmReview')}
         </Text>
@@ -258,6 +263,7 @@ const RequestForm = () => {
           textStyle={styles.primaryButtonText}
         />
       </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };

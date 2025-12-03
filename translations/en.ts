@@ -117,6 +117,7 @@ export const en = {
   'editProfile.takePhotoError': 'Failed to take photo. Please try again.',
   'editProfile.selectImageError': 'Failed to select image. Please try again.',
   'editProfile.photoUpdated': 'Profile photo updated successfully',
+  'editProfile.profilePhotoUpdated': 'Profile photo updated successfully',
   'editProfile.photoDeleted': 'Profile photo deleted successfully',
   'editProfile.deletePhotoError': 'Failed to delete profile photo. Please try again.',
   'editProfile.uploadError': 'Failed to upload image. Please try again.',

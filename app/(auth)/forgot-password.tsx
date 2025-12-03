@@ -6,7 +6,7 @@ import { Feather } from '@expo/vector-icons';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { ActivityIndicator, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -58,14 +58,19 @@ const ForgotPassword = () => {
     }
 
   return (
-    <View
-        style={{paddingTop: inset.top,
-            paddingBottom: inset.bottom,
-            backgroundColor: "#fff",
-            flex: 1,
-            paddingHorizontal: "5%"
-        }}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
     >
+      <View
+          style={{paddingTop: inset.top,
+              paddingBottom: inset.bottom,
+              backgroundColor: "#fff",
+              flex: 1,
+              paddingHorizontal: "5%"
+          }}
+      >
         {!verificationEmail && (
         <>
         <View style= {styles.headerSection}>
@@ -155,7 +160,8 @@ const ForgotPassword = () => {
 
         )}
 
-    </View>
+      </View>
+    </KeyboardAvoidingView>
   )
 }
 

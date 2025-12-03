@@ -12,6 +12,8 @@ import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   FlatList,
+  KeyboardAvoidingView,
+  Platform,
   Text,
   TextInput,
   TouchableOpacity,
@@ -244,12 +246,17 @@ const ReportsScreen: React.FC = () => {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <View
-        style={[
-          styles.container,
-          { paddingTop: insets.top, paddingBottom: insets.bottom },
-        ]}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
       >
+        <View
+          style={[
+            styles.container,
+            { paddingTop: insets.top, paddingBottom: insets.bottom },
+          ]}
+        >
         <View style={styles.headerWrap}>
           <Text style={styles.title}>{t('reports.title')}</Text>
         </View>
@@ -337,6 +344,7 @@ const ReportsScreen: React.FC = () => {
           isLoading={isEditing}
         />
       </View>
+      </KeyboardAvoidingView>
     </GestureHandlerRootView>
   );
 };

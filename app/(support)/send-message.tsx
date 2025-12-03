@@ -1,6 +1,6 @@
 import { useTranslation } from '@/utils/translations';
 import React, { useState, useEffect } from 'react';
-import { ActivityIndicator, TouchableOpacity, ScrollView, Text, View, TextInput } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, TouchableOpacity, ScrollView, Text, View, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -61,17 +61,22 @@ const SendMessageContent = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Feather name="arrow-left" size={24} color="#1A2373" />
-        </TouchableOpacity>
-        <Text style={styles.headerText}>{t('sendMessage.send')}</Text>
-      </View>
-      <ScrollView
-        style={styles.scrollContainer}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ marginTop: 16, paddingBottom: 100 }}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
       >
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+            <Feather name="arrow-left" size={24} color="#1A2373" />
+          </TouchableOpacity>
+          <Text style={styles.headerText}>{t('sendMessage.send')}</Text>
+        </View>
+        <ScrollView
+          style={styles.scrollContainer}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ marginTop: 16, paddingBottom: 100 }}
+        >
         <View style={styles.content}>
           <Text style={styles.title}>{t('sendMessage.needHelp')}</Text>
           <Text style={styles.subtitle}>{t('sendMessage.subtitle')}</Text>
@@ -123,6 +128,7 @@ const SendMessageContent = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };

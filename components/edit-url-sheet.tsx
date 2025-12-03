@@ -2,7 +2,9 @@ import { useTranslation } from '@/utils/translations';
 import React, { useEffect, useState } from 'react';
 import {
   Animated,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   Text,
   TextInput,
   TouchableOpacity,
@@ -67,18 +69,23 @@ const EditUrlSheet: React.FC<EditUrlSheetProps> = ({
       animationType="none"
       onRequestClose={onClose}
     >
-      <TouchableWithoutFeedback onPress={onClose}>
-        <View style={styles.modalOverlay}>
-          <TouchableWithoutFeedback>
-            <Animated.View
-              style={[
-                styles.modalContent,
-                {
-                  transform: [{ translateY }],
-                  paddingBottom: insets.bottom + 20,
-                },
-              ]}
-            >
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+      >
+        <TouchableWithoutFeedback onPress={onClose}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback>
+              <Animated.View
+                style={[
+                  styles.modalContent,
+                  {
+                    transform: [{ translateY }],
+                    paddingBottom: insets.bottom + 20,
+                  },
+                ]}
+              >
               <View style={styles.modalHeader}>
                 <View style={styles.dragHandle} />
                 <Text style={styles.title}>{t('editUrlSheet.title')}</Text>
@@ -135,6 +142,7 @@ const EditUrlSheet: React.FC<EditUrlSheetProps> = ({
           </TouchableWithoutFeedback>
         </View>
       </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
     </Modal>
   );
 };
