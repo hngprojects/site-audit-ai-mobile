@@ -2,6 +2,7 @@ import { useSelectedIssuesStore } from '@/store/audit-summary-selected-issue-sto
 import { useAuditInfoStore } from '@/store/audit-website-details-store';
 import styles, { reportColors } from '@/stylesheets/single-issue-detail-screen-stylesheet';
 import { Status } from '@/type';
+import { useTranslation } from '@/utils/translations';
 import { AntDesign, Feather, Ionicons } from '@expo/vector-icons';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -13,6 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 
 const SingleIssueDetailScreen = () => {
+    const { t } = useTranslation();
     const inset = useSafeAreaInsets();
     const router = useRouter();
 
@@ -30,9 +32,9 @@ const SingleIssueDetailScreen = () => {
 
     const issue = useMemo(() => availableIssues.find(iss => iss.id === id), [availableIssues, id]);
 
-    const title = issue?.title || 'Unknown';
+    const title = issue?.title || t('issueDetail.unknown');
     const miniscore = issue?.score || '0';
-    const description = issue?.description || 'No description';
+    const description = issue?.description || t('issueDetail.noDescription');
     const ministatus = issue?.status || 'Warning';
 
     const businessBenefits = businessBenefitsStr ? JSON.parse(businessBenefitsStr) : [];
@@ -116,7 +118,7 @@ const rawDescription = Array.isArray(params.description) ? params.description[0]
             >
                 <Ionicons name="arrow-back-sharp" size={24} color="black" />
             </TouchableOpacity>
-            <Text style={styles.pageTitle}>Audit Summary</Text>
+            <Text style={styles.pageTitle}>{t('issueDetail.auditSummary')}</Text>
         </View>
             
             
@@ -152,7 +154,7 @@ const rawDescription = Array.isArray(params.description) ? params.description[0]
                   onPress={() => router.push({ pathname: '/(main)/auditing-screen', params: { url: domain, isReRun: 'true' } })}
                 >
                   <AntDesign name="reload" size={15} color="red" />
-                  <Text style={{color: "red", alignItems: "center", ...styles.domainText, fontSize: 13}}>Re-run audit</Text>
+                  <Text style={{color: "red", alignItems: "center", ...styles.domainText, fontSize: 13}}>{t('issueDetail.reRunAudit')}</Text>
                 </TouchableOpacity>
             </View>
             
@@ -169,13 +171,13 @@ const rawDescription = Array.isArray(params.description) ? params.description[0]
                         ...styles.cardLabel, 
                         color: "#000"
                     }}>
-                        Website Score
+                        {t('issueDetail.websiteScore')}
                     </Text>
                 <Text style={{
                     ...styles.cardLabel, 
                     color: "#dfdfdfff", 
                     marginTop: 5}}>
-                        Scan Date: {scanDate}
+                        {t('issueDetail.scanDate')}: {scanDate}
                 </Text>
                 <Text style={{
                     color: "#000", 
@@ -183,9 +185,9 @@ const rawDescription = Array.isArray(params.description) ? params.description[0]
                     fontSize: 13, 
                     marginTop: 20, 
                 }}>
-                    {status === "low" ? "Your website is performing poorly. Immediate improvements are needed to enhance user experience and SEO." : 
-                    status === "high" ? "Great job! Your website is performing well. Keep up the good work to maintain and further enhance user experience and SEO. Fix the issues below to make it even better."  : 
-                    "Your website has an average performance. There is room for improvement to boost user experience and SEO." }
+                    {status === "low" ? t('reportDashboard.statusCritical') : 
+                    status === "high" ? t('reportDashboard.statusGood') : 
+                    t('reportDashboard.statusWarning')}
                 </Text>
         </View>
 
@@ -212,7 +214,7 @@ const rawDescription = Array.isArray(params.description) ? params.description[0]
     <Text style={{
       ...styles.usabilityText
     }}>
-      {ministatus === 'UX' ? 'User Experience' : ministatus === 'Performance' ? 'Performance' : 'SEO'}
+      {ministatus === 'UX' ? t('issueDetail.userExperience') : ministatus === 'Performance' ? t('issueDetail.performance') : t('issueDetail.seo')}
     </Text>
 
     <View style={{
@@ -242,7 +244,7 @@ const rawDescription = Array.isArray(params.description) ? params.description[0]
   <Text style={{
     ...styles.whatThisWillDoTitle
   }}>
-    WHAT this would do to your business
+    {t('issueDetail.whatThisWouldDo')}
   </Text>
 
   <Text style={{
@@ -250,14 +252,14 @@ const rawDescription = Array.isArray(params.description) ? params.description[0]
   }}>
     {businessBenefits.length > 0 ? businessBenefits.map((benefit: string, index: number) => (
       `• ${benefit}${index < businessBenefits.length - 1 ? '\n' : ''}`
-    )).join('') : '• Lower conversions for your website\n• Poor user experience\n• People leaving your website early'}
+    )).join('') : t('issueDetail.defaultBenefits')}
   </Text>
 
   {/* PROBLEMS */}
   <Text style={{
     ...styles.problemsTitle
   }}>
-    Problems
+    {t('issueDetail.problems')}
   </Text>
 
   <View style={{...styles.problemDetailsContainer }}>
@@ -269,9 +271,9 @@ const rawDescription = Array.isArray(params.description) ? params.description[0]
       <Text style={{
         ...styles.problemText
       }}>
-        {ministatus === 'UX' ? 'Issues with user interface and navigation' :
-         ministatus === 'Performance' ? 'Slow loading times and performance bottlenecks' :
-         'Problems with search engine optimization'}
+        {ministatus === 'UX' ? t('issueDetail.problemUX') :
+         ministatus === 'Performance' ? t('issueDetail.problemPerformance') :
+         t('issueDetail.problemSEO')}
       </Text>
     </View>
 
@@ -285,7 +287,7 @@ const rawDescription = Array.isArray(params.description) ? params.description[0]
       <Text style={{
         ...styles.problemText
       }}>
-        Missing features may drive customers away.
+        {t('issueDetail.missingFeatures')}
       </Text>
     </View>
 
@@ -299,7 +301,7 @@ const rawDescription = Array.isArray(params.description) ? params.description[0]
       <Text style={{
         ...styles.problemText
       }}>
-        Lack of visual hierarchy makes important content hard to notice.
+        {t('issueDetail.visualHierarchy')}
       </Text>
     </View>
   </View>
@@ -308,15 +310,15 @@ const rawDescription = Array.isArray(params.description) ? params.description[0]
   <Text style={{
     ...styles.suggestionTitle
   }}>
-    Suggestions
+    {t('issueDetail.suggestions')}
   </Text>
 
   <Text style={{
     ...styles.suggestionText
   }}>
-    {impactMessage || (ministatus === 'UX' ? 'Improve user interface design and navigation structure to enhance user experience.' :
-     ministatus === 'Performance' ? 'Optimize images, enable compression, and improve server response times for better performance.' :
-     'Fix meta tags, improve content structure, and enhance internal linking for better SEO.')}
+    {impactMessage || (ministatus === 'UX' ? t('issueDetail.suggestionUX') :
+     ministatus === 'Performance' ? t('issueDetail.suggestionPerformance') :
+     t('issueDetail.suggestionSEO'))}
   </Text>
 
   {/* Continue Button */}
@@ -329,7 +331,7 @@ const rawDescription = Array.isArray(params.description) ? params.description[0]
     <Text style={{
      ...styles.continueButtonText
     }}>
-      Continue
+      {t('issueDetail.continue')}
     </Text>
   </TouchableOpacity>
 

@@ -102,8 +102,8 @@ const SignUp = () => {
         // Show success message and redirect to sign-in page
         Toast.show({
           type: 'success',
-          text1: 'Success!',
-          text2: err.message || 'Account created successfully. Please sign in.',
+          text1: t('common.success'),
+          text2: err.message || t('auth.signUpSuccess'),
         });
         // Redirect to sign-in page after a short delay, preserving the redirect parameter
         setTimeout(() => {

@@ -2,7 +2,9 @@ import { useTranslation } from '@/utils/translations';
 import React, { useEffect, useState } from 'react';
 import {
   Animated,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   Text,
   TextInput,
   TouchableOpacity,
@@ -67,74 +69,80 @@ const EditUrlSheet: React.FC<EditUrlSheetProps> = ({
       animationType="none"
       onRequestClose={onClose}
     >
-      <TouchableWithoutFeedback onPress={onClose}>
-        <View style={styles.modalOverlay}>
-          <TouchableWithoutFeedback>
-            <Animated.View
-              style={[
-                styles.modalContent,
-                {
-                  transform: [{ translateY }],
-                  paddingBottom: insets.bottom + 20,
-                },
-              ]}
-            >
-              <View style={styles.modalHeader}>
-                <View style={styles.dragHandle} />
-                <Text style={styles.title}>{t('editUrlSheet.title')}</Text>
-              </View>
-
-              <View style={styles.contentContainer}>
-                <View style={styles.inputContainer}>
-                  <Text style={styles.inputLabel}>{t('editUrlSheet.currentUrl')}</Text>
-                  <TextInput
-                    style={[styles.input, styles.inputReadOnly]}
-                    value={currentUrl}
-                    editable={false}
-                    placeholderTextColor="#9CA3AF"
-                  />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+      >
+        <TouchableWithoutFeedback onPress={onClose}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback onPress={() => { }}>
+              <Animated.View
+                style={[
+                  styles.modalContent,
+                  {
+                    transform: [{ translateY }],
+                    paddingBottom: insets.bottom + 20,
+                  },
+                ]}
+              >
+                <View style={styles.modalHeader}>
+                  <View style={styles.dragHandle} />
+                  <Text style={styles.title}>{t('editUrlSheet.title')}</Text>
                 </View>
 
-                <View style={styles.inputContainer}>
-                  <Text style={styles.inputLabel}>{t('editUrlSheet.newUrl')}</Text>
-                  <TextInput
-                    style={styles.input}
-                    value={newUrl}
-                    onChangeText={setNewUrl}
-                    placeholder={t('editUrlSheet.enterUrl')}
-                    placeholderTextColor="#9CA3AF"
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    keyboardType="url"
-                  />
+                <View style={styles.contentContainer}>
+                  <View style={styles.inputContainer}>
+                    <Text style={styles.inputLabel}>{t('editUrlSheet.currentUrl')}</Text>
+                    <TextInput
+                      style={[styles.input, styles.inputReadOnly]}
+                      value={currentUrl}
+                      editable={false}
+                      placeholderTextColor="#9CA3AF"
+                    />
+                  </View>
+
+                  <View style={styles.inputContainer}>
+                    <Text style={styles.inputLabel}>{t('editUrlSheet.newUrl')}</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={newUrl}
+                      onChangeText={setNewUrl}
+                      placeholder={t('editUrlSheet.enterUrl')}
+                      placeholderTextColor="#9CA3AF"
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      keyboardType="url"
+                    />
+                  </View>
                 </View>
-              </View>
 
-              <View style={styles.buttonsContainer}>
-                <TouchableOpacity
-                  style={[styles.scanButton, isLoading && styles.buttonDisabled]}
-                  onPress={handleConfirm}
-                  activeOpacity={0.8}
-                  disabled={isLoading || !newUrl.trim()}
-                >
-                  <Text style={styles.scanButtonText}>
-                    {isLoading ? t('editUrlSheet.scanning') : t('editUrlSheet.scan')}
-                  </Text>
-                </TouchableOpacity>
+                <View style={styles.buttonsContainer}>
+                  <TouchableOpacity
+                    style={[styles.scanButton, isLoading && styles.buttonDisabled]}
+                    onPress={handleConfirm}
+                    activeOpacity={0.8}
+                    disabled={isLoading || !newUrl.trim()}
+                  >
+                    <Text style={styles.scanButtonText}>
+                      {isLoading ? t('editUrlSheet.scanning') : t('editUrlSheet.scan')}
+                    </Text>
+                  </TouchableOpacity>
 
-                <TouchableOpacity
-                  style={styles.cancelButton}
-                  onPress={onClose}
-                  activeOpacity={0.8}
-                  disabled={isLoading}
-                >
-                  <Text style={styles.cancelButtonText}>{t('common.cancel')}</Text>
-                </TouchableOpacity>
-              </View>
-            </Animated.View>
-          </TouchableWithoutFeedback>
-        </View>
-      </TouchableWithoutFeedback>
+                  <TouchableOpacity
+                    style={styles.cancelButton}
+                    onPress={onClose}
+                    activeOpacity={0.8}
+                    disabled={isLoading}
+                  >
+                    <Text style={styles.cancelButtonText}>{t('common.cancel')}</Text>
+                  </TouchableOpacity>
+                </View>
+              </Animated.View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
     </Modal>
   );
 };

@@ -38,3 +38,7 @@ export const signInWithApple = async (): Promise<AuthResponse> => {
   return await authService.signInWithApple();
 };
 
+export const deleteAccount = async (token: string): Promise<void> => {
+  return await authService.deleteAccount(token);
+};
+

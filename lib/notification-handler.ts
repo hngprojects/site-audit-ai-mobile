@@ -1,3 +1,4 @@
+import Constants from 'expo-constants';
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 
@@ -39,13 +40,28 @@ export const requestNotificationPermissions = async (): Promise<boolean> => {
 // Get push token
 export const getPushToken = async (): Promise<PushToken | null> => {
   try {
-    const token = await Notifications.getExpoPushTokenAsync();
+    // Use Expo's push notification service instead of FCM
+    // This avoids Firebase initialization errors on Android
+    const projectId = Constants.expoConfig?.extra?.eas?.projectId;
+
+    const options: Notifications.ExpoPushTokenOptions = projectId
+      ? { projectId }
+      : {};
+
+    const token = await Notifications.getExpoPushTokenAsync(options);
     return {
       token: token.data,
       platform: Platform.OS as 'ios' | 'android',
     };
-  } catch (error) {
-    console.error('Error getting push token:', error);
+  } catch (error: any) {
+    // Handle Firebase initialization errors gracefully
+    const errorMessage = error?.message || String(error);
+    if (errorMessage.includes('Firebase') || errorMessage.includes('FCM')) {
+      console.warn('Firebase not configured. Push notifications will use Expo service when configured.');
+      console.warn('To enable push notifications in production, configure Firebase FCM credentials following: https://docs.expo.dev/push-notifications/fcm-credentials/');
+    } else {
+      console.error('Error getting push token:', error);
+    }
     return null;
   }
 };

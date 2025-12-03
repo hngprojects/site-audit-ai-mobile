@@ -5,25 +5,16 @@ import ProfileHeader from '@/components/profile/profile-header';
 // import ProfileSkeleton from '@/components/profile/profile-skeleton';
 import { useAuth } from '@/hooks/use-auth';
 import styles from '@/stylesheets/profile-stylesheet';
+import { useTranslation } from '@/utils/translations';
 import { useFocusEffect } from '@react-navigation/native';
 import { useCallback, useEffect, useState } from 'react';
-import { ScrollView } from 'react-native';
+import { ScrollView, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const Profile = () => {
+  const { t } = useTranslation();
   const { isAuthenticated, isInitialized, user } = useAuth();
   const [modalVisible, setModalVisible] = useState(false);
-
-  // Create a mock user for unauthenticated users to show the profile interface
-  const mockUser = {
-    id: 'mock',
-    fullName: '',
-    email: '',
-    createdAt: new Date().toISOString(),
-    profileImage: undefined,
-  };
-
-  const displayUser = isAuthenticated ? user : mockUser;
 
   useFocusEffect(
     useCallback(() => {
@@ -31,7 +22,7 @@ const Profile = () => {
         setModalVisible(true);
       } else if (isAuthenticated) {
         console.log(user);
-        
+
         setModalVisible(false);
       }
     }, [isInitialized, isAuthenticated, user])
@@ -61,8 +52,18 @@ const Profile = () => {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 50 }}
         >
-          <ProfileHeader text="Profile" />
-          <ProfileContent user={displayUser} />
+          <ProfileHeader text={t('profile.edit')} />
+          {isAuthenticated && user ? (
+            <ProfileContent user={user} />
+          ) : (
+            <>
+              <ProfileEmptyState />
+
+              <TouchableOpacity style={styles.signUpsignInBtn} onPress={() => setModalVisible(true)}>
+                <Text style={styles.authText}>{t('auth.signUp')} / {t('auth.signIn')}</Text>
+              </TouchableOpacity>
+            </>
+          )}
         </ScrollView>
       </SafeAreaView>
       <AuthModal visible={modalVisible && !isAuthenticated} onClose={closeModal} dismissible={false} />

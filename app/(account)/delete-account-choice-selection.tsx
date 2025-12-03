@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { ActivityIndicator, TouchableOpacity, ScrollView, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/themed-text';
-import { Feather } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
 import { feedbackOptions } from '@/constants/delete-account';
 import styles from '@/stylesheets/delete-account-choice-selection-stylesheet';
+import { Feather } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, ScrollView, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 const DeleteAccountChoiceSelectionContent = () => {
@@ -18,7 +18,7 @@ const DeleteAccountChoiceSelectionContent = () => {
 
   const handleDeleteAccount = () => {
     // Navigate to next step in deletion process
-    router.push('/(account)/delete-account-verification');
+    router.push('/(account)/delete-account-final-confirmation');
   };
 
   return (
@@ -46,7 +46,7 @@ const DeleteAccountChoiceSelectionContent = () => {
 
         {/* Feedback Options */}
         <View style={styles.feedbackContainer}>
-          
+
           <View style={styles.optionsGroup}>
             {feedbackOptions.map((option, index) => (
               <View key={index}>

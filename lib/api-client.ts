@@ -40,14 +40,14 @@ export const formatErrorMessage = (errorData: any): string => {
       }
       return result;
     };
-    
+
     const errorMessages = flattenErrors(errorData.data.errors);
-    
+
     if (errorMessages.length > 0) {
       return errorMessages.join('. ');
     }
   }
-  
+  console.log('errorData', errorData);
   return errorData.message || errorData.error || 'An error occurred';
 };
 

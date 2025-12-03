@@ -6,11 +6,14 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from "react-native";
 import Toast from "react-native-toast-message";
@@ -341,9 +344,16 @@ export default function ReportDashboard() {
       </ScrollView>
 
 
-      <Modal transparent visible={showModal} animationType="fade">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalBox}>
+      <Modal transparent visible={showModal} animationType="fade" onRequestClose={() => setShowModal(false)}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={{ flex: 1 }}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+        >
+          <TouchableWithoutFeedback onPress={() => setShowModal(false)}>
+            <View style={styles.modalOverlay}>
+              <TouchableWithoutFeedback>
+                <View style={styles.modalBox}>
 
             <TouchableOpacity
               onPress={() => setShowModal(false)}
@@ -396,7 +406,10 @@ export default function ReportDashboard() {
               <Text style={styles.modalButtonText}>{t('reportDashboard.gotIt')}</Text>
             </TouchableOpacity>
           </View>
+        </TouchableWithoutFeedback>
         </View>
+      </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
       </Modal>
     </View>
   );

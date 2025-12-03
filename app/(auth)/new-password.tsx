@@ -5,7 +5,7 @@ import { useResetPasswordEmailStore } from '@/zustardStore/resetPasswordEmailSto
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { ActivityIndicator, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View } from "react-native";
 import Toast from 'react-native-toast-message';
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -75,9 +75,13 @@ export default function NewPassword() {
     }
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-     
-       <View style= {styles.headerSection}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+    >
+      <View style={[styles.container, { paddingTop: insets.top }]}>
+        <View style= {styles.headerSection}>
             <TouchableOpacity 
                 onPress={router.back}
                 style={styles.backarrow}
@@ -178,6 +182,7 @@ export default function NewPassword() {
                     <Text style={styles.resetBtnText}>{t('newPassword.reset')}</Text>
                 </TouchableOpacity>
             )}
-    </View>
+      </View>
+    </KeyboardAvoidingView>
   );
 }

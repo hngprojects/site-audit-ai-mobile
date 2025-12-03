@@ -1,4 +1,5 @@
 import { useAuth } from '@/hooks/use-auth';
+import { appleAuthService } from '@/lib/apple-auth-service';
 import styles from '@/stylesheets/profile-stylesheet';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -8,7 +9,6 @@ import {
   Image,
   Keyboard,
   Modal,
-  Platform,
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
@@ -90,9 +90,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose, redirect, dismi
 
   const handleOverlayPress = () => {
     Keyboard.dismiss();
-    if (dismissible) {
-      onClose();
-    }
+    onClose();
   };
 
   return (
@@ -104,7 +102,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose, redirect, dismi
     >
       <TouchableWithoutFeedback onPress={handleOverlayPress}>
         <View style={styles.modalOverlay}>
-          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <TouchableWithoutFeedback onPress={() => { }}>
             <Animated.View
               style={[
                 styles.modalContent,
@@ -113,6 +111,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose, redirect, dismi
                   paddingBottom: inset.bottom + 20,
                 },
               ]}
+              onStartShouldSetResponder={() => true}
             >
               <View style={styles.modalHeader}>
                 <View style={styles.dragHandle} />

@@ -391,6 +391,7 @@ export const es = {
   'deleteAccount.resend': 'Reenviar',
   'deleteAccount.resendIn': 'Reenviar código en',
   'deleteAccount.verifyAndConfirm': 'Verificar y confirmar eliminación',
+  'deleteAccount.deleteError': 'Error al eliminar la cuenta. Por favor, inténtalo de nuevo.',
   'deleteAccountVerification.title': 'Eliminar cuenta',
   'deleteAccountVerification.mainTitle': 'Verifica tu identidad',
   'deleteAccountVerification.subtitle': 'Por razones de seguridad, por favor ingresa el código de 6 dígitos enviado a da*********i20@gmail.com',
@@ -519,4 +520,75 @@ export const es = {
   'privacyPolicy.sectionContent.sharing.paragraph1': 'No compartimos tu información con terceros.',
   'privacyPolicy.sectionContent.security.paragraph1': 'Protegemos tu información con medidas de seguridad apropiadas.',
   'privacyPolicy.sectionContent.rights.paragraph1': 'Tienes derecho a acceder a tu información personal.',
+
+  // Request Form - Additional
+  'requestForm.noScanResults': 'No hay resultados de análisis disponibles. Por favor, ejecuta un análisis primero.',
+  'requestForm.goBack': 'Volver',
+  'requestForm.pleaseSignIn': 'Por favor, inicia sesión para enviar una solicitud',
+  'requestForm.websiteRequired': 'La URL del sitio web es requerida',
+  'requestForm.jobIdRequired': 'El ID del trabajo es requerido',
+  'requestForm.submitSuccess': 'Solicitud enviada exitosamente',
+  'requestForm.submitError': 'Error al enviar la solicitud. Por favor, inténtalo de nuevo.',
+  'requestForm.loadScanError': 'Error al cargar los resultados del análisis. Por favor, inténtalo de nuevo.',
+
+  // Issue Detail Screen
+  'issueDetail.auditSummary': 'Resumen de auditoría',
+  'issueDetail.reRunAudit': 'Reejecutar auditoría',
+  'issueDetail.websiteScore': 'Puntuación del sitio web',
+  'issueDetail.scanDate': 'Fecha de análisis',
+  'issueDetail.unknown': 'Desconocido',
+  'issueDetail.noDescription': 'Sin descripción',
+  'issueDetail.userExperience': 'Experiencia de usuario',
+  'issueDetail.performance': 'Rendimiento',
+  'issueDetail.seo': 'SEO',
+  'issueDetail.whatThisWouldDo': 'QUÉ haría esto a tu negocio',
+  'issueDetail.defaultBenefits': '• Conversiones más bajas para tu sitio web\n• Mala experiencia de usuario\n• La gente abandona tu sitio web temprano',
+  'issueDetail.problems': 'Problemas',
+  'issueDetail.problemUX': 'Problemas con la interfaz de usuario y la navegación',
+  'issueDetail.problemPerformance': 'Tiempos de carga lentos y cuellos de botella de rendimiento',
+  'issueDetail.problemSEO': 'Problemas con la optimización de motores de búsqueda',
+  'issueDetail.missingFeatures': 'Las características faltantes pueden alejar a los clientes.',
+  'issueDetail.visualHierarchy': 'La falta de jerarquía visual hace que el contenido importante sea difícil de notar.',
+  'issueDetail.suggestions': 'Sugerencias',
+  'issueDetail.suggestionUX': 'Mejora el diseño de la interfaz de usuario y la estructura de navegación para mejorar la experiencia del usuario.',
+  'issueDetail.suggestionPerformance': 'Optimiza las imágenes, habilita la compresión y mejora los tiempos de respuesta del servidor para un mejor rendimiento.',
+  'issueDetail.suggestionSEO': 'Corrige las etiquetas meta, mejora la estructura del contenido y mejora los enlaces internos para un mejor SEO.',
+  'issueDetail.continue': 'Continuar',
+
+  // Confirmation Screen
+  'confirmation.requestOnWay': '¡Tu solicitud está en camino!',
+  'confirmation.requestReceived': 'Sitelytics ha recibido tu solicitud y te responderá en 24 horas.',
+  'confirmation.backToHome': 'Volver al inicio',
+
+  // Profile Empty State
+  'profileEmpty.signInToView': 'Por favor, inicia sesión para ver tu perfil',
+
+  // Edit Profile - Additional
+  'editProfile.phonePlaceholder': 'Ingresa tu número de teléfono (opcional)',
+  'editProfile.selectCountry': 'Seleccionar país',
+  'editProfile.searchCountries': 'Buscar países...',
+  'editProfile.phoneTooShort': 'El número de teléfono es demasiado corto para {country}',
+  'editProfile.chooseOption': 'Elegir una opción',
+  'editProfile.chooseFromGallery': 'Elegir de la galería',
+  'editProfile.photoDeleted': 'Foto de perfil eliminada exitosamente',
+  'editProfile.deletePhotoError': 'Error al eliminar la foto de perfil. Por favor, inténtalo de nuevo.',
+  'editProfile.biometricNotAvailable': 'La autenticación por huella dactilar no está disponible en este dispositivo. Por favor, configura la huella dactilar en la configuración de tu dispositivo.',
+  'editProfile.faceIdNotAvailable': 'Face ID no está disponible en este dispositivo. Por favor, configura Face ID en la configuración de tu dispositivo.',
+  'editProfile.enableFaceId': 'Habilitar inicio de sesión con Face ID',
+  'editProfile.biometricEnabled': 'El inicio de sesión por huella dactilar ha sido habilitado. Tus credenciales se guardarán de forma segura.',
+  'editProfile.faceIdEnabled': 'El inicio de sesión con Face ID ha sido habilitado. Tus credenciales se guardarán de forma segura.',
+  'editProfile.biometricFailed': 'La autenticación biométrica falló. Por favor, inténtalo de nuevo.',
+  'editProfile.biometricDisabled': 'El inicio de sesión biométrico ha sido deshabilitado y las credenciales guardadas han sido eliminadas.',
+  'editProfile.biometricUpdateError': 'Error al actualizar la configuración biométrica. Por favor, inténtalo de nuevo.',
+
+  // Notifications - Additional
+  'notifications.markAllReadSuccess': 'Todas las notificaciones marcadas como leídas',
+  'notifications.markAllReadError': 'No se pudieron marcar todas las notificaciones como leídas',
+
+  // Auth - Additional
+  'auth.signUpSuccess': 'Cuenta creada exitosamente. Por favor, inicia sesión.',
+  'auth.signInErrorGeneric': 'Error al iniciar sesión. Por favor, inténtalo de nuevo.',
+  'auth.invalidEmailPassword': 'Email o contraseña inválidos.',
+  'auth.serverError': 'Error del servidor. Por favor, inténtalo más tarde.',
+  'auth.signUpErrorGeneric': 'Error al registrarse. Por favor, inténtalo de nuevo.',
 };

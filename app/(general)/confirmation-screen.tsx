@@ -1,6 +1,7 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useAuditStore } from '@/store/website-domain';
+import { useTranslation } from '@/utils/translations';
 import styles from '@/stylesheets/confirmation-screen-stylesheet';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -9,6 +10,7 @@ import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const ConfirmationScreenContent = () => {
+  const { t } = useTranslation();
   const router = useRouter();
   const website = useAuditStore((state) => state.domain);
   const inset = useSafeAreaInsets();
@@ -22,15 +24,15 @@ const ConfirmationScreenContent = () => {
             <Ionicons name="paper-plane-outline" size={30.72} color="#1A7338" />
           </View>
         </View>
-        <ThemedText type="title" style={styles.title}>Your request is on its way!</ThemedText>
+        <ThemedText type="title" style={styles.title}>{t('confirmation.requestOnWay')}</ThemedText>
         <ThemedText style={styles.message}>
-          Sitelytics has received your request and will get back to you within 24 hours.
+          {t('confirmation.requestReceived')}
         </ThemedText>
 
       </View>
 
       <TouchableOpacity style={styles.button} onPress={() => router.replace('/(tabs)/')}>
-        <Text style={styles.buttonText}>Back to home</Text>
+        <Text style={styles.buttonText}>{t('confirmation.backToHome')}</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.shareButtonContainer} 
@@ -41,7 +43,7 @@ const ConfirmationScreenContent = () => {
         })}
       >
         <Feather name="share-2" size={18} color="#FF5A3D" />
-        <Text style={styles.shareButtonText}>Share</Text>
+        <Text style={styles.shareButtonText}>{t('common.share')}</Text>
       </TouchableOpacity>
     </ThemedView>
   );

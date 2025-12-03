@@ -63,7 +63,7 @@ const DeleteConfirmationSheet: React.FC<DeleteConfirmationSheetProps> = ({
     >
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.modalOverlay}>
-          <TouchableWithoutFeedback>
+          <TouchableWithoutFeedback onPress={() => {}}>
             <Animated.View
               style={[
                 styles.modalContent,
