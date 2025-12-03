@@ -9,16 +9,22 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 
 import IssueCard from "@/components/issue-card";
 import { useSelectedIssuesStore } from "@/store/audit-summary-selected-issue-store";
 import { useAuditInfoStore } from "@/store/audit-website-details-store";
-import { Status } from "@/type";
+import { LeadResponse, Status } from "@/type";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { leadService } from "../../lib/lead-generation-service";
+
+import TopAlert from "@/components/top-alert";
+
+
+
 
 
 
@@ -32,6 +38,8 @@ export default function ReportDashboard() {
   const [modalTextInput, setModalTextInput] = useState<string>('')
   const [emptyModalTextInput, setEmptyModalTextInput] = useState<boolean>(false)
   const [scanResult, setScanResult] = useState<any>(null);
+  const [leadResponse, setLeadResponse] = useState<LeadResponse | null>(null)
+  const [modalLoading, setModalLoading] = useState<boolean>(false);
 
   const { addIssue, clearIssues, setIssues } = useSelectedIssuesStore();
 
@@ -60,7 +68,7 @@ const hireAPro = () => {
     }
    
     
-    //navigate to  fix/hire professional
+    //navigate to  fix/hire professional 
     router.push("/(hireRequest)/hire-request");
   } catch (error) {
     console.log(error)
@@ -88,14 +96,33 @@ const hireAPro = () => {
   };
   
 
-  const modalContinueButton = () => {
+  const modalContinueButton = async (modalTextInput : string) => {
     if (modalTextInput.trim() === "") {
       setEmptyModalTextInput(true);
       return;
     }
+    
+    setModalLoading(true)
 
-    alert("We've sent you an email");
-    setShowModal(false);
+    try {
+       const response = await leadService.createLead(modalTextInput);
+
+       setLeadResponse (response)
+
+       if (response.status === "success")
+       {
+        console.log("success")
+         setShowModal(false);
+       }
+    } catch (error : any) {
+      console.log("error")
+      const apiError = error?.response?.data ?? null;
+      console.log(apiError)
+      setLeadResponse(apiError);
+
+    } finally {
+      setModalLoading(false)
+    }
   };
 
 
@@ -192,9 +219,10 @@ const hireAPro = () => {
           </TouchableOpacity>
           <Text style={[styles.pageTitle, {textAlign: 'center'}]}>Audit Summary</Text>
         </View>
-
-        
-
+       
+          {leadResponse?.status === "success" && (
+            <TopAlert message={leadResponse.message} duration={4000} />
+          )}
         
         <View style={{
           flexDirection: "row",
@@ -315,6 +343,7 @@ const hireAPro = () => {
         <View style={{ height: 80 }} />
       </ScrollView>
 
+
     
       <Modal transparent visible={showModal} animationType="fade">
         <View style={styles.modalOverlay}>
@@ -344,7 +373,7 @@ const hireAPro = () => {
             style={{
               color: "#000",
               borderWidth: 1.5,
-             borderColor: emptyModalTextInput ? "#D72D2D" : "#E5E7EB",
+              borderColor: emptyModalTextInput || leadResponse?.status === "error" ? "#D72D2D" : "#E5E7EB",
               borderRadius: 5,
               padding: 10,
             }}
@@ -361,15 +390,34 @@ const hireAPro = () => {
             Pls ensure you enter a valid email address
           </Text>
          )}
+         
+         {leadResponse?.status === "error" && (
+          <Text style={{
+            fontFamily: "RethinkSans-Regular",
+            fontSize: 13,
+            color: "#D72D2D",
+            
+          }}>
+            {leadResponse.message}
+          </Text>
+         )}
 
          <View style={{marginBottom: 20}}/>
 
-            <TouchableOpacity
+            {modalLoading ? (
+              <ActivityIndicator 
+                size={"large"} 
+                color={"#e24017ff"} 
+                style={styles.modalActivityIndicator}
+              />
+            ): (
+              <TouchableOpacity
               style={styles.modalButton}
-              onPress={modalContinueButton}
+              onPress={() => modalContinueButton(modalTextInput)}
             >
               <Text style={styles.modalButtonText}>Got It</Text>
             </TouchableOpacity>
+            )}
           </View>
         </View>
       </Modal>
