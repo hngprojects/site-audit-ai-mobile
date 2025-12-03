@@ -43,6 +43,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (fontsLoaded || fontError) {
+      console.log('Fonts loaded:', fontsLoaded, 'Font error:', fontError);
       SplashScreen.hideAsync();
 
       // Initialize notifications
