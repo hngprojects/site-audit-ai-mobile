@@ -76,7 +76,7 @@ const EditUrlSheet: React.FC<EditUrlSheetProps> = ({
       >
         <TouchableWithoutFeedback onPress={onClose}>
           <View style={styles.modalOverlay}>
-            <TouchableWithoutFeedback onPress={() => {}}>
+            <TouchableWithoutFeedback onPress={() => { }}>
               <Animated.View
                 style={[
                   styles.modalContent,
@@ -86,62 +86,62 @@ const EditUrlSheet: React.FC<EditUrlSheetProps> = ({
                   },
                 ]}
               >
-              <View style={styles.modalHeader}>
-                <View style={styles.dragHandle} />
-                <Text style={styles.title}>{t('editUrlSheet.title')}</Text>
-              </View>
-
-              <View style={styles.contentContainer}>
-                <View style={styles.inputContainer}>
-                  <Text style={styles.inputLabel}>{t('editUrlSheet.currentUrl')}</Text>
-                  <TextInput
-                    style={[styles.input, styles.inputReadOnly]}
-                    value={currentUrl}
-                    editable={false}
-                    placeholderTextColor="#9CA3AF"
-                  />
+                <View style={styles.modalHeader}>
+                  <View style={styles.dragHandle} />
+                  <Text style={styles.title}>{t('editUrlSheet.title')}</Text>
                 </View>
 
-                <View style={styles.inputContainer}>
-                  <Text style={styles.inputLabel}>{t('editUrlSheet.newUrl')}</Text>
-                  <TextInput
-                    style={styles.input}
-                    value={newUrl}
-                    onChangeText={setNewUrl}
-                    placeholder={t('editUrlSheet.enterUrl')}
-                    placeholderTextColor="#9CA3AF"
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    keyboardType="url"
-                  />
+                <View style={styles.contentContainer}>
+                  <View style={styles.inputContainer}>
+                    <Text style={styles.inputLabel}>{t('editUrlSheet.currentUrl')}</Text>
+                    <TextInput
+                      style={[styles.input, styles.inputReadOnly]}
+                      value={currentUrl}
+                      editable={false}
+                      placeholderTextColor="#9CA3AF"
+                    />
+                  </View>
+
+                  <View style={styles.inputContainer}>
+                    <Text style={styles.inputLabel}>{t('editUrlSheet.newUrl')}</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={newUrl}
+                      onChangeText={setNewUrl}
+                      placeholder={t('editUrlSheet.enterUrl')}
+                      placeholderTextColor="#9CA3AF"
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      keyboardType="url"
+                    />
+                  </View>
                 </View>
-              </View>
 
-              <View style={styles.buttonsContainer}>
-                <TouchableOpacity
-                  style={[styles.scanButton, isLoading && styles.buttonDisabled]}
-                  onPress={handleConfirm}
-                  activeOpacity={0.8}
-                  disabled={isLoading || !newUrl.trim()}
-                >
-                  <Text style={styles.scanButtonText}>
-                    {isLoading ? t('editUrlSheet.scanning') : t('editUrlSheet.scan')}
-                  </Text>
-                </TouchableOpacity>
+                <View style={styles.buttonsContainer}>
+                  <TouchableOpacity
+                    style={[styles.scanButton, isLoading && styles.buttonDisabled]}
+                    onPress={handleConfirm}
+                    activeOpacity={0.8}
+                    disabled={isLoading || !newUrl.trim()}
+                  >
+                    <Text style={styles.scanButtonText}>
+                      {isLoading ? t('editUrlSheet.scanning') : t('editUrlSheet.scan')}
+                    </Text>
+                  </TouchableOpacity>
 
-                <TouchableOpacity
-                  style={styles.cancelButton}
-                  onPress={onClose}
-                  activeOpacity={0.8}
-                  disabled={isLoading}
-                >
-                  <Text style={styles.cancelButtonText}>{t('common.cancel')}</Text>
-                </TouchableOpacity>
-              </View>
-            </Animated.View>
-          </TouchableWithoutFeedback>
-        </View>
-      </TouchableWithoutFeedback>
+                  <TouchableOpacity
+                    style={styles.cancelButton}
+                    onPress={onClose}
+                    activeOpacity={0.8}
+                    disabled={isLoading}
+                  >
+                    <Text style={styles.cancelButtonText}>{t('common.cancel')}</Text>
+                  </TouchableOpacity>
+                </View>
+              </Animated.View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
     </Modal>
   );
