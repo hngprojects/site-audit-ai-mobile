@@ -283,9 +283,12 @@ const SignIn = () => {
 
         <View style={styles.accountLinkContainer}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-            <Text style={styles.accountLinkText}>{t('auth.noAccount')} </Text>
-            <TouchableOpacity onPress={() => router.push('/(auth)/sign-up')}>
-              <Text style={styles.accountLinkButton}>{t('auth.signUp')}</Text>
+            <Text style={styles.accountLinkText}>Don&apos;t have an account? </Text>
+            <TouchableOpacity onPress={() => router.push({
+              pathname: '/(auth)/sign-up',
+              params: params.redirect ? { redirect: params.redirect } : {}
+            })}>
+              <Text style={styles.accountLinkButton}>Sign up</Text>
             </TouchableOpacity>
           </View>
         </View>

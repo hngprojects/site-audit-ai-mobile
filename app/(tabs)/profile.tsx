@@ -4,8 +4,8 @@ import ProfileEmptyState from '@/components/profile/profile-empty-state';
 import ProfileHeader from '@/components/profile/profile-header';
 // import ProfileSkeleton from '@/components/profile/profile-skeleton';
 import { useAuth } from '@/hooks/use-auth';
-import { useTranslation } from '@/utils/translations';
 import styles from '@/stylesheets/profile-stylesheet';
+import { useTranslation } from '@/utils/translations';
 import { useFocusEffect } from '@react-navigation/native';
 import { useCallback, useEffect, useState } from 'react';
 import { ScrollView, Text, TouchableOpacity } from 'react-native';
@@ -16,20 +16,16 @@ const Profile = () => {
   const { isAuthenticated, isInitialized, user } = useAuth();
   const [modalVisible, setModalVisible] = useState(false);
 
-  const handleAuthModal = () => {
-    if (isInitialized && !isAuthenticated) {
-      setModalVisible(true);
-    } else if (isAuthenticated) {
-      console.log(user);
-
-      setModalVisible(false);
-    }
-  }
-
   useFocusEffect(
     useCallback(() => {
-      handleAuthModal()
-    }, [isAuthenticated, isInitialized, user])
+      if (isInitialized && !isAuthenticated) {
+        setModalVisible(true);
+      } else if (isAuthenticated) {
+        console.log(user);
+
+        setModalVisible(false);
+      }
+    }, [isInitialized, isAuthenticated, user])
   );
 
   useEffect(() => {
@@ -63,7 +59,7 @@ const Profile = () => {
             <>
               <ProfileEmptyState />
 
-              <TouchableOpacity style={styles.signUpsignInBtn} onPress={handleAuthModal}>
+              <TouchableOpacity style={styles.signUpsignInBtn} onPress={() => setModalVisible(true)}>
                 <Text style={styles.authText}>{t('auth.signUp')} / {t('auth.signIn')}</Text>
               </TouchableOpacity>
             </>

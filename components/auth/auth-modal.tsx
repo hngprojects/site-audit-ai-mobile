@@ -145,19 +145,23 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose, redirect, dismi
                   </TouchableOpacity>
                 )}
 
-                {Platform.OS === "ios" && (
+                {appleAuthService.isAvailable() && (
                   <TouchableOpacity
-                    style={styles.socialButton}
+                    style={[styles.socialButton, isLoading && { opacity: 0.6 }]}
                     onPress={handleAppleLogin}
+                    disabled={isLoading}
                   >
-                    <Image
-                      source={require('../../assets/images/apple.png')}
-                      style={styles.appleIcon}
-                    />
+                    {isLoading ? (
+                      <ActivityIndicator size="small" color="#1c1c1c" style={{ marginRight: 12 }} />
+                    ) : (
+                      <Image
+                        source={require('../../assets/images/apple.png')}
+                        style={styles.appleIcon}
+                      />
+                    )}
                     <Text style={styles.socialButtonText}>Continue with Apple</Text>
                   </TouchableOpacity>
                 )}
-
 
                 <TouchableOpacity
                   style={styles.socialButton}

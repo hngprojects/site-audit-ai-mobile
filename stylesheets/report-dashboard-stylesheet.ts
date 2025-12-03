@@ -103,16 +103,15 @@ const style = StyleSheet.create({
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.45)",
-    justifyContent: "flex-end", 
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   modalBox: {
     width: "90%",
-    alignSelf: "center",
     backgroundColor: "#FFF",
     borderRadius: 18,
     padding: 22,
-    marginBottom: "25%", 
   },
 
   modalTitle: {

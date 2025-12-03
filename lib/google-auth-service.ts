@@ -138,6 +138,10 @@ function initializeGoogleSignIn(): void {
 }
 
 /**
+ * Alternative Google Sign-In using expo-auth-session (works in Expo Go)
+ */
+
+/**
  * Check if running in Expo Go (not supported)
  */
 function checkExpoGo(): void {
@@ -220,10 +224,6 @@ async function extractIdToken(response: any): Promise<string> {
     'Response structure: ' + JSON.stringify(response, null, 2)
   );
 }
-
-/**
- * Alternative Google Sign-In using expo-auth-session (works in Expo Go)
- */
 
 /**
  * Google Authentication Service

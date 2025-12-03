@@ -10,6 +10,7 @@ import { FlatList, Image, KeyboardAvoidingView, Platform, RefreshControl, TextIn
 import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
+// import Toast from 'react-native-toast-message';
 
 const SkeletonCard = () => (
   <View style={[styles.card, styles.skeletonCard]}>
@@ -202,75 +203,77 @@ export default function NotificationsScreen() {
         keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
       >
         {Platform.OS === "ios" ?
-        (
-          <>
-            <View style={styles.header}>
-              <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-                <Feather name="arrow-left" size={24} color="#1A2373" />
-              </TouchableOpacity>
-              <ThemedText style={styles.headerTitle} type="title" >{t('notifications.title')}</ThemedText>
-              <TouchableOpacity style={styles.markAllButton} onPress={markAllRead} >
-                <ThemedText style={styles.markAllText}>{t('notifications.markAllRead')}</ThemedText>
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.searchMargin}>
-              <View style={styles.searchContainer}>
-                <MaterialIcons name="search" size={18} color="#9BA1A6" />
-                <TextInput value={search} onChangeText={setSearch} placeholder={t('common.search')} placeholderTextColor="#C7C8C9" style={styles.searchInput} />
+          (
+            <>
+              <View style={styles.header}>
+                <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+                  <Feather name="arrow-left" size={24} color="#1A2373" />
+                </TouchableOpacity>
+                <ThemedText style={styles.headerTitle} type="title" >{t('notifications.title')}</ThemedText>
+                <TouchableOpacity style={styles.markAllButton} onPress={markAllRead} >
+                  <ThemedText style={styles.markAllText}>{t('notifications.markAllRead')}</ThemedText>
+                </TouchableOpacity>
               </View>
-            </View>
-          </>
-        ) : (
-          <>
-            <View style={styles.header}>
-              <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-                <Feather name="arrow-left" size={24} color="#1A2373" />
-              </TouchableOpacity>
-              <ThemedText style={styles.androidheaderTitle} type="title" >{t('notifications.title')}</ThemedText>
-              <TouchableOpacity style={styles.markAllButton} onPress={markAllRead} >
-                <ThemedText style={styles.markAllTextAndroid}>{t('notifications.markAllRead')}</ThemedText>
-              </TouchableOpacity>
-            </View>
 
-            <View style={styles.searchMargin}>
-              <View style={styles.androidSearchContainer}>
-                <MaterialIcons name="search" size={18} color="#9BA1A6" />
-                <TextInput value={search} onChangeText={setSearch} placeholder={t('common.search')} placeholderTextColor="#C7C8C9" style={styles.searchInput} />
+              <View style={styles.searchMargin}>
+                <View style={styles.searchContainer}>
+                  <MaterialIcons name="search" size={18} color="#9BA1A6" />
+                  <TextInput value={search} onChangeText={setSearch} placeholder="Search" placeholderTextColor="#C7C8C9" style={styles.searchInput} />
+                </View>
               </View>
-            </View>
-          </>
-        )}
+            </>
+          ) : (
+            <>
+              <View style={styles.header}>
+                <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+                  <Feather name="arrow-left" size={24} color="#1A2373" />
+                </TouchableOpacity>
+                <ThemedText style={styles.androidheaderTitle} type="title" >Notification</ThemedText>
+                {notifications.length > 0 && (
+                  <TouchableOpacity style={styles.markAllButton} onPress={markAllRead} >
+                    <ThemedText style={styles.markAllTextAndroid}>Mark all as read</ThemedText>
+                  </TouchableOpacity>
+                )}
+              </View>
 
-      {error ? (
-        <View style={styles.errorPadding}>
-          <ThemedText>{error}</ThemedText>
-          <TouchableOpacity onPress={load} style={{ marginTop: 12 }}>
-            <ThemedText>{t('notifications.tryAgain')}</ThemedText>
-          </TouchableOpacity>
-        </View>
-      ) : (
-        <FlatList
-          data={notifications.filter((n) => (
-            !search || n.title.toLowerCase().includes(search.toLowerCase()) || n.message.toLowerCase().includes(search.toLowerCase())
-          ))}
-          keyExtractor={(i) => i.id}
-          renderItem={({ item }) => <NotificationItem item={item} onMarkRead={handleMarkRead} onDelete={handleDelete} />}
-          ItemSeparatorComponent={() => <View style={styles.separator} />}
-          contentContainerStyle={styles.listContainer}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-          ListEmptyComponent={() => (
-            <View style={styles.emptyContainer}>
-              <View style={styles.emptyIconContainer}>
-                <Image source={require('@/assets/images/no-message-bell.png')} style={styles.emptyIcon} />
+              <View style={styles.searchMargin}>
+                <View style={styles.androidSearchContainer}>
+                  <MaterialIcons name="search" size={18} color="#9BA1A6" />
+                  <TextInput value={search} onChangeText={setSearch} placeholder={t('common.search')} placeholderTextColor="#C7C8C9" style={styles.searchInput} />
+                </View>
               </View>
-              <ThemedText type="subtitle" style={{ marginTop: 12 }}>{t('notifications.noMessage')}</ThemedText>
-            </View>
+            </>
           )}
-        />
-      )}
+
+        {error ? (
+          <View style={styles.errorPadding}>
+            <ThemedText>{error}</ThemedText>
+            <TouchableOpacity onPress={load} style={{ marginTop: 12 }}>
+              <ThemedText>{t('notifications.tryAgain')}</ThemedText>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <FlatList
+            data={notifications.filter((n) => (
+              !search || n.title.toLowerCase().includes(search.toLowerCase()) || n.message.toLowerCase().includes(search.toLowerCase())
+            ))}
+            keyExtractor={(i) => i.id}
+            renderItem={({ item }) => <NotificationItem item={item} onMarkRead={handleMarkRead} onDelete={handleDelete} />}
+            ItemSeparatorComponent={() => <View style={styles.separator} />}
+            contentContainerStyle={styles.listContainer}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+            ListEmptyComponent={() => (
+              <View style={styles.emptyContainer}>
+                <View style={styles.emptyIconContainer}>
+                  <Image source={require('@/assets/images/no-message-bell.png')} style={styles.emptyIcon} />
+                </View>
+                <ThemedText type="subtitle" style={{ marginTop: 12 }}>{t('notifications.noMessage')}</ThemedText>
+              </View>
+            )}
+          />
+        )}
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

@@ -152,7 +152,6 @@ const RequestForm = () => {
     }
   };
 
-  // Show loading state
   if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
@@ -269,3 +268,4 @@ const RequestForm = () => {
 };
 
 export default RequestForm;
+
