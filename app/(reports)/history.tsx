@@ -43,33 +43,23 @@ const HistoryScreen: React.FC = () => {
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
 
-  const formatMonthHeader = React.useCallback((date: Date): string => {
-    return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-  }, []);
+  const formatMonthHeader = React.useCallback((date: Date) =>
+    date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }), []);
 
-  const formatDateHeader = React.useCallback((date: Date): string => {
+  const formatDateHeader = React.useCallback((date: Date) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
-
     const dateToCheck = new Date(date);
     dateToCheck.setHours(0, 0, 0, 0);
 
-    if (dateToCheck.getTime() === today.getTime()) {
-      return 'Today';
-    }
-
-    if (dateToCheck.getTime() === yesterday.getTime()) {
-      return 'Yesterday';
-    }
+    if (dateToCheck.getTime() === today.getTime()) return 'Today';
+    if (dateToCheck.getTime() === yesterday.getTime()) return 'Yesterday';
 
     const weekday = date.toLocaleDateString('en-US', { weekday: 'short' });
     const month = date.toLocaleDateString('en-US', { month: 'short' });
-    const day = date.getDate();
-
-    return `${weekday}. ${month} ${day.toString().padStart(2, '0')}`;
+    return `${weekday}. ${month} ${date.getDate().toString().padStart(2, '0')}`;
   }, []);
 
   const mockHistoryData = useMemo<HistoryItem[]>(() => {
@@ -111,73 +101,37 @@ const HistoryScreen: React.FC = () => {
   }, [siteUrl]);
 
   const groupedData = useMemo(() => {
-    const filtered = mockHistoryData.filter(item => {
-      const searchTerm = search.toLowerCase();
-      return item.url.toLowerCase().includes(searchTerm) ||
-        item.scanDate.toLowerCase().includes(searchTerm);
-    });
+    const searchTerm = search.toLowerCase();
+    const filtered = mockHistoryData.filter(item =>
+      item.url.toLowerCase().includes(searchTerm) || item.scanDate.toLowerCase().includes(searchTerm)
+    );
 
     const sorted = [...filtered].sort((a, b) => b.date.getTime() - a.date.getTime());
-
     const monthGroups = new Map<string, Map<string, HistoryItem[]>>();
 
     sorted.forEach(item => {
       const monthKey = formatMonthHeader(item.date);
       const dateKey = formatDateHeader(item.date);
-
-      if (!monthGroups.has(monthKey)) {
-        monthGroups.set(monthKey, new Map());
-      }
-
+      if (!monthGroups.has(monthKey)) monthGroups.set(monthKey, new Map());
       const dateMap = monthGroups.get(monthKey)!;
-      if (!dateMap.has(dateKey)) {
-        dateMap.set(dateKey, []);
-      }
-
+      if (!dateMap.has(dateKey)) dateMap.set(dateKey, []);
       dateMap.get(dateKey)!.push(item);
     });
 
-    const result: { title: string; monthTitle: string; dateTitle: string; data: HistoryItem[] }[] = [];
-
-    monthGroups.forEach((dateMap, monthTitle) => {
-      dateMap.forEach((items, dateTitle) => {
-        result.push({
-          title: `${monthTitle}|${dateTitle}`,
-          monthTitle,
-          dateTitle,
-          data: items
-        });
-      });
-    });
-
-    return result;
+    return Array.from(monthGroups.entries()).flatMap(([monthTitle, dateMap]) =>
+      Array.from(dateMap.entries()).map(([dateTitle, items]) => ({
+        title: `${monthTitle}|${dateTitle}`,
+        monthTitle,
+        dateTitle,
+        data: items
+      }))
+    );
   }, [search, mockHistoryData, formatMonthHeader, formatDateHeader]);
 
-  const handleLongPress = (itemId: string) => {
-    if (!isSelectionMode) {
-      setIsSelectionMode(true);
-      setSelectedItems(new Set([itemId]));
-    }
-  };
+  const allItemIds = useMemo(() => new Set(groupedData.flatMap(section => section.data.map(item => item.id))), [groupedData]);
+  const isAllSelected = selectedItems.size > 0 && selectedItems.size === allItemIds.size;
 
-  const handleItemPress = (itemId: string) => {
-    if (isSelectionMode) {
-      setSelectedItems(prev => {
-        const newSet = new Set(prev);
-        if (newSet.has(itemId)) {
-          newSet.delete(itemId);
-        } else {
-          newSet.add(itemId);
-        }
-        if (newSet.size === 0) {
-          setIsSelectionMode(false);
-        }
-        return newSet;
-      });
-    }
-  };
-
-  const toggleItemSelection = (itemId: string) => {
+  const toggleSelection = (itemId: string) => {
     setSelectedItems(prev => {
       const newSet = new Set(prev);
       if (newSet.has(itemId)) {
@@ -185,11 +139,26 @@ const HistoryScreen: React.FC = () => {
       } else {
         newSet.add(itemId);
       }
-      if (newSet.size === 0) {
-        setIsSelectionMode(false);
-      }
+      if (newSet.size === 0) setIsSelectionMode(false);
       return newSet;
     });
+  };
+
+  const handleSelectButton = () => {
+    if (!isSelectionMode) {
+      setIsSelectionMode(true);
+    } else if (isAllSelected) {
+      setSelectedItems(new Set());
+      setIsSelectionMode(false);
+    } else {
+      setSelectedItems(new Set(allItemIds));
+    }
+  };
+
+  const getSelectButtonText = () => {
+    if (!isSelectionMode) return t('common.select');
+    if (isAllSelected) return t('common.unselect');
+    return t('history.selectAll');
   };
 
   return (
@@ -216,7 +185,9 @@ const HistoryScreen: React.FC = () => {
             <Text style={styles.siteName} numberOfLines={1} ellipsizeMode="tail">
               {siteName}
             </Text>
-            <Text style={styles.selectButton}>{t('common.select')}</Text>
+            <TouchableOpacity onPress={handleSelectButton}>
+              <Text style={styles.selectButton}>{getSelectButtonText()}</Text>
+            </TouchableOpacity>
           </View>
 
           <View style={styles.searchContainer}>
@@ -236,40 +207,39 @@ const HistoryScreen: React.FC = () => {
             contentContainerStyle={styles.listWrap}
             showsVerticalScrollIndicator={false}
             renderSectionHeader={({ section }) => {
-              const monthTitle = section.monthTitle;
-              const dateTitle = section.dateTitle;
               const sectionIndex = groupedData.findIndex(s => s.title === section.title);
-              const prevSection = sectionIndex > 0 ? groupedData[sectionIndex - 1] : null;
-              const prevMonth = prevSection ? prevSection.monthTitle : null;
-              const showMonthHeader = prevMonth !== monthTitle;
-
+              const showMonthHeader = sectionIndex === 0 || groupedData[sectionIndex - 1].monthTitle !== section.monthTitle;
               return (
                 <View>
                   {showMonthHeader && (
                     <View style={styles.monthHeader}>
-                      <Text style={styles.monthHeaderText}>{monthTitle}</Text>
+                      <Text style={styles.monthHeaderText}>{section.monthTitle}</Text>
                     </View>
                   )}
                   <View style={styles.sectionHeader}>
-                    <Text style={styles.sectionHeaderText}>{dateTitle}</Text>
+                    <Text style={styles.sectionHeaderText}>{section.dateTitle}</Text>
                   </View>
                 </View>
               );
             }}
             renderItem={({ item }) => {
               const isSelected = selectedItems.has(item.id);
-
               return (
                 <TouchableOpacity
                   style={styles.historyCard}
-                  onLongPress={() => handleLongPress(item.id)}
-                  onPress={() => handleItemPress(item.id)}
+                  onLongPress={() => {
+                    if (!isSelectionMode) {
+                      setIsSelectionMode(true);
+                      setSelectedItems(new Set([item.id]));
+                    }
+                  }}
+                  onPress={() => isSelectionMode && toggleSelection(item.id)}
                   activeOpacity={0.7}
                 >
                   {isSelectionMode && (
                     <TouchableOpacity
                       style={styles.checkboxContainer}
-                      onPress={() => toggleItemSelection(item.id)}
+                      onPress={() => toggleSelection(item.id)}
                       hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                     >
                       {isSelected ? (
@@ -280,15 +250,9 @@ const HistoryScreen: React.FC = () => {
                     </TouchableOpacity>
                   )}
                   <View style={[styles.cardLeft, isSelectionMode && styles.cardLeftWithCheckbox]}>
-                    <Text style={styles.urlText} numberOfLines={1}>
-                      {item.url}
-                    </Text>
-                    <Text style={styles.scoreText}>
-                      Score: {item.score}/100
-                    </Text>
-                    <Text style={styles.scanDateText}>
-                      Scan Date: {item.scanDate}
-                    </Text>
+                    <Text style={styles.urlText} numberOfLines={1}>{item.url}</Text>
+                    <Text style={styles.scoreText}>Score: {item.score}/100</Text>
+                    <Text style={styles.scanDateText}>Scan Date: {item.scanDate}</Text>
                   </View>
                   <View style={styles.cardRight}>
                     <Text style={styles.scanTimeText}>{item.scanTime}</Text>
