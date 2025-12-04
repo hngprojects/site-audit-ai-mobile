@@ -59,34 +59,28 @@ export default StyleSheet.create({
     marginTop: 3,
     flex: 1,
   },
-  segmentContainer: {
-    flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 4,
-    marginBottom: 18,
-    borderWidth: 1,
-    borderColor: '#F2F2F2',
+  monthHeader: {
+    paddingVertical: 16,
+    paddingHorizontal: 4,
+    marginTop: 8,
   },
-  segmentButton: {
-    flex: 1,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  segmentButtonActive: {
-    backgroundColor: '#FF5A3D',
-  },
-  segmentText: {
+  monthHeaderText: {
     fontFamily: "RethinkSans-Medium",
-    fontSize: 14,
-    color: '#6B7280',
+    fontSize: 18,
+    color: "#1A2373",
   },
-  segmentTextActive: {
-    color: '#FFFFFF',
-    fontFamily: "RethinkSans-SemiBold",
+  sectionHeader: {
+    paddingVertical: 12,
+    paddingHorizontal: 4,
+    marginTop: 4,
+  },
+  sectionHeaderText: {
+    fontFamily: "RethinkSans-Medium",
+    fontSize: 16,
+    color: "#6B7280",
+  },
+  sectionSeparator: {
+    height: 8,
   },
   listWrap: {
     paddingBottom: 20,
