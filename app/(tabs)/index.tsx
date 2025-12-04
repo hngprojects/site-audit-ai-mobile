@@ -3,7 +3,6 @@ import AuditResultCard from "@/components/auditResultCard";
 import EmptyState from "@/components/homeScreenEmptyState";
 import { useSitesStore } from "@/store/sites-store";
 import styles from "@/stylesheets/homeScreenStylesheet";
-import { getPersistentDeviceInfo } from "@/utils/device-id";
 import { normalizeUrl, validateWebsiteUrl } from "@/utils/url-validation";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Octicons from "@expo/vector-icons/Octicons";
@@ -25,13 +24,6 @@ export default function HomeScreen() {
 
   useEffect(() => {
     fetchSites();
-   
-    const testDeviceId = async () => {
-      const info = await getPersistentDeviceInfo();
-      console.log(" DEVICE INFO:", info);
-    };
-
-    testDeviceId();
 
   }, [fetchSites]);
 
