@@ -63,7 +63,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose, redirect, dismi
         });
       } else {
         // Fallback to default route if redirect is invalid
-        router.push('/(tabs)');
+        router.push('/');
       }
 
       // Clear any stored redirects

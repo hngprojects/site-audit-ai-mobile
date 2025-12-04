@@ -1,13 +1,14 @@
 import { apiClient, formatErrorMessage, isAxiosError } from '@/lib/api-client';
 import { useAuthStore } from '@/store/auth-store';
+import { storage, STORAGE_KEYS } from './storage';
 
 // Redirect utilities for secure authentication flows
 export class RedirectService {
   private static readonly ALLOWED_ROUTES = [
-    '/(tabs)',
-    '/(hireRequest)/request-form',
-    '/(reports)/report-dashboard',
-    '/(main)/auditing-screen',
+    '/',
+    '/request-form',
+    '/report-dashboard',
+    '/auditing-screen',
   ];
 
   private static readonly MAX_REDIRECT_LENGTH = 500;
@@ -72,9 +73,7 @@ export class RedirectService {
     try {
       const validated = this.validateRedirect(redirect);
       if (validated) {
-        // In a real app, you'd use AsyncStorage or similar
-        // For now, we'll use a simple approach
-        console.log('Storing redirect:', validated);
+        await storage.setItem(STORAGE_KEYS.REDIRECT_URL, validated);
       }
     } catch (error) {
       console.error('Failed to store redirect:', error);
@@ -87,8 +86,7 @@ export class RedirectService {
    */
   static async getStoredRedirect(): Promise<string | null> {
     try {
-      // In a real app, retrieve from AsyncStorage
-      return null;
+      return await storage.getItem(STORAGE_KEYS.REDIRECT_URL);
     } catch (error) {
       console.error('Failed to get stored redirect:', error);
       return null;
@@ -100,8 +98,7 @@ export class RedirectService {
    */
   static async clearStoredRedirect(): Promise<void> {
     try {
-      // Clear from storage
-      console.log('Cleared stored redirect');
+      await storage.removeItem(STORAGE_KEYS.REDIRECT_URL);
     } catch (error) {
       console.error('Failed to clear stored redirect:', error);
     }

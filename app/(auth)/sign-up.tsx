@@ -74,11 +74,11 @@ const SignUp = () => {
           });
         } else {
           // Invalid redirect, fallback to default
-          router.replace('/(tabs)');
+          router.replace('/');
         }
       } else {
         // No redirect, go to default route
-        router.replace('/(tabs)');
+        router.replace('/');
       }
     }
   }, [isAuthenticated, router, params]);

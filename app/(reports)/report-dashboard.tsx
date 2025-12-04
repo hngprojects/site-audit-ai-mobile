@@ -245,7 +245,7 @@ export default function ReportDashboard() {
           <Text style={[styles.scoreText, { color: statusColor(normalizeStatus(summaryResult ? (summaryResult.website_score >= 80 ? 'Good' : summaryResult.website_score >= 50 ? 'Warning' : 'Critical') : 'Warning')) }]}>{summaryResult?.website_score || t('common.loading')}</Text>
           <Text style={{ ...styles.cardLabel, color: "#000" }}>{t('reportDashboard.websiteScore')}</Text>
           <Text style={{ ...styles.cardLabel, color: "#dfdfdfff", marginTop: 5 }}>{t('reportDashboard.scanDate')}: {summaryResult?.scan_date ? new Date(summaryResult.scan_date).toLocaleDateString() : t('common.loading')}</Text>
-          <Text style={{ color: "#000", fontFamily: "RethinkSans-Medium", fontSize: 13, marginTop: 20, }}>
+          <Text style={{ color: "#000", fontFamily: "RethinkSans-Medium", fontSize: 13, marginTop: 5, }}>
             {normalizeStatus(summaryResult ? (summaryResult.website_score >= 80 ? 'Good' : summaryResult.website_score >= 50 ? 'Warning' : 'Critical') : 'Warning') === "Critical" ? t('reportDashboard.statusCritical') :
               normalizeStatus(summaryResult ? (summaryResult.website_score >= 80 ? 'Good' : summaryResult.website_score >= 50 ? 'Warning' : 'Critical') : 'Warning') === "Good" ? t('reportDashboard.statusGood') :
                 t('reportDashboard.statusWarning')}

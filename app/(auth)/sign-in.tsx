@@ -96,42 +96,6 @@ const SignIn = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      // Check for redirect in params first, then stored redirect
-      let redirectUrl = params.redirect as string;
-
-      if (!redirectUrl) {
-        // Try to get stored redirect
-        RedirectService.getStoredRedirect().then(stored => {
-          if (stored) {
-            redirectUrl = stored;
-            RedirectService.clearStoredRedirect();
-          }
-        });
-      }
-
-      if (redirectUrl) {
-        const validatedRedirect = RedirectService.validateRedirect(redirectUrl);
-
-        if (validatedRedirect) {
-          const { pathname, params: redirectParams } = RedirectService.parseRedirectUrl(validatedRedirect);
-
-          router.replace({
-            pathname: pathname as any,
-            params: redirectParams
-          });
-        } else {
-          // Invalid redirect, fallback to default
-          router.replace('/(tabs)');
-        }
-      } else {
-        // No redirect, go to default route
-        router.replace('/(tabs)');
-      }
-    }
-  }, [isAuthenticated, router, params]);
-
   // Show error toasts
   useEffect(() => {
     if (error) {
@@ -176,7 +140,33 @@ const SignIn = () => {
           password: password,
         });
       }
-      // Navigation is handled by useEffect when isAuthenticated changes
+      
+      // Handle redirect after successful sign-in
+      let redirectUrl = params.redirect as string;
+
+      if (!redirectUrl) {
+        const stored = await RedirectService.getStoredRedirect();
+        if (stored) {
+          redirectUrl = stored;
+          RedirectService.clearStoredRedirect();
+        }
+      }
+
+      if (redirectUrl) {
+        const validatedRedirect = RedirectService.validateRedirect(redirectUrl);
+
+        if (validatedRedirect) {
+          const { pathname, params: redirectParams } = RedirectService.parseRedirectUrl(validatedRedirect);
+          router.replace({
+            pathname: pathname as any,
+            params: redirectParams
+          });
+        } else {
+          router.replace('/');
+        }
+      } else {
+        router.replace('/');
+      }
     } catch (error) {
       // Error is handled by the store and shown via Alert
       console.error('Sign in error:', error);
