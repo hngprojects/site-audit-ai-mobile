@@ -1,5 +1,8 @@
+import styles from '@/stylesheets/history-stylesheet';
+import { useTranslation } from '@/utils/translations';
+import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useState, useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   FlatList,
   KeyboardAvoidingView,
@@ -11,9 +14,6 @@ import {
 } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Feather, Ionicons } from '@expo/vector-icons';
-import { useTranslation } from '@/utils/translations';
-import styles from '@/stylesheets/history-stylesheet';
 
 interface HistoryItem {
   id: string;
@@ -29,13 +29,21 @@ const HistoryScreen: React.FC = () => {
   const router = useRouter();
   const params = useLocalSearchParams();
   const siteUrl = Array.isArray(params.url) ? params.url[0] : params.url || '';
-  const siteName = siteUrl.replace(/^https?:\/\//, '').replace(/^www\./, '') || 'Site';
+
+  // Extract site name and capitalize first letter
+  const getSiteName = (url: string): string => {
+    if (!url) return 'Site';
+    const domain = url.replace(/^https?:\/\//, '').replace(/^www\./, '').split('.')[0];
+    return domain.charAt(0).toUpperCase() + domain.slice(1).toLowerCase();
+  };
+
+  const siteName = getSiteName(siteUrl);
 
   const [search, setSearch] = useState('');
   const [selectedSegment, setSelectedSegment] = useState<'month' | 'week'>('month');
 
   // Mock data - replace with actual API call
-  const mockHistoryData: HistoryItem[] = [
+  const mockHistoryData = useMemo<HistoryItem[]>(() => [
     {
       id: '1',
       url: siteUrl,
@@ -64,7 +72,7 @@ const HistoryScreen: React.FC = () => {
       scanDate: 'Nov 28, 2024',
       scanTime: '4:20 PM'
     },
-  ];
+  ], [siteUrl]);
 
   const filteredData = useMemo(() => {
     return mockHistoryData.filter(item => {
@@ -80,12 +88,6 @@ const HistoryScreen: React.FC = () => {
     return '#D72D2D';
   };
 
-  const getScoreStatus = (score: number) => {
-    if (score >= 80) return 'Good';
-    if (score >= 50) return 'Warning';
-    return 'Critical';
-  };
-
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <KeyboardAvoidingView
@@ -99,7 +101,6 @@ const HistoryScreen: React.FC = () => {
             { paddingTop: insets.top, paddingBottom: insets.bottom },
           ]}
         >
-          {/* Header */}
           <View style={styles.header}>
             <TouchableOpacity
               onPress={() => router.back()}
@@ -111,12 +112,9 @@ const HistoryScreen: React.FC = () => {
             <Text style={styles.siteName} numberOfLines={1} ellipsizeMode="tail">
               {siteName}
             </Text>
-            <TouchableOpacity style={styles.selectButton}>
-              <Text style={styles.selectButtonText}>{t('common.select')}</Text>
-            </TouchableOpacity>
+            <Text style={styles.selectButton}>{t('common.select')}</Text>
           </View>
 
-          {/* Search Bar */}
           <View style={styles.searchContainer}>
             <Ionicons name="search" size={24} color="#c0c0c0ff" />
             <TextInput

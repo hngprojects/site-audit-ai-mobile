@@ -28,15 +28,9 @@ export default StyleSheet.create({
     marginHorizontal: 12,
   },
   selectButton: {
-    backgroundColor: '#FF5A3D',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
-  },
-  selectButtonText: {
     fontFamily: "RethinkSans-SemiBold",
     fontSize: 14,
-    color: "#FFFFFF",
+    color: "#FF5A3D",
   },
   searchContainer: {
     marginTop: 14,
