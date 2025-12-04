@@ -1,16 +1,34 @@
-import React, { useState, useEffect } from 'react';
-import { ActivityIndicator, TouchableOpacity, View, Text } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useAuthStore } from '@/store/auth-store';
+import { useTranslation } from '@/utils/translations';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 import styles from '../../stylesheets/delete-account-final-confirmation-stylesheet';
 
 const DeleteAccountFinalConfirmationContent = () => {
   const router = useRouter();
+  const { deleteAccount, isLoading } = useAuthStore();
+  const { t } = useTranslation();
+  const [isDeleting, setIsDeleting] = useState(false);
 
-  const handleYes = () => {
-    // Proceed with deletion
-    router.push('/(account)/deletion-confirmation-screen');
+  const handleYes = async () => {
+    setIsDeleting(true);
+    try {
+      await deleteAccount();
+      // Navigate to confirmation screen after successful deletion
+      router.replace('/(account)/deletion-confirmation-screen');
+    } catch (error) {
+      setIsDeleting(false);
+      const errorMessage = error instanceof Error ? error.message : t('deleteAccount.deleteError');
+      Toast.show({
+        type: 'error',
+        text1: t('common.error'),
+        text2: errorMessage,
+      });
+    }
   };
 
   const handleNo = () => {
@@ -24,9 +42,7 @@ const DeleteAccountFinalConfirmationContent = () => {
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
           <Feather name="arrow-left" size={24} color="#1A2373" />
         </TouchableOpacity>
-        <View style={styles.titleContainer}>
-          <Text style={styles.headerTitle}>Delete Account</Text>
-        </View>
+        <Text style={styles.headerTitle}>Delete Account</Text>
       </View>
 
       <View style={styles.content}>
@@ -39,10 +55,22 @@ const DeleteAccountFinalConfirmationContent = () => {
         <Text style={styles.description}> Are you sure you want to delete your account?</Text>
 
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.yesButton} onPress={handleYes}>
-            <Text style={styles.yesButtonText}>Yes</Text>
+          <TouchableOpacity
+            style={[styles.yesButton, (isDeleting || isLoading) && styles.yesButtonDisabled]}
+            onPress={handleYes}
+            disabled={isDeleting || isLoading}
+          >
+            {isDeleting || isLoading ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Text style={styles.yesButtonText}>Yes</Text>
+            )}
           </TouchableOpacity>
-          <TouchableOpacity style={styles.noButton} onPress={handleNo}>
+          <TouchableOpacity
+            style={styles.noButton}
+            onPress={handleNo}
+            disabled={isDeleting || isLoading}
+          >
             <Text style={styles.noButtonText}>No</Text>
           </TouchableOpacity>
         </View>

@@ -1,16 +1,20 @@
+import { COUNTRIES, PHONE_NUMBER_LENGTHS } from '@/constants/countries';
 import { profileService } from '@/lib/profile-service';
 import { useAuthStore } from '@/store/auth-store';
 import styles from '@/stylesheets/edit-profile-stylesheet';
 import { getFullImageUrl } from '@/utils/image-url';
+import { useTranslation } from '@/utils/translations';
 import { Feather } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, Image, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ActivityIndicator, Alert, FlatList, Image, KeyboardAvoidingView, Modal, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 
 const EditProfileContent = () => {
+  const { t } = useTranslation();
   const router = useRouter();
   const { user, token } = useAuthStore();
   const [fullName, setFullName] = useState(user?.fullName || '');
@@ -19,7 +23,31 @@ const EditProfileContent = () => {
   const [profileImage, setProfileImage] = useState<string | null>(user?.profileImage || null);
   const [isLoading, setIsLoading] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
-  const [errors, setErrors] = useState<{fullName?: string; email?: string; phoneNumber?: string}>({});
+  const [errors, setErrors] = useState<{ fullName?: string; email?: string; phoneNumber?: string }>({});
+  const [showCountryPicker, setShowCountryPicker] = useState(false);
+  const [countrySearch, setCountrySearch] = useState('');
+  const [selectedCountry, setSelectedCountry] = useState({
+    code: 'NG',
+    name: 'Nigeria',
+    flag: '🇳🇬',
+    dial_code: '+234'
+  });
+
+  // Countries data imported from constants
+
+  // Filter countries based on search - memoized for performance
+  const filteredCountries = useMemo(() => {
+    if (!countrySearch.trim()) {
+      return COUNTRIES;
+    }
+    const searchLower = countrySearch.toLowerCase();
+    return COUNTRIES.filter(country =>
+      country.name.toLowerCase().includes(searchLower) ||
+      country.dial_code.includes(countrySearch) ||
+      country.code.toLowerCase().includes(searchLower)
+    );
+  }, [countrySearch]);
+
   const hasInitialized = useRef(false);
 
   // Load fresh profile data when screen is focused
@@ -64,22 +92,37 @@ const EditProfileContent = () => {
   );
 
   const validateForm = () => {
-    const newErrors: {fullName?: string; email?: string; phoneNumber?: string} = {};
+    const newErrors: { fullName?: string; email?: string; phoneNumber?: string } = {};
 
     if (!fullName.trim()) {
-      newErrors.fullName = 'Full name is required';
+      newErrors.fullName = t('editProfile.nameRequired');
     } else if (fullName.trim().length < 2) {
-      newErrors.fullName = 'Full name must be at least 2 characters';
+      newErrors.fullName = t('editProfile.nameMinLength');
+    } else {
+      // Disallow emojis and punctuation: only allow letters, numbers, and spaces
+      const hasInvalidChars = /[^A-Za-z0-9 ]/g.test(fullName);
+      if (hasInvalidChars) {
+        newErrors.fullName = t('editProfile.nameInvalidChars');
+      }
     }
 
     if (!email.trim()) {
-      newErrors.email = 'Email is required';
+      newErrors.email = t('auth.emailRequired');
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = 'Incorrect email format';
+      newErrors.email = t('auth.invalidEmail');
     }
 
-    if (phoneNumber && phoneNumber.trim() && !/^\+?[\d\s\-\(\)]+$/.test(phoneNumber)) {
-      newErrors.phoneNumber = 'Please enter a valid phone number';
+    if (phoneNumber && phoneNumber.trim()) {
+      // Basic phone number validation - check if it contains only valid characters
+      const phoneRegex = /^[\d\s\-\(\)\+]+$/;
+      const digitsOnly = phoneNumber.replace(/\D/g, '');
+
+      if (!phoneRegex.test(phoneNumber)) {
+        newErrors.phoneNumber = t('editProfile.phoneInvalid');
+      } else if (digitsOnly.length < 7) {
+        newErrors.phoneNumber = t('editProfile.phoneTooShort').replace('{country}', selectedCountry.name);
+      }
+      // Note: We don't check for "too long" here because maxLength prevents input beyond the limit
     }
 
     setErrors(newErrors);
@@ -113,26 +156,28 @@ const EditProfileContent = () => {
       }
 
       const updatedUser = await profileService.updateProfile(updateData, token);
-      
+
       // Update Zustand store with the latest user data
       useAuthStore.setState({ user: updatedUser });
-      
+
       // Update local state to reflect changes
       setFullName(updatedUser.fullName);
       setEmail(updatedUser.email);
       setPhoneNumber(updatedUser.phoneNumber || '');
       setProfileImage(updatedUser.profileImage || null);
 
-      Alert.alert(
-        'Success',
-        'Profile has been updated successfully',
-        [{ text: 'OK', onPress: () => router.back() }]
-      );
+      Toast.show({
+        type: 'success',
+        text1: t('common.success'),
+        text2: t('editProfile.profileUpdated'),
+      });
+      setTimeout(() => router.back(), 1500);
     } catch (error) {
-      Alert.alert(
-        'Error',
-        error instanceof Error ? error.message : 'Failed to update profile. Please try again.'
-      );
+      Toast.show({
+        type: 'error',
+        text1: t('common.error'),
+        text2: error instanceof Error ? error.message : t('editProfile.updateError'),
+      });
     } finally {
       setIsLoading(false);
     }
@@ -146,12 +191,13 @@ const EditProfileContent = () => {
     if (Platform.OS !== 'web') {
       const { status: cameraStatus } = await ImagePicker.requestCameraPermissionsAsync();
       const { status: mediaLibraryStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      
+
       if (cameraStatus !== 'granted' || mediaLibraryStatus !== 'granted') {
-        Alert.alert(
-          'Permissions Required',
-          'Camera and media library permissions are required to change your profile photo.'
-        );
+        Toast.show({
+          type: 'warning',
+          text1: t('editProfile.permissionsRequired'),
+          text2: t('editProfile.cameraPermission'),
+        });
         return false;
       }
     }
@@ -173,13 +219,21 @@ const EditProfileContent = () => {
       if (!result.canceled && result.assets[0]) {
         const asset = result.assets[0];
         if (asset.fileSize && asset.fileSize > 3 * 1024 * 1024) {
-          Alert.alert('Error', 'Image size must be less than 3MB. Please choose a smaller image.');
+          Toast.show({
+            type: 'error',
+            text1: t('common.error'),
+            text2: t('editProfile.imageSizeError'),
+          });
           return;
         }
         await uploadImage(asset.uri);
       }
     } catch {
-      Alert.alert('Error', 'Failed to take photo. Please try again.');
+      Toast.show({
+        type: 'error',
+        text1: t('common.error'),
+        text2: t('editProfile.takePhotoError'),
+      });
     }
   };
 
@@ -198,13 +252,21 @@ const EditProfileContent = () => {
       if (!result.canceled && result.assets[0]) {
         const asset = result.assets[0];
         if (asset.fileSize && asset.fileSize > 3 * 1024 * 1024) {
-          Alert.alert('Error', 'Image size must be less than 3MB. Please choose a smaller image.');
+          Toast.show({
+            type: 'error',
+            text1: t('common.error'),
+            text2: t('editProfile.imageSizeError'),
+          });
           return;
         }
         await uploadImage(asset.uri);
       }
     } catch {
-      Alert.alert('Error', 'Failed to select image. Please try again.');
+      Toast.show({
+        type: 'error',
+        text1: t('common.error'),
+        text2: t('editProfile.selectImageError'),
+      });
     }
   };
 
@@ -215,7 +277,7 @@ const EditProfileContent = () => {
     try {
       const imageUrl = await profileService.uploadProfileImage(imageUri, token);
       setProfileImage(imageUrl);
-      
+
       const currentUser = useAuthStore.getState().user;
       if (currentUser) {
         const updatedUser = {
@@ -225,61 +287,73 @@ const EditProfileContent = () => {
         useAuthStore.setState({ user: updatedUser });
       }
 
-      Alert.alert('Success', 'Profile photo updated successfully');
+      Toast.show({
+        type: 'success',
+        text1: t('common.success'),
+        text2: t('editProfile.photoUpdated'),
+      });
     } catch (error) {
-      Alert.alert(
-        'Error',
-        error instanceof Error ? error.message : 'Failed to upload image. Please try again.'
-      );
+      Toast.show({
+        type: 'error',
+        text1: t('common.error'),
+        text2: error instanceof Error ? error.message : t('editProfile.uploadError'),
+      });
     } finally {
       setIsUploadingImage(false);
     }
   };
 
   const handleChangePhoto = () => {
+    // For action sheets, we'll keep using Alert for now as Toast doesn't support user interaction
+    // But we can show toasts after actions
     Alert.alert(
-      'Change Profile Photo',
-      'Choose an option',
+      t('editProfile.changePhoto'),
+      t('editProfile.chooseOption'),
       [
-        { text: 'Take Photo', onPress: handleTakePhoto },
-        { text: 'Choose from Gallery', onPress: handleChooseFromGallery },
-        { text: 'Cancel', style: 'cancel' }
+        { text: t('photoSheet.takePhoto'), onPress: handleTakePhoto },
+        { text: t('editProfile.chooseFromGallery'), onPress: handleChooseFromGallery },
+        { text: t('common.cancel'), style: 'cancel' }
       ]
     );
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView
-        style={styles.scrollContainer}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ marginTop: 16, paddingBottom: 100 }}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
       >
-        <View style={styles.header}>
-          <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-            <Feather name="arrow-left" size={24} color="#1A2373" />
-          </TouchableOpacity>
-          <Text style={styles.headerText}>Edit Profile</Text>
-        </View>
+        <ScrollView
+          style={styles.scrollContainer}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ marginTop: 16, paddingBottom: 100 }}
+        >
+          <View style={styles.header}>
+            <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+              <Feather name="arrow-left" size={24} color="#1A2373" />
+            </TouchableOpacity>
+            <Text style={styles.headerText}>{t('editProfile.title')}</Text>
+          </View>
 
-        <View style={styles.content}>
-          {/* Profile Image Section */}
-          <View style={styles.profileImageSection}>
-            <View style={styles.profileImageContainer}>
-              {profileImage && profileImage.trim() ? (
-                <Image
-                  source={{ uri: getFullImageUrl(profileImage) || '' }}
-                  style={styles.profileImage}
-                  resizeMode="cover"
-                  onError={() => {
-                    setProfileImage(null);
-                  }}
-                />
-              ) : (
-                <View style={styles.profileImagePlaceholder}>
-                  <Text style={styles.profileImageInitials}>
-                    {fullName && fullName.trim()
-                      ? fullName
+          <View style={styles.content}>
+            {/* Profile Image Section */}
+            <View style={styles.profileImageSection}>
+              <View style={styles.profileImageContainer}>
+                {profileImage && profileImage.trim() ? (
+                  <Image
+                    source={{ uri: getFullImageUrl(profileImage) || '' }}
+                    style={styles.profileImage}
+                    resizeMode="cover"
+                    onError={() => {
+                      setProfileImage(null);
+                    }}
+                  />
+                ) : (
+                  <View style={styles.profileImagePlaceholder}>
+                    <Text style={styles.profileImageInitials}>
+                      {fullName && fullName.trim()
+                        ? fullName
                           .trim()
                           .split(' ')
                           .filter(n => n.length > 0)
@@ -287,106 +361,194 @@ const EditProfileContent = () => {
                           .join('')
                           .toUpperCase()
                           .slice(0, 2)
-                      : email && email.trim()
-                      ? email[0].toUpperCase()
-                      : 'U'}
-                  </Text>
-                </View>
-              )}
-              {isUploadingImage && (
-                <View style={styles.imageUploadOverlay}>
-                  <ActivityIndicator size="small" color="#fff" />
-                </View>
-              )}
-              <TouchableOpacity
-                style={styles.editImageButton}
-                onPress={handleChangePhoto}
-                disabled={isUploadingImage}
-              >
-                <Feather name="camera" size={18} color="white" />
+                        : email && email.trim()
+                          ? email[0].toUpperCase()
+                          : 'U'}
+                    </Text>
+                  </View>
+                )}
+                {isUploadingImage && (
+                  <View style={styles.imageUploadOverlay}>
+                    <ActivityIndicator size="small" color="#fff" />
+                  </View>
+                )}
+                <TouchableOpacity
+                  style={styles.editImageButton}
+                  onPress={handleChangePhoto}
+                  disabled={isUploadingImage}
+                >
+                  <Feather name="camera" size={18} color="white" />
+                </TouchableOpacity>
+              </View>
+              <TouchableOpacity onPress={handleChangePhoto} disabled={isUploadingImage}>
+                <Text style={styles.changePhotoText}>
+                  {isUploadingImage ? t('common.loading') : t('editProfile.changePhoto')}
+                </Text>
               </TouchableOpacity>
             </View>
-            <TouchableOpacity onPress={handleChangePhoto} disabled={isUploadingImage}>
-              <Text style={styles.changePhotoText}>
-                {isUploadingImage ? 'Uploading...' : 'Change Photo'}
-              </Text>
-            </TouchableOpacity>
-          </View>
 
-          {/* Form Section */}
-          <View style={styles.formSection}>
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Full Name</Text>
-              <TextInput
-                style={[styles.input, errors.fullName && styles.inputError]}
-                value={fullName}
-                onChangeText={(text: string) => {
-                  setFullName(text);
-                  if (errors.fullName) setErrors({...errors, fullName: undefined});
-                }}
-                placeholder="Enter your full name"
-                placeholderTextColor="#B9B9B9"
-              />
-              {errors.fullName && <Text style={styles.errorText}>{errors.fullName}</Text>}
+            {/* Form Section */}
+            <View style={styles.formSection}>
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>{t('editProfile.fullName')}</Text>
+                <TextInput
+                  style={[styles.input, errors.fullName && styles.inputError]}
+                  value={fullName}
+                  onChangeText={(text: string) => {
+                    setFullName(text);
+                    if (errors.fullName) setErrors({ ...errors, fullName: undefined });
+                  }}
+                  placeholder={t('editProfile.enterFullName')}
+                  placeholderTextColor="#B9B9B9"
+                />
+                {errors.fullName && <Text style={styles.errorText}>{errors.fullName}</Text>}
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>{t('editProfile.email')}</Text>
+                <TextInput
+                  style={[styles.input, errors.email && styles.inputError]}
+                  value={email}
+                  placeholder={t('editProfile.enterEmail')}
+                  placeholderTextColor="#B9B9B9"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  editable={false}
+                />
+                {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Phone Number</Text>
+                <View style={[styles.phoneInputContainer, errors.phoneNumber && styles.inputError]}>
+                  <TouchableOpacity
+                    style={styles.countryPickerButton}
+                    onPress={() => setShowCountryPicker(true)}
+                    activeOpacity={0.7}
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                  >
+                    <Text style={styles.countryFlag}>{selectedCountry.flag}</Text>
+                    <Text style={styles.countryCodeText}>{selectedCountry.dial_code}</Text>
+                  </TouchableOpacity>
+                  <TextInput
+                    style={styles.phoneNumberInput}
+                    value={phoneNumber.replace(selectedCountry.dial_code, '').trim()}
+                    onChangeText={(text) => {
+                      // Remove any non-digit characters
+                      const cleanText = text.replace(/\D/g, '');
+                      const maxLength = PHONE_NUMBER_LENGTHS[selectedCountry.code] || PHONE_NUMBER_LENGTHS.default;
+
+                      // Limit input to maximum length for the selected country
+                      const limitedText = cleanText.slice(0, maxLength);
+                      const fullNumber = selectedCountry.dial_code + limitedText;
+
+                      setPhoneNumber(fullNumber);
+                      if (errors.phoneNumber) setErrors({ ...errors, phoneNumber: undefined });
+                    }}
+                    placeholder={t('editProfile.phonePlaceholder')}
+                    placeholderTextColor="#B9B9B9"
+                    keyboardType="phone-pad"
+                    maxLength={PHONE_NUMBER_LENGTHS[selectedCountry.code] || PHONE_NUMBER_LENGTHS.default}
+                    editable={true}
+                    selectTextOnFocus={true}
+                  />
+                </View>
+                {errors.phoneNumber && <Text style={styles.errorText}>{errors.phoneNumber}</Text>}
+              </View>
+
+              <Modal
+                visible={showCountryPicker}
+                transparent={true}
+                animationType="fade"
+                onRequestClose={() => setShowCountryPicker(false)}
+              >
+                <TouchableOpacity
+                  style={styles.countryModalBackdrop}
+                  activeOpacity={1}
+                  onPress={() => setShowCountryPicker(false)}
+                >
+                  <View style={styles.countryModalContent}>
+                    <View style={styles.countryModalHeader}>
+                      <Text style={styles.countryModalTitle}>{t('editProfile.selectCountry')}</Text>
+                      <TouchableOpacity
+                        onPress={() => setShowCountryPicker(false)}
+                        style={styles.countryModalClose}
+                      >
+                        <Text style={styles.countryModalCloseText}>✕</Text>
+                      </TouchableOpacity>
+                    </View>
+
+                    <View style={styles.countrySearchContainer}>
+                      <TextInput
+                        style={styles.countrySearchInput}
+                        placeholder={t('editProfile.searchCountries')}
+                        placeholderTextColor="#B9B9B9"
+                        value={countrySearch}
+                        onChangeText={setCountrySearch}
+                      />
+                    </View>
+
+                    <FlatList
+                      data={filteredCountries}
+                      keyExtractor={(item) => item.code}
+                      style={styles.countryList}
+                      showsVerticalScrollIndicator={false}
+                      initialNumToRender={20}
+                      maxToRenderPerBatch={10}
+                      windowSize={10}
+                      removeClippedSubviews={true}
+                      renderItem={({ item: country }) => (
+                        <TouchableOpacity
+                          style={styles.countryItem}
+                          onPress={() => {
+                            setSelectedCountry(country);
+                            setShowCountryPicker(false);
+                            setCountrySearch('');
+                            // Update phone number with new country code
+                            const currentNumber = phoneNumber.replace(/^\+\d+/, '');
+                            setPhoneNumber(country.dial_code + currentNumber);
+                          }}
+                        >
+                          <Text style={styles.countryFlag}>{country.flag}</Text>
+                          <View style={styles.countryInfo}>
+                            <Text style={styles.countryName}>{country.name}</Text>
+                            <Text style={styles.countryDialCode}>{country.dial_code}</Text>
+                          </View>
+                          {selectedCountry.code === country.code && (
+                            <Text style={styles.countrySelected}>✓</Text>
+                          )}
+                        </TouchableOpacity>
+                      )}
+                    />
+                  </View>
+                </TouchableOpacity>
+              </Modal>
             </View>
 
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Email Address</Text>
-              <TextInput
-                style={[styles.input, errors.email && styles.inputError]}
-                value={email}
-                onChangeText={(text: string) => {
-                  setEmail(text);
-                  if (errors.email) setErrors({...errors, email: undefined});
-                }}
-                placeholder="Enter your email"
-                placeholderTextColor="#B9B9B9"
-                keyboardType="email-address"
-                autoCapitalize="none"
-              />
-              {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Phone Number</Text>
-              <TextInput
-                style={[styles.input, errors.phoneNumber && styles.inputError]}
-                value={phoneNumber}
-                onChangeText={(text: string) => {
-                  setPhoneNumber(text);
-                  if (errors.phoneNumber) setErrors({...errors, phoneNumber: undefined});
-                }}
-                placeholder="Enter your phone number (optional)"
-                placeholderTextColor="#B9B9B9"
-                keyboardType="phone-pad"
-              />
-              {errors.phoneNumber && <Text style={styles.errorText}>{errors.phoneNumber}</Text>}
+            {/* Buttons */}
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={[styles.saveButton, (isLoading || isUploadingImage) && styles.saveButtonDisabled]}
+                onPress={handleSave}
+                disabled={isLoading || isUploadingImage}
+              >
+                {isLoading ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <Text style={styles.saveButtonText}>{t('editProfile.saveChanges')}</Text>
+                )}
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={handleCancel}
+                disabled={isLoading || isUploadingImage}
+              >
+                <Text style={styles.cancelButtonText}>{t('common.cancel')}</Text>
+              </TouchableOpacity>
             </View>
           </View>
-
-          {/* Buttons */}
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={[styles.saveButton, (isLoading || isUploadingImage) && styles.saveButtonDisabled]}
-              onPress={handleSave}
-              disabled={isLoading || isUploadingImage}
-            >
-              {isLoading ? (
-                <ActivityIndicator size="small" color="#fff" />
-              ) : (
-                <Text style={styles.saveButtonText}>Save Changes</Text>
-              )}
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={handleCancel}
-              disabled={isLoading || isUploadingImage}
-            >
-              <Text style={styles.cancelButtonText}>Cancel</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };

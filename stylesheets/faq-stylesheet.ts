@@ -44,13 +44,11 @@ const styles = StyleSheet.create({
   },
   confusedText: {
     fontSize: 14,
-    fontWeight: '500',
     color: '#1C1C1C',
     fontFamily: 'RethinkSans-Regular',
   },
   contactText: {
     fontSize: 14,
-    fontWeight: '500',
     color: '#FF5A3D',
     fontFamily: 'RethinkSans-Regular',
     marginTop: 5,

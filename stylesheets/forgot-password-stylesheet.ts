@@ -40,15 +40,17 @@ const styles = StyleSheet.create({
     headerSection: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 25
+        marginBottom: 25,
+        justifyContent: 'center',
     },
     backarrow: {
-        marginRight: 55,
-        marginLeft: 15
+        position: 'absolute',
+        left: 16,
     },
     headerText: {
          fontSize: 20,
-        fontFamily: "RethinkSans-Bold"
+        fontFamily: "RethinkSans-Bold",
+        textAlign: 'center',
     },
     VerificationContainer: {
         justifyContent: "center",

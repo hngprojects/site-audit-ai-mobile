@@ -15,7 +15,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 28,
     fontFamily: 'RethinkSans-Bold',
-    fontWeight: '700',
     color: '#1C1C1C',
     marginBottom: 8,
     textAlign: 'center',
@@ -26,11 +25,18 @@ const styles = StyleSheet.create({
     color: '#1A2373',
     textAlign: 'center',
   },
+  reScanNote: {
+    fontSize: 14,
+    fontFamily: 'RethinkSans-Regular',
+    color: '#666',
+    textAlign: 'center',
+    marginTop: 4,
+  },
   loadingContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginVertical: 20,
-    minHeight: 60,
+    marginVertical: 40,
+    minHeight: 120,
   },
   content: {
     flex: 1,
@@ -60,7 +66,6 @@ const styles = StyleSheet.create({
   progressText: {
     fontSize: 18,
     fontFamily: 'RethinkSans-SemiBold',
-    fontWeight: '600',
     color: '#000',
     marginTop: 12,
   },

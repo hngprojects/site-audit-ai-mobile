@@ -1,18 +1,26 @@
-import { getScanResult } from "@/actions/scan-actions";
+import { submitLead } from "@/actions/leads-actions";
+import { getScanSummary } from "@/actions/scan-actions";
+import type { SummaryResult } from "@/lib/scan-service";
 import styles, { reportColors } from "@/stylesheets/report-dashboard-stylesheet";
+import { useTranslation } from "@/utils/translations";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
-  View
+  TouchableWithoutFeedback,
+  View,
 } from "react-native";
+import Toast from "react-native-toast-message";
 
 import IssueCard from "@/components/issue-card";
+import TopAlert from "@/components/top-alert";
 import { useSelectedIssuesStore } from "@/store/audit-summary-selected-issue-store";
 import { useAuditInfoStore } from "@/store/audit-website-details-store";
 import { LeadResponse, Status } from "@/type";
@@ -20,8 +28,6 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { leadService } from "../../lib/lead-generation-service";
-
-import TopAlert from "@/components/top-alert";
 
 
 
@@ -33,14 +39,16 @@ import TopAlert from "@/components/top-alert";
 
 
 export default function ReportDashboard() {
+  const { t } = useTranslation();
   const [isLoaded, setIsLoaded] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [modalTextInput, setModalTextInput] = useState<string>('')
   const [emptyModalTextInput, setEmptyModalTextInput] = useState<boolean>(false)
+  const [summaryResult, setSummaryResult] = useState<SummaryResult | null>(null);
   const [scanResult, setScanResult] = useState<any>(null);
   const [leadResponse, setLeadResponse] = useState<LeadResponse | null>(null)
   const [modalLoading, setModalLoading] = useState<boolean>(false);
-
+  const router = useRouter();
   const { addIssue, clearIssues, setIssues } = useSelectedIssuesStore();
 
   const { issues } = useSelectedIssuesStore();
@@ -48,42 +56,38 @@ export default function ReportDashboard() {
   const { setAuditInfo } = useAuditInfoStore();
 
 
-  
-
-const params = useLocalSearchParams();
-
-const jobId = Array.isArray(params.jobId) ? params.jobId[0] : params.jobId;
-const url = Array.isArray(params.url) ? params.url[0] : params.url;
 
 
+  const params = useLocalSearchParams();
+
+  const jobId = Array.isArray(params.jobId) ? params.jobId[0] : params.jobId;
+  const url = Array.isArray(params.url) ? params.url[0] : params.url;
 
 
-const hireAPro = () => {
 
 
-  try {
-   
-    if (issues.length < 1){
-      return alert ("Please select the issues you want our professionals to assist you with ")
+  const hireAPro = () => {
+    try {
+      if (issues.length < 1) {
+        Toast.show({
+          type: 'error',
+          text1: t('common.error'),
+          text2: t('reports.selectIssuesForPro'),
+        });
+        return;
+      }
+
+      //navigate to  fix/hire professional 
+      router.push("/(hireRequest)/hire-request");
+    } catch (error) {
+      console.log(error)
     }
-   
-    
-    //navigate to  fix/hire professional 
-    router.push("/(hireRequest)/hire-request");
-  } catch (error) {
-    console.log(error)
-  }
-}
-
-
-  const router = useRouter();
-
-
+  };
 
   const statusColor = (s: Status) =>
     s === "Critical" ? reportColors.scoreLow :
-    s === "Good" ? reportColors.scoreHigh :
-    reportColors.scoreMedium;
+      s === "Good" ? reportColors.scoreHigh :
+        reportColors.scoreMedium;
 
   // Normalize status to match Status type
   const normalizeStatus = (status: string): Status => {
@@ -94,32 +98,39 @@ const hireAPro = () => {
       default: return "Warning";
     }
   };
-  
 
-  const modalContinueButton = async (modalTextInput : string) => {
+  const modalContinueButton = async (modalTextInput: string) => {
     if (modalTextInput.trim() === "") {
       setEmptyModalTextInput(true);
       return;
     }
-    
+
     setModalLoading(true)
 
     try {
-       const response = await leadService.createLead(modalTextInput);
+      const response = await submitLead(modalTextInput.trim());
+      Toast.show({
+        type: 'success',
+        text1: t('common.success'),
+        text2: response.message,
+      });
+      setShowModal(false);
+    } catch (error) {
+      try {
+        const response = await leadService.createLead(modalTextInput);
 
-       setLeadResponse (response)
+        setLeadResponse(response)
 
-       if (response.status === "success")
-       {
-        console.log("success")
-         setShowModal(false);
-       }
-    } catch (error : any) {
-      console.log("error")
-      const apiError = error?.response?.data ?? null;
-      console.log(apiError)
-      setLeadResponse(apiError);
-
+        if (response.status === "success") {
+          console.log("success")
+          setShowModal(false);
+        }
+      } catch (error: any) {
+        console.log("error")
+        const apiError = error?.response?.data ?? null;
+        console.log(apiError)
+        setLeadResponse(apiError);
+      }
     } finally {
       setModalLoading(false)
     }
@@ -128,28 +139,8 @@ const hireAPro = () => {
 
 
 
-    const ISSUE_LIST = scanResult?.issues || [];
+  const CATEGORIES = summaryResult?.categories || [];
 
-    // Function to toggle all issues selection
-    const toggleAllIssues = () => {
-      const allSelected = issues.length === ISSUE_LIST.length && ISSUE_LIST.length > 0;
-
-      if (allSelected) {
-        // Unmark all - clear the store
-        clearIssues();
-      } else {
-        // Mark all - add all issues
-        ISSUE_LIST.forEach((issue: any) => {
-          addIssue({
-            id: issue.id,
-            title: issue.title,
-            score: String(issue.score),
-            status: normalizeStatus(scanResult?.status || 'Warning'),
-            description: issue.description,
-          });
-        });
-      }
-    }
 
 
 
@@ -159,24 +150,23 @@ const hireAPro = () => {
     if (jobId) {
       const fetchResult = async () => {
         try {
-          const result = await getScanResult(jobId);
-          setScanResult(result);
-          setIssues(result.issues.map(issue => ({ ...issue, score: String(issue.score) })));
+          const result = await getScanSummary(jobId);
+          setSummaryResult(result);
 
           // Set audit info for details page
           setAuditInfo({
             domain: url,
-            status: result.status,
-            score: String(result.overall_score),
-            scanDate: result.scanned_at ? new Date(result.scanned_at).toLocaleDateString() : '',
+            status: result.website_score >= 80 ? 'Good' : result.website_score >= 50 ? 'Warning' : 'Critical',
+            score: String(result.website_score),
+            scanDate: new Date(result.scan_date).toLocaleDateString(),
           });
         } catch (error) {
-          console.error('Failed to fetch scan result:', error);
+          console.error('Failed to fetch scan issues:', error);
         }
       };
       fetchResult();
     }
-  }, [jobId, url, setAuditInfo, setIssues]);
+  }, [jobId, url, setAuditInfo]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -190,12 +180,12 @@ const hireAPro = () => {
   // for modal to come-up automatically
 
   useEffect(() => {
-  const modalTimer = setTimeout(() => {
-    setShowModal(true);
-  }, 7000); 
+    const modalTimer = setTimeout(() => {
+      setShowModal(true);
+    }, 7000);
 
-  return () => clearTimeout(modalTimer);
-}, []);
+    return () => clearTimeout(modalTimer);
+  }, []);
 
 
   if (!isLoaded) {
@@ -210,104 +200,85 @@ const hireAPro = () => {
     <View style={[styles.screenContainer]}>
       <ScrollView showsVerticalScrollIndicator={false}>
 
-        <View style={{position: 'relative', marginBottom: 20, paddingHorizontal: 20, paddingTop: 10, marginTop: 35,}}>
+        <View style={{ position: 'relative', marginBottom: 20, paddingHorizontal: 20, paddingTop: 10, marginTop: 35, }}>
           <TouchableOpacity
             onPress={() => router.back()}
-            style={{position: 'absolute', left: 20, zIndex: 1}}
+            style={{ position: 'absolute', left: 20, zIndex: 1 }}
           >
             <Ionicons name="arrow-back-sharp" size={24} color="black" />
           </TouchableOpacity>
-          <Text style={[styles.pageTitle, {textAlign: 'center'}]}>Audit Summary</Text>
+          <Text style={[styles.pageTitle, { textAlign: 'center' }]}>{t('reportDashboard.auditSummary')}</Text>
         </View>
-       
-          {leadResponse?.status === "success" && (
-            <TopAlert message={leadResponse.message} duration={4000} />
-          )}
-        
+
+        {leadResponse?.status === "success" && (
+          <TopAlert message={leadResponse.message} duration={4000} />
+        )}
+
         <View style={{
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
           paddingHorizontal: 20,
         }}>
-         <View style={{
-          flexDirection: "row",
-          alignItems: "center",
-          gap: 10,
-          backgroundColor: "#e3e7ecff",
-          borderRadius: 25,
-          padding: 3,
-          paddingHorizontal: 10,
-          alignContent: "center",
-         }}>
-          <Feather name="link-2" size={15} color="blue" />
-          <Text style={{...styles.domainText, alignItems: "center", color: "blue",  fontSize: 10,}}>{url}</Text>
-         </View>
+          <View style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 10,
+            backgroundColor: "#e3e7ecff",
+            borderRadius: 25,
+            padding: 3,
+            paddingHorizontal: 10,
+            alignContent: "center",
+          }}>
+            <Feather name="link-2" size={15} color="blue" />
+            <Text style={{ ...styles.domainText, alignItems: "center", color: "blue", fontSize: 10, }}>{url}</Text>
+          </View>
 
-         <TouchableOpacity
-           style={{
-             flexDirection: "row",
-             alignItems: "center",
-             gap: 10,
-             padding: 3,
-             paddingHorizontal: 10,
-             alignContent: "center",
-           }}
-           onPress={() => router.push({ pathname: '/(main)/auditing-screen', params: { url: url, isReRun: 'true' } })}
-         >
-           <AntDesign name="reload" size={15} color="red" />
-           <Text style={{color: "red", alignItems: "center", ...styles.domainText, fontSize: 13}}>Re-run audit</Text>
-         </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 10,
+              padding: 3,
+              paddingHorizontal: 10,
+              alignContent: "center",
+            }}
+            onPress={() => router.push({ pathname: '/(main)/auditing-screen', params: { url: url, isReRun: 'true' } })}
+          >
+            <AntDesign name="reload" size={15} color="red" />
+            <Text style={{ color: "red", alignItems: "center", ...styles.domainText, fontSize: 13 }}>{t('reportDashboard.rerunAudit')}</Text>
+          </TouchableOpacity>
         </View>
 
-        
-        <View style={{paddingHorizontal: 25, marginVertical: 5, marginTop: 15}}>
-          <Text style={[styles.scoreText, { color: statusColor(normalizeStatus(scanResult?.status || 'Warning')) }]}>{scanResult?.overall_score || 'Loading...'}</Text>
-          <Text style={{...styles.cardLabel, color: "#000"}}>Website Score</Text>
-          <Text style={{...styles.cardLabel, color: "#dfdfdfff", marginTop: 5}}>Scan Date: {scanResult?.scanned_at ? new Date(scanResult.scanned_at).toLocaleDateString() : 'Loading...'}</Text>
-          <Text style={{color: "#000", fontFamily: "RethinkSans-Medium", fontSize: 13, marginTop: 20, }}>
-            {normalizeStatus(scanResult?.status || 'Warning') === "Critical" ? "Your website is performing poorly. Immediate improvements are needed to enhance user experience and SEO." :
-            normalizeStatus(scanResult?.status || 'Warning') === "Good" ? "Great job! Your website is performing well. Keep up the good work to maintain and further enhance user experience and SEO. Fix the issues below to make it even better."  :
-            "Your website has an average performance. There is room for improvement to boost user experience and SEO." }
-            </Text>
+
+        <View style={{ paddingHorizontal: 25, marginVertical: 5, marginTop: 15 }}>
+          <Text style={[styles.scoreText, { color: statusColor(normalizeStatus(summaryResult ? (summaryResult.website_score >= 80 ? 'Good' : summaryResult.website_score >= 50 ? 'Warning' : 'Critical') : 'Warning')) }]}>{summaryResult?.website_score || t('common.loading')}</Text>
+          <Text style={{ ...styles.cardLabel, color: "#000" }}>{t('reportDashboard.websiteScore')}</Text>
+          <Text style={{ ...styles.cardLabel, color: "#dfdfdfff", marginTop: 5 }}>{t('reportDashboard.scanDate')}: {summaryResult?.scan_date ? new Date(summaryResult.scan_date).toLocaleDateString() : t('common.loading')}</Text>
+          <Text style={{ color: "#000", fontFamily: "RethinkSans-Medium", fontSize: 13, marginTop: 5, }}>
+            {normalizeStatus(summaryResult ? (summaryResult.website_score >= 80 ? 'Good' : summaryResult.website_score >= 50 ? 'Warning' : 'Critical') : 'Warning') === "Critical" ? t('reportDashboard.statusCritical') :
+              normalizeStatus(summaryResult ? (summaryResult.website_score >= 80 ? 'Good' : summaryResult.website_score >= 50 ? 'Warning' : 'Critical') : 'Warning') === "Good" ? t('reportDashboard.statusGood') :
+                t('reportDashboard.statusWarning')}
+          </Text>
         </View>
 
-        {scanResult ? (
+        {summaryResult ? (
           <>
-            <TouchableOpacity onPress={toggleAllIssues}>
-              <Text
-                style={{
-                  marginLeft: "auto",
-                  marginTop: 20,
-                  marginBottom: 20,
-                  marginRight: 20,
-                  color: "blue"
-                }}
-              >
-                {issues.length === ISSUE_LIST.length && ISSUE_LIST.length > 0 ? "Unmark All" : "Mark All"}
-              </Text>
-            </TouchableOpacity>
-
-            <View style={{paddingHorizontal: "5%",}}>
-              {ISSUE_LIST.map((issue: any) => (
+            <View style={{ paddingHorizontal: "5%", }}>
+              {CATEGORIES.map((category: any) => (
                 <IssueCard
-                  key={issue.id}
-                  id={issue.id}
-                  title={issue.title}
-                  score={String(issue.score)}
-                  description={issue.description}
-                  status={normalizeStatus(scanResult?.status || 'Warning')}
+                  key={category.key}
+                  id={category.key}
+                  title={category.title}
+                  score={String(category.score)}
+                  description={category.short_description}
+                  status={normalizeStatus(summaryResult ? (summaryResult.website_score >= 80 ? 'Good' : summaryResult.website_score >= 50 ? 'Warning' : 'Critical') : 'Warning')}
                   onPressDetails={() =>
                     router.push({
                       pathname: "/[id]",
                       params: {
-                        id: issue.id,
-                        title: issue.title,
-                        score: String(issue.score),
-                        description: issue.description,
-                        status: normalizeStatus(scanResult?.status || 'Warning'),
-                        businessBenefits: issue.business_benefits ? JSON.stringify(issue.business_benefits) : null,
-                        impactMessage: issue.impact_message || null,
+                        id: category.key,
+                        jobId: jobId,
                       },
                     })
                   }
@@ -318,108 +289,113 @@ const hireAPro = () => {
         ) : (
           <View style={{ paddingVertical: 40, alignItems: 'center' }}>
             <ActivityIndicator size="large" color="#F04438" />
-            <Text style={{ marginTop: 10, color: '#666' }}>Loading scan results...</Text>
+            <Text style={{ marginTop: 10, color: '#666' }}>{t('reportDashboard.loadingResults')}</Text>
           </View>
         )}
 
         <View>
           <Text
-          style={{textAlign: "center", marginTop: 18, fontSize: 14, fontFamily: "RethinkSans-Medium", color: "#656566ff",}}
+            style={{ textAlign: "center", marginTop: 18, fontSize: 14, fontFamily: "RethinkSans-Medium", color: "#656566ff", }}
           >
-            Get your sales up with a free review from an expert
+            {t('reportDashboard.getSalesUp')}
           </Text>
         </View>
-       
-        
-        
+
+
+
         <TouchableOpacity
           style={styles.continueBtn}
-          onPress={hireAPro} 
+          onPress={hireAPro}
         >
-          <Text style={styles.continueText}>Continue</Text>
+          <Text style={styles.continueText}>{t('common.continue')}</Text>
         </TouchableOpacity>
 
-        
+
         <View style={{ height: 80 }} />
       </ScrollView>
 
+      <Modal transparent visible={showModal} animationType="fade" onRequestClose={() => setShowModal(false)}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={{ flex: 1 }}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+        >
+          <TouchableWithoutFeedback onPress={() => setShowModal(false)}>
+            <View style={styles.modalOverlay}>
+              <TouchableWithoutFeedback>
+                <View style={styles.modalBox}>
+                  <TouchableOpacity
+                    onPress={() => setShowModal(false)}
+                    style={{ position: "absolute", right: 5, margin: 10, paddingBottom: 15 }}
+                  >
+                    <Ionicons name="close" size={30} color="#e24017ff" />
+                  </TouchableOpacity>
 
-    
-      <Modal transparent visible={showModal} animationType="fade">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalBox}>
+                  <Text style={styles.modalTitle}>{t('reportDashboard.modalTitle')}</Text>
 
-            <TouchableOpacity 
-              onPress={() => setShowModal(false)}
-              style={{ position: "absolute",  right: 5 , margin: 10, paddingBottom: 15}}
-            >
-              <Ionicons name="close" size={30} color="#e24017ff" />
-            </TouchableOpacity>
+                  <Text style={styles.modalSubtitle}>
+                    {t('reportDashboard.modalSubtitle')}
+                  </Text>
 
-            <Text style={styles.modalTitle}>Your website can be better</Text>
+                  <View>
+                    <TextInput
+                      placeholder={t('reportDashboard.enterEmail')}
+                      onChangeText={(x) => {
+                        setModalTextInput(x);
+                        if (emptyModalTextInput && x !== "") setEmptyModalTextInput(false);
+                      }}
+                      placeholderTextColor={"#dbdbdbff"}
+                      style={{
+                        color: "#000",
+                        borderWidth: 1.5,
+                        borderColor: emptyModalTextInput || leadResponse?.status === "error" ? "#D72D2D" : "#E5E7EB",
+                        borderRadius: 5,
+                        padding: 10,
+                      }}
+                    />
+                  </View>
 
-            <Text style={styles.modalSubtitle}>
-              Dont miss a chance to stay ahead. Get free website monitoring and insights
-            </Text>
+                  {emptyModalTextInput && (
+                    <Text style={{
+                      fontFamily: "RethinkSans-Regular",
+                      fontSize: 13,
+                      color: "#D72D2D",
+                    }}>
+                      {t('reportDashboard.invalidEmail')}
+                    </Text>
+                  )}
 
-         <View>
-            <TextInput
-            placeholder="Enter Email"
-            onChangeText={(x) => {
-              setModalTextInput(x);
-              if (emptyModalTextInput && x !== "") setEmptyModalTextInput(false);
-            }}
-            placeholderTextColor={"#dbdbdbff"}
-            style={{
-              color: "#000",
-              borderWidth: 1.5,
-              borderColor: emptyModalTextInput || leadResponse?.status === "error" ? "#D72D2D" : "#E5E7EB",
-              borderRadius: 5,
-              padding: 10,
-            }}
-            />
+                  {leadResponse?.status === "error" && (
+                    <Text style={{
+                      fontFamily: "RethinkSans-Regular",
+                      fontSize: 13,
+                      color: "#D72D2D",
+                    }}>
+                      {leadResponse.message}
+                    </Text>
+                  )}
 
-         </View>
-         {emptyModalTextInput && (
-          <Text style={{
-            fontFamily: "RethinkSans-Regular",
-            fontSize: 13,
-            color: "#D72D2D",
-            
-          }}>
-            Pls ensure you enter a valid email address
-          </Text>
-         )}
-         
-         {leadResponse?.status === "error" && (
-          <Text style={{
-            fontFamily: "RethinkSans-Regular",
-            fontSize: 13,
-            color: "#D72D2D",
-            
-          }}>
-            {leadResponse.message}
-          </Text>
-         )}
+                  <View style={{ marginBottom: 20 }} />
 
-         <View style={{marginBottom: 20}}/>
-
-            {modalLoading ? (
-              <ActivityIndicator 
-                size={"large"} 
-                color={"#e24017ff"} 
-                style={styles.modalActivityIndicator}
-              />
-            ): (
-              <TouchableOpacity
-              style={styles.modalButton}
-              onPress={() => modalContinueButton(modalTextInput)}
-            >
-              <Text style={styles.modalButtonText}>Got It</Text>
-            </TouchableOpacity>
-            )}
-          </View>
-        </View>
+                  {modalLoading ? (
+                    <ActivityIndicator
+                      size={"large"}
+                      color={"#e24017ff"}
+                      style={styles.modalActivityIndicator}
+                    />
+                  ) : (
+                    <TouchableOpacity
+                      style={styles.modalButton}
+                      onPress={() => modalContinueButton(modalTextInput)}
+                    >
+                      <Text style={styles.modalButtonText}>{t('reportDashboard.gotIt')}</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
       </Modal>
     </View>
   );

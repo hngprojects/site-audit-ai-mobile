@@ -1,17 +1,29 @@
-import styles from '@/stylesheets/email-support-stylesheet';
 import { supportService } from '@/lib/support-service';
+import { useAuthStore } from '@/store/auth-store';
+import styles from '@/stylesheets/email-support-stylesheet';
+import { useTranslation } from '@/utils/translations';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 
 const EmailSupportContent = () => {
+  const { t } = useTranslation();
   const router = useRouter();
-  const [email, setEmail] = useState('user@gmail.com');
+  const { user } = useAuthStore();
+  const [email, setEmail] = useState(user?.email || '');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  // Update email when user data changes
+  useEffect(() => {
+    if (user?.email) {
+      setEmail(user.email);
+    }
+  }, [user?.email]);
 
   const isValidEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -24,22 +36,38 @@ const EmailSupportContent = () => {
     const trimmedMessage = message.trim();
 
     if (!trimmedEmail) {
-      Alert.alert('Error', 'Please enter your email address');
+      Toast.show({
+        type: 'error',
+        text1: t('common.error'),
+        text2: t('emailSupport.emailRequired'),
+      });
       return;
     }
 
     if (!isValidEmail(trimmedEmail)) {
-      Alert.alert('Error', 'Please enter a valid email address');
+      Toast.show({
+        type: 'error',
+        text1: t('common.error'),
+        text2: t('emailSupport.invalidEmail'),
+      });
       return;
     }
 
     if (!trimmedSubject) {
-      Alert.alert('Error', 'Please enter a subject');
+      Toast.show({
+        type: 'error',
+        text1: t('common.error'),
+        text2: t('emailSupport.subjectRequired'),
+      });
       return;
     }
 
     if (!trimmedMessage) {
-      Alert.alert('Error', 'Please enter your message');
+      Toast.show({
+        type: 'error',
+        text1: t('common.error'),
+        text2: t('emailSupport.messageRequired'),
+      });
       return;
     }
 
@@ -50,11 +78,18 @@ const EmailSupportContent = () => {
         subject: trimmedSubject,
         message: trimmedMessage,
       });
-      Alert.alert('Success', 'Your email has been sent successfully', [
-        { text: 'OK', onPress: () => router.back() },
-      ]);
+      Toast.show({
+        type: 'success',
+        text1: t('common.success'),
+        text2: t('emailSupport.sentSuccess'),
+      });
+      setTimeout(() => router.back(), 1500);
     } catch (error) {
-      Alert.alert('Error', error instanceof Error ? error.message : 'Failed to send email. Please try again.');
+      Toast.show({
+        type: 'error',
+        text1: t('common.error'),
+        text2: error instanceof Error ? error.message : t('emailSupport.sendError'),
+      });
     } finally {
       setIsLoading(false);
     }
@@ -62,73 +97,79 @@ const EmailSupportContent = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Feather name="arrow-left" size={24} color="#1A2373" />
-        </TouchableOpacity>
-        <Text style={styles.headerText}>Email Support</Text>
-      </View>
-      <ScrollView
-        style={styles.scrollContainer}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ marginTop: 16, paddingBottom: 100 }}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
       >
-        <View style={styles.content}>
-          {/* <Text style={styles.title}>Contact Us</Text>
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+            <Feather name="arrow-left" size={24} color="#1A2373" />
+          </TouchableOpacity>
+          <Text style={styles.headerText}>{t('emailSupport.title')}</Text>
+        </View>
+        <ScrollView
+          style={styles.scrollContainer}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ marginTop: 16, paddingBottom: 100 }}
+        >
+          <View style={styles.content}>
+            {/* <Text style={styles.title}>Contact Us</Text>
           <Text style={styles.subtitle}>Send us an email and we will respond within 24 hours</Text> */}
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Your Email</Text>
-            <TextInput
-              style={styles.input}
-              value={email}
-              onChangeText={setEmail}
-              placeholder="user@gmail.com"
-              placeholderTextColor="#999"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-          </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>{t('emailSupport.yourEmail')}</Text>
+              <TextInput
+                style={styles.input}
+                value={email}
+                onChangeText={setEmail}
+                placeholder={t('emailSupport.emailPlaceholder')}
+                placeholderTextColor="#999"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+            </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Subject</Text>
-            <TextInput
-              style={styles.input}
-              value={subject}
-              onChangeText={setSubject}
-              placeholder="e.g Inquiry"
-              placeholderTextColor="#999"
-            />
-          </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>{t('emailSupport.subject')}</Text>
+              <TextInput
+                style={styles.input}
+                value={subject}
+                onChangeText={setSubject}
+                placeholder={t('emailSupport.subjectPlaceholder')}
+                placeholderTextColor="#999"
+              />
+            </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Message</Text>
-            <TextInput
-              style={[styles.input, styles.messageInput]}
-              value={message}
-              onChangeText={setMessage}
-              placeholder="Type your message here..."
-              placeholderTextColor="#999"
-              multiline
-              numberOfLines={6}
-              textAlignVertical="top"
-            />
-          </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>{t('emailSupport.message')}</Text>
+              <TextInput
+                style={[styles.input, styles.messageInput]}
+                value={message}
+                onChangeText={setMessage}
+                placeholder={t('emailSupport.messagePlaceholder')}
+                placeholderTextColor="#999"
+                multiline
+                numberOfLines={6}
+                textAlignVertical="top"
+              />
+            </View>
 
-          <TouchableOpacity 
-            style={[styles.sendButton, isLoading && styles.sendButtonDisabled]} 
-            onPress={handleSend}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <ActivityIndicator size="small" color="#fff" />
-            ) : (
-              <Text style={styles.sendButtonText}>Send Message</Text>
-            )}
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+            <TouchableOpacity
+              style={[styles.sendButton, isLoading && { opacity: 0.6 }]}
+              onPress={handleSend}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <Text style={styles.sendButtonText}>{t('emailSupport.sendMessage')}</Text>
+              )}
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };

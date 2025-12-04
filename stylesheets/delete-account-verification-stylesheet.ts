@@ -20,20 +20,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 6,
     paddingHorizontal: 16,
+    justifyContent: 'center',
   },
   backButton: {
-    marginRight: 16,
-  },
-  titleContainer: {
-    flex: 1,
-    alignItems: 'center',
+    position: 'absolute',
+    left: 16,
   },
   title: {
     fontSize: 20,
     fontFamily: 'RethinkSans-Bold',
     color: '#1c1c1c',
     textAlign: 'center',
-    fontWeight: 700,
   },
   content: {
     flex: 1,

@@ -39,12 +39,27 @@ const styles = StyleSheet.create({
   },
   avatarContainer: {
     position: 'relative',
+    width: 70,
+    height: 70,
+  },
+  avatarImage: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
   },
   avatarPlaceholder: {
     width: 70,
     height: 70,
     backgroundColor: '#333333',
     borderRadius: 35,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  avatarInitials: {
+    fontSize: 24,
+    fontFamily: 'RethinkSans-SemiBold',
+    color: '#FFFFFF',
+    textAlign: 'center',
   },
   editIconContainer: {
     position: 'absolute',
@@ -56,6 +71,8 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
   },
   userInfoContainer: {
     width: '100%',
@@ -86,7 +103,6 @@ const styles = StyleSheet.create({
   },
   sectionHeading: {
     fontSize: 16,
-    fontWeight: '600',
     color: '#1c1c1c',
     marginBottom: 12,
     fontFamily: 'RethinkSans-SemiBold',
@@ -111,9 +127,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
   },
+  settingsItemRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
   settingsItemText: {
     fontSize: 14,
     color: '#1c1c1c',
+    fontFamily: 'RethinkSans-Regular',
+  },
+  frequencyText: {
+    fontSize: 14,
+    color: '#6B7280',
     fontFamily: 'RethinkSans-Regular',
   },
   logoutText: {
@@ -320,22 +346,46 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     paddingHorizontal: 10,
   },
- signUpsignInBtn: {
-  width: "100%",
-  height: 50,
-  borderRadius: 10,
-  borderWidth: 1,
-  borderColor: "#FF5A3D",
-  justifyContent: "center",
-  alignItems: "center",
-  marginTop: 20,
-},
-authText: {
-  color: "#FF5A3D",
-  fontSize: 16,
-  fontFamily: "RethinkSans-SemiBold",
-},
+  signUpsignInBtn: {
+    width: "100%",
+    height: 50,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#FF5A3D",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 20,
+  },
+  authText: {
+    color: "#FF5A3D",
+    fontSize: 16,
+    fontFamily: "RethinkSans-SemiBold",
+  },
 
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  overlayContent: {
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    paddingHorizontal: 24,
+    paddingVertical: 16,
+    borderRadius: 12,
+    maxWidth: 280,
+  },
+  overlayText: {
+    color: 'white',
+    fontSize: 16,
+    fontFamily: 'RethinkSans-Medium',
+    textAlign: 'center',
+  },
 });
 
 export default styles;

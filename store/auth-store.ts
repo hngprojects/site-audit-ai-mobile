@@ -8,8 +8,10 @@ interface AuthStore extends AuthState {
   // Actions
   signIn: (email: string, password: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
+  signInWithApple: () => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  deleteAccount: () => Promise<void>;
   initialize: () => Promise<void>;
   clearError: () => void;
   error: string | null;
@@ -69,6 +71,26 @@ export const useAuthStore = create<AuthStore>()(
         }
       },
 
+      signInWithApple: async () => {
+        set({ isLoading: true, error: null });
+        try {
+          const response = await authActions.signInWithApple();
+          set({
+            user: response.user,
+            token: response.token,
+            isAuthenticated: true,
+            isLoading: false,
+            error: null,
+          });
+        } catch (error) {
+          set({
+            isLoading: false,
+            error: error instanceof Error ? error.message : 'Failed to sign in with Apple',
+          });
+          throw error;
+        }
+      },
+
       signUp: async (email: string, password: string) => {
         set({ isLoading: true, error: null });
         try {
@@ -105,6 +127,28 @@ export const useAuthStore = create<AuthStore>()(
             isLoading: false,
             error: error instanceof Error ? error.message : 'Failed to sign out',
           });
+        }
+      },
+
+      deleteAccount: async () => {
+        set({ isLoading: true, error: null });
+        try {
+          const state = get();
+          if (!state.token) {
+            throw new Error('No authentication token found');
+          }
+          await authActions.deleteAccount(state.token);
+          // Clear all auth state after successful deletion
+          set({
+            ...initialState,
+            isInitialized: true,
+          });
+        } catch (error) {
+          set({
+            isLoading: false,
+            error: error instanceof Error ? error.message : 'Failed to delete account',
+          });
+          throw error;
         }
       },
 

@@ -15,16 +15,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 6,
     paddingHorizontal: 16,
+    justifyContent: 'center',
   },
   backButton: {
-    marginRight: 16,
+    position: 'absolute',
+    left: 16,
   },
   headerText: {
     fontSize: 20,
     lineHeight: 24,
     color: '#1c1c1c',
     fontFamily: 'RethinkSans-Bold',
-    flex: 1,
     textAlign: 'center',
   },
   content: {
@@ -39,7 +40,6 @@ const styles = StyleSheet.create({
   },
   inputLabel: {
     fontSize: 16,
-    fontWeight: '600',
     fontFamily: 'RethinkSans-SemiBold',
     color: '#1c1c1c',
   },
@@ -68,7 +68,6 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 12,
-    fontWeight: '500',
     color: '#D32F2F',
     fontFamily: 'RethinkSans-Medium',
   },
@@ -84,6 +83,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#FF5A3D',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  updateButtonDisabled: {
+    opacity: 0.6,
   },
   updateButtonText: {
     fontSize: 16,

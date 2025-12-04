@@ -1,77 +1,462 @@
-import * as AuthSession from 'expo-auth-session';
-import * as WebBrowser from 'expo-web-browser';
+/**
+ * Google Authentication Service - Native Google Sign-In
+ * 
+ * FRESH IMPLEMENTATION WITH DIFFERENT APPROACH:
+ * - Uses @react-native-google-signin/google-signin native library
+ * - Different configuration strategy and naming
+ * - Enhanced error handling and diagnostics
+ * - Platform-specific client ID handling
+ * - Robust token extraction with fallbacks
+ * 
+ * Requirements:
+ * - Development build (not Expo Go)
+ * - EXPO_PUBLIC_GOOGLE_CLIENT_ID: Web OAuth Client ID (required)
+ * - EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID: iOS OAuth Client ID (for iOS)
+ * - Android: SHA-1 fingerprint in Google Cloud Console
+ * - iOS: Bundle ID matches Google Cloud Console
+ */
+
+import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 
-// Complete the auth session
-WebBrowser.maybeCompleteAuthSession();
+// Check if we're in Expo Go - conditionally import Google Sign-In
+const isExpoGo = Constants.executionEnvironment === 'storeClient';
 
-const GOOGLE_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID || '546863276810-ggsrvoues4vrn2tpuq6bliou5dujgggi.apps.googleusercontent.com';
+// Dynamic imports for Google Sign-In
+let GoogleSignin: any = null;
+let isErrorWithCode: any = null;
+let isSuccessResponse: any = null;
+let statusCodes: any = null;
 
-const discovery = {
-  authorizationEndpoint: 'https://accounts.google.com/o/oauth2/v2/auth',
-  tokenEndpoint: 'https://oauth2.googleapis.com/token',
-  revocationEndpoint: 'https://oauth2.googleapis.com/revoke',
-};
+// Conditionally import native modules only when not in Expo Go
+if (!isExpoGo) {
+  try {
+    const googleSigninModule = require('@react-native-google-signin/google-signin');
+    GoogleSignin = googleSigninModule.GoogleSignin;
+    isErrorWithCode = googleSigninModule.isErrorWithCode;
+    isSuccessResponse = googleSigninModule.isSuccessResponse;
+    statusCodes = googleSigninModule.statusCodes;
+  } catch (error) {
+    console.error('Failed to import Google Sign-In modules:', error);
+    // Set to null so we can check later
+    GoogleSignin = null;
+    isErrorWithCode = null;
+    isSuccessResponse = null;
+    statusCodes = null;
+  }
+}
+
+// Environment variable names - using different naming convention
+const WEB_OAUTH_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID;
+const IOS_OAUTH_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID;
+const ANDROID_OAUTH_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID;
+
+// Configuration state
+let isInitialized = false;
+
+/**
+ * Initialize Google Sign-In with platform-specific configuration
+ * Uses a different initialization strategy
+ */
+function initializeGoogleSignIn(): void {
+  if (isInitialized || !GoogleSignin) {
+    return;
+  }
+
+  // Validate web client ID is available (required for all platforms)
+  if (!WEB_OAUTH_CLIENT_ID) {
+    const errorMsg =
+      'Google Sign-In configuration error: EXPO_PUBLIC_GOOGLE_CLIENT_ID is not set.\n\n' +
+      'Please add it to your eas.json build profile under env.EXPO_PUBLIC_GOOGLE_CLIENT_ID';
+    console.error('❌', errorMsg);
+    throw new Error(errorMsg);
+  }
+
+  // For Android: Validate that Android client ID is set (used for package name matching)
+  if (Platform.OS === 'android' && !ANDROID_OAUTH_CLIENT_ID) {
+    console.warn(
+      '⚠️ EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID is not set.\n' +
+      'Android OAuth Client ID should be configured in Google Cloud Console with:\n' +
+      '- Package name: com.peliah.sitelytics\n' +
+      '- SHA-1 certificate fingerprint\n' +
+      'The webClientId will use the Web Client ID, which is correct.'
+    );
+  }
+
+  const signInConfig: {
+    webClientId: string;
+    iosClientId?: string;
+    offlineAccess?: boolean;
+    forceCodeForRefreshToken?: boolean;
+    scopes?: string[];
+  } = {
+    // Always use Web Client ID for webClientId parameter (standard approach)
+    // The Android client ID is matched automatically via package name + SHA-1
+    webClientId: WEB_OAUTH_CLIENT_ID,
+    // Disable offline access - we only need id_token
+    offlineAccess: false,
+    // Don't force code for refresh token
+    forceCodeForRefreshToken: false,
+    // Minimal scopes - only what's needed for authentication
+    scopes: [],
+  };
+
+  // Add iOS client ID if available and on iOS platform
+  if (Platform.OS === 'ios') {
+    if (IOS_OAUTH_CLIENT_ID) {
+      signInConfig.iosClientId = IOS_OAUTH_CLIENT_ID;
+      console.log('✅ iOS Client ID configured');
+    } else {
+      console.warn(
+        '⚠️ iOS Client ID not set. iOS sign-in may not work properly.\n' +
+        'Set EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID in eas.json'
+      );
+    }
+  }
+
+  // Log configuration for debugging
+  console.log('=== Google Sign-In Configuration ===');
+  console.log('Platform:', Platform.OS);
+  console.log('Web Client ID (webClientId):', WEB_OAUTH_CLIENT_ID.substring(0, 30) + '...');
+  if (Platform.OS === 'android') {
+    if (ANDROID_OAUTH_CLIENT_ID) {
+      console.log('Android Client ID (for package matching):', ANDROID_OAUTH_CLIENT_ID.substring(0, 30) + '...');
+      console.log('Note: Android OAuth Client ID must be configured in Google Cloud Console');
+      console.log('      with package name: com.peliah.sitelytics and SHA-1 fingerprint');
+    } else {
+      console.log('⚠️ Android Client ID not set - ensure it\'s configured in Google Cloud Console');
+    }
+  } else if (Platform.OS === 'ios' && IOS_OAUTH_CLIENT_ID) {
+    console.log('iOS Client ID:', IOS_OAUTH_CLIENT_ID.substring(0, 30) + '...');
+  }
+  console.log('===================================');
+
+  // Configure Google Sign-In
+  GoogleSignin.configure(signInConfig);
+  isInitialized = true;
+}
+
+/**
+ * Alternative Google Sign-In using expo-auth-session (works in Expo Go)
+ */
+
+/**
+ * Check if running in Expo Go (not supported)
+ */
+function checkExpoGo(): void {
+  const isExpoGo = Constants.executionEnvironment === 'storeClient';
+  if (isExpoGo) {
+    throw new Error(
+      'Native Google Sign-In requires a development build.\n\n' +
+      'Expo Go does not support native modules.\n\n' +
+      'To use Google Sign-In:\n' +
+      '1. Create a development build: eas build --profile development --platform android\n' +
+      '2. Install the development build on your device\n' +
+      '3. Run: npx expo start --dev-client'
+    );
+  }
+}
+
+/**
+ * Check Google Play Services (Android only)
+ */
+async function checkPlayServices(): Promise<void> {
+  if (Platform.OS !== 'android' || !GoogleSignin) {
+    return;
+  }
+
+  try {
+    await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+  } catch (error: any) {
+    if (isErrorWithCode && isErrorWithCode(error) && error.code === statusCodes?.PLAY_SERVICES_NOT_AVAILABLE) {
+      throw new Error(
+        'Google Play Services is not available or outdated.\n\n' +
+        'Please install or update Google Play Services from the Play Store.'
+      );
+    }
+    throw error;
+  }
+}
+
+/**
+ * Extract id_token from sign-in response with multiple fallback strategies
+ */
+async function extractIdToken(response: any): Promise<string> {
+  if (!GoogleSignin) {
+    throw new Error('Google Sign-In is not available');
+  }
+
+  // Strategy 1: Direct idToken in response
+  if (response?.data?.idToken) {
+    console.log('✅ Found id_token in response.data.idToken');
+    return response.data.idToken;
+  }
+
+  // Strategy 2: Check response.idToken directly
+  if (response?.idToken) {
+    console.log('✅ Found id_token in response.idToken');
+    return response.idToken;
+  }
+
+  // Strategy 3: Get tokens using getTokens() method
+  console.log('⚠️ id_token not in response, trying getTokens()...');
+  try {
+    const tokens = await GoogleSignin.getTokens();
+    if (tokens?.idToken) {
+      console.log('✅ Retrieved id_token from getTokens()');
+      return tokens.idToken;
+    }
+  } catch (tokenError) {
+    console.error('❌ Failed to get tokens:', tokenError);
+  }
+
+  // Strategy 4: Check current user
+  try {
+    const currentUser = await GoogleSignin.getCurrentUser();
+    if (currentUser?.idToken) {
+      console.log('✅ Retrieved id_token from getCurrentUser()');
+      return currentUser.idToken;
+    }
+  } catch (userError) {
+    console.error('❌ Failed to get current user:', userError);
+  }
+
+  // All strategies failed
+  throw new Error(
+    'Could not obtain id_token from Google Sign-In.\n\n' +
+    'Response structure: ' + JSON.stringify(response, null, 2)
+  );
+}
 
 /**
  * Google Authentication Service
- * Handles Google OAuth sign-in and retrieves id_token
  */
 export const googleAuthService = {
   /**
-   * Sign in with Google and get id_token
-   * @returns The id_token from Google
+   * Sign in with Google and return id_token
    */
   async signIn(): Promise<string> {
     try {
-      const redirectUri = AuthSession.makeRedirectUri({
-        scheme: 'siteauditaife',
-        path: 'oauth',
-      });
+      // Check if running in Expo Go
+      checkExpoGo();
 
-      const request = new AuthSession.AuthRequest({
-        clientId: GOOGLE_CLIENT_ID,
-        scopes: ['openid', 'profile', 'email'],
-        responseType: AuthSession.ResponseType.IdToken,
-        redirectUri,
-        extraParams: {},
-        additionalParameters: {},
-      });
-
-      const result = await request.promptAsync(discovery, {
-        useProxy: true,
-        showInRecents: true,
-      });
-
-      if (result.type === 'success') {
-        // Extract id_token from the response
-        const idToken = result.params.id_token;
-        
-        if (!idToken) {
-          throw new Error('No id_token received from Google');
-        }
-
-        return idToken;
-      } else if (result.type === 'error') {
-        throw new Error(result.error?.message || 'Google sign-in failed');
-      } else {
-        // User cancelled
-        throw new Error('Google sign-in was cancelled');
+      // Check if Google Sign-In is available
+      if (!GoogleSignin) {
+        throw new Error(
+          'Google Sign-In is not available.\n\n' +
+          'This could be because:\n' +
+          '1. The app is running in Expo Go (use a development build)\n' +
+          '2. The @react-native-google-signin/google-signin package is not properly installed\n' +
+          '3. The native module is not linked\n\n' +
+          'To fix this:\n' +
+          '1. Create a development build: eas build --profile development --platform android\n' +
+          '2. Or run: npx expo run:android (if using Expo SDK)'
+        );
       }
-    } catch (error) {
-      console.error('Google sign-in error:', error);
+
+      // Initialize configuration
+      initializeGoogleSignIn();
+
+      // Check Google Play Services (Android)
+      await checkPlayServices();
+
+      console.log('🚀 Starting Google Sign-In...');
+
+      // Always sign out first to ensure we get a fresh token
+      // This prevents using expired cached tokens
+      try {
+        const currentUser = await GoogleSignin.getCurrentUser();
+        if (currentUser) {
+          console.log('⚠️ User already signed in, signing out to get fresh token...');
+          try {
+            await GoogleSignin.signOut();
+            console.log('✅ Signed out successfully, will proceed with fresh sign-in');
+          } catch (signOutError) {
+            console.log('⚠️ Sign-out error (ignoring, will proceed anyway):', signOutError);
+          }
+        }
+      } catch {
+        // Not signed in or error checking, continue with sign-in flow
+        console.log('User not signed in, starting fresh sign-in flow...');
+      }
+
+      // Perform sign-in (this will show the Google sign-in UI)
+      const signInResponse = await GoogleSignin.signIn();
+
+      // Validate response
+      if (!isSuccessResponse(signInResponse)) {
+        throw new Error('Google sign-in was cancelled or failed.');
+      }
+
+      console.log('✅ Google Sign-In successful');
+      console.log('User Info:', {
+        id: signInResponse.data?.user?.id,
+        email: signInResponse.data?.user?.email,
+        name: signInResponse.data?.user?.name,
+      });
+
+      // Extract id_token using multiple strategies
+      const idToken = await extractIdToken(signInResponse);
+
+      if (!idToken) {
+        throw new Error('Google returned null id_token. Please try again.');
+      }
+
+      console.log('✅ Successfully obtained id_token');
+      console.log('ID Token length:', idToken.length);
+      return idToken;
+    } catch (error: any) {
+      console.error('❌ Google Sign-In error:', error);
+
+      // Handle specific error codes
+      if (isErrorWithCode(error)) {
+        switch (error.code) {
+          case statusCodes.SIGN_IN_CANCELLED:
+            throw new Error('Sign-in was cancelled by the user.');
+
+          case statusCodes.IN_PROGRESS:
+            throw new Error('Sign-in is already in progress. Please wait.');
+
+          case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
+            throw new Error(
+              'Google Play Services is not available or outdated.\n\n' +
+              'Please install or update Google Play Services from the Play Store.'
+            );
+
+          case statusCodes.SIGN_IN_REQUIRED:
+            throw new Error('Sign-in is required. Please try again.');
+
+          default:
+            // Check for DEVELOPER_ERROR (configuration issue)
+            const errorMessage = String(error.message || '').toLowerCase();
+            const errorCode = String(error.code || '');
+            const isConfigError =
+              errorMessage.includes('developer_error') ||
+              errorMessage.includes('10:') ||
+              errorCode === '10' ||
+              errorMessage.includes('non-recoverable') ||
+              errorMessage.includes('sign in failure');
+
+            if (isConfigError) {
+              let troubleshooting = '🔴 Google Sign-In Configuration Error\n\n';
+
+              if (Platform.OS === 'android') {
+                troubleshooting +=
+                  '📱 ANDROID SETUP:\n\n' +
+                  '1️⃣ Get SHA-1 Fingerprint:\n' +
+                  '   cd android && ./gradlew signingReport\n' +
+                  '   Look for "SHA1" under "Variant: debug"\n\n' +
+                  '2️⃣ Add SHA-1 to Google Cloud Console:\n' +
+                  '   • Go to: https://console.cloud.google.com/apis/credentials\n' +
+                  '   • Click your Android OAuth 2.0 Client ID\n' +
+                  '   • Add SHA-1 under "SHA-1 certificate fingerprints"\n' +
+                  '   • SAVE and WAIT 5-10 minutes\n\n' +
+                  '3️⃣ Verify Package Name:\n' +
+                  `   • App: ${Constants.expoConfig?.android?.package || 'com.peliah.sitelytics'}\n` +
+                  '   • Must match Google Cloud Console OAuth Client\n\n' +
+                  '4️⃣ Verify Client IDs:\n' +
+                  `   • Web: ${WEB_OAUTH_CLIENT_ID?.substring(0, 20)}...\n` +
+                  `   • Android: ${ANDROID_OAUTH_CLIENT_ID?.substring(0, 20) || 'NOT SET'}...\n` +
+                  '   • All should start with the SAME project number\n\n';
+              } else if (Platform.OS === 'ios') {
+                troubleshooting +=
+                  '📱 iOS SETUP:\n\n' +
+                  '1️⃣ Verify Bundle ID:\n' +
+                  `   • App: ${Constants.expoConfig?.ios?.bundleIdentifier || 'com.peliah.sitelytics'}\n` +
+                  '   • Must match Google Cloud Console OAuth Client\n\n' +
+                  '2️⃣ Verify iOS Client ID:\n' +
+                  `   • iOS Client ID: ${IOS_OAUTH_CLIENT_ID ? 'SET' : '❌ NOT SET'}\n` +
+                  '   • Must be from Google Cloud Console > iOS OAuth Client\n\n';
+              }
+
+              troubleshooting +=
+                '📚 Resources:\n' +
+                '   • https://react-native-google-signin.github.io/docs/setting-up/get-config-file\n' +
+                '   • https://react-native-google-signin.github.io/docs/troubleshooting\n';
+
+              throw new Error(troubleshooting);
+            }
+        }
+      }
+
+      // Re-throw if already an Error instance
       if (error instanceof Error) {
         throw error;
       }
-      throw new Error('Failed to sign in with Google');
+
+      throw new Error('Failed to sign in with Google. Please try again.');
     }
   },
 
   /**
-   * Get the current platform (ios or android)
+   * Sign out from Google
+   */
+  async signOut(): Promise<void> {
+    if (!GoogleSignin) {
+      console.warn('Google Sign-In not available');
+      return;
+    }
+
+    try {
+      await GoogleSignin.signOut();
+      console.log('✅ Successfully signed out from Google');
+    } catch (error) {
+      console.error('❌ Error signing out from Google:', error);
+      throw error;
+    }
+  },
+
+  /**
+    * Revoke access and sign out
+    */
+  async revokeAccess(): Promise<void> {
+    if (!GoogleSignin) {
+      console.warn('Google Sign-In not available');
+      return;
+    }
+
+    try {
+      await GoogleSignin.revokeAccess();
+      console.log('✅ Successfully revoked Google access');
+    } catch (error) {
+      console.error('❌ Error revoking Google access:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Get current platform
    */
   getPlatform(): 'ios' | 'android' {
+    // Import Platform dynamically if not already imported
+    // if (!Platform) {
+    //   try {
+    //     // Platform = require('react-native').Platform;
+    //   } catch {
+    //     return 'android'; // fallback
+    //   }
+    // }
     return Platform.OS === 'ios' ? 'ios' : 'android';
   },
-};
 
+  /**
+   * Check if service is available
+   */
+  isAvailable(): boolean {
+    const isExpoGo = Constants.executionEnvironment === 'storeClient';
+    if (isExpoGo) {
+      console.warn(
+        '⚠️ Native Google Sign-In requires a development build.\n' +
+        'Expo Go does not support native modules.'
+      );
+      return false;
+    }
+
+    if (!GoogleSignin) {
+      console.warn('⚠️ Google Sign-In module not loaded');
+      return false;
+    }
+
+    return true;
+  },
+};

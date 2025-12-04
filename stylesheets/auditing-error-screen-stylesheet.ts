@@ -6,8 +6,8 @@ const COLORS = {
   background: "#FFFFFF",
   textPrimary: "#111827",
   textSecondary: "#6B7280",
-  accent: "#F16049", 
-  accentTint: "#FEEAEA", 
+  accent: "#F16049",
+  accentTint: "#FEEAEA",
 };
 
 const styles = StyleSheet.create({
@@ -43,21 +43,19 @@ const styles = StyleSheet.create({
     color: COLORS.accent,
   },
 
- 
+
   title: {
     marginTop: 35,
     fontFamily: "RethinkSans-Bold",
     fontSize: 20,
-    fontWeight: "700",
     color: COLORS.textPrimary,
     textAlign: "center",
   },
 
   bodyPrimary: {
     marginTop: 18,
-    fontFamily: "RethinkSans-Regular",
-    fontSize: 14,
-    fontWeight: "400",
+    fontFamily: "RethinkSans-Medium",
+    fontSize: 16,
     color: COLORS.textSecondary,
     textAlign: "center",
     lineHeight: 20,
@@ -68,7 +66,6 @@ const styles = StyleSheet.create({
     marginTop: 14,
     fontFamily: "RethinkSans-Medium",
     fontSize: 14,
-    fontWeight: "600",
     color: COLORS.textPrimary,
     textAlign: "center",
     lineHeight: 20,
@@ -77,15 +74,35 @@ const styles = StyleSheet.create({
   bodySecondary: {
     marginTop: 20,
     fontFamily: "RethinkSans-Regular",
-    fontSize: 13,
-    fontWeight: "400",
+    fontSize: 16,
     color: COLORS.textSecondary,
     textAlign: "center",
     lineHeight: 18,
     paddingHorizontal: 10,
   },
 
- 
+
+  buttonContainer: {
+    width: "100%",
+    paddingHorizontal: "5%",
+    paddingBottom: 20,
+    paddingTop: 10,
+  },
+
+  tryAgainButton: {
+    width: "100%",
+    height: 52,
+    borderRadius: 12,
+    backgroundColor: "#ff5a3d",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  tryAgainButtonText: {
+    fontFamily: "RethinkSans-SemiBold",
+    fontSize: 16,
+    color: "#FFFFFF",
+  },
+
   buttonGroup: {
     width: "100%",
     marginBottom: 68,
@@ -108,7 +125,6 @@ const styles = StyleSheet.create({
   primaryButtonText: {
     fontFamily: "RethinkSans",
     fontSize: 16,
-    fontWeight: "600",
     color: "#FFFFFF",
   },
 
@@ -125,11 +141,10 @@ const styles = StyleSheet.create({
   secondaryButtonText: {
     fontFamily: "RethinkSans",
     fontSize: 16,
-    fontWeight: "600",
     color: COLORS.accent,
   },
 
- 
+
   fullWidth: {
     width: width - 56,
   },

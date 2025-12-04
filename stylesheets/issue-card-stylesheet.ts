@@ -40,7 +40,6 @@ export default StyleSheet.create({
   issueTitle: {
     fontFamily: "RethinkSans-SemiBold",
     fontSize: 14,
-    fontWeight: "700",
     color: "#111827",
   },
 
@@ -63,7 +62,6 @@ export default StyleSheet.create({
     fontFamily: "RethinkSans-Regular",
     fontSize: 13,
     color: "#3F5BD9",
-    fontWeight: "600",
   },
 
   right: {
@@ -82,7 +80,6 @@ export default StyleSheet.create({
   badgeText: {
     fontFamily: "RethinkSans-Medium",
     fontSize: 12,
-    fontWeight: "700",
   },
   viewDetailsInnerWrap: {
     flexDirection: "row", 
@@ -101,7 +98,6 @@ export default StyleSheet.create({
     
   },
   statusText: {
-    fontWeight: "600",
     fontFamily: "RethinkSans-Bold",
     fontSize: 14,
   },

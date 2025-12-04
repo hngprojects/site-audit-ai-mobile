@@ -1,13 +1,16 @@
 import { ThemedText } from '@/components/themed-text';
 import type { Notification } from '@/service/notifications';
-import { deleteNotification, getNotifications, markAsRead } from '@/service/notifications';
+import { deleteNotification, getNotifications, markAllAsRead, markAsRead } from '@/service/notifications';
 import styles from '@/stylesheets/notifications-stylesheet';
+import { useTranslation } from '@/utils/translations';
 import { Feather, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useCallback, useEffect, useState } from 'react';
-import { Alert, FlatList, Image, Platform, TextInput, TouchableOpacity, View } from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
+import { FlatList, Image, KeyboardAvoidingView, Platform, RefreshControl, TextInput, TouchableOpacity, View } from 'react-native';
 import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
+// import Toast from 'react-native-toast-message';
 
 const SkeletonCard = () => (
   <View style={[styles.card, styles.skeletonCard]}>
@@ -41,7 +44,7 @@ const NotificationItem = ({ item, onMarkRead, onDelete }: { item: Notification; 
           onPress={() => onMarkRead(item.id)}
         >
           <View style={styles.itemIconContainer}>
-              <Ionicons name="notifications-outline" size={24} color="blue" />
+            <Ionicons name="notifications-outline" size={24} color="blue" />
           </View>
 
           <View style={styles.cardContent}>
@@ -84,12 +87,14 @@ const NotificationItem = ({ item, onMarkRead, onDelete }: { item: Notification; 
 };
 
 export default function NotificationsScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
 
   const [isLoading, setIsLoading] = useState(true);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
 
   const load = useCallback(async () => {
     setIsLoading(true);
@@ -99,7 +104,7 @@ export default function NotificationsScreen() {
       setNotifications(data);
     } catch (error) {
       console.error('Notifications load error', error);
-      setError('Failed to load notifications');
+      setError(t('notifications.loadError'));
     } finally {
       setIsLoading(false);
     }
@@ -109,46 +114,76 @@ export default function NotificationsScreen() {
     load();
   }, [load]);
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await load();
+    setRefreshing(false);
+  };
+
   const markAllRead = async () => {
     try {
-      // update local state since backend is dummy
-      setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })));
+      const success = await markAllAsRead();
+      if (success) {
+        setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })));
+        Toast.show({
+          type: 'success',
+          text1: t('common.success'),
+          text2: t('notifications.markAllReadSuccess'),
+        });
+      }
     } catch (e) {
       console.error('Mark all read error', e);
+      Toast.show({
+        type: 'error',
+        text1: t('common.error'),
+        text2: t('notifications.markAllReadError'),
+      });
     }
   };
 
   const handleMarkRead = async (id: string) => {
     try {
-      const ok = await markAsRead(id);
+      const ok = await markAsRead([id]);
       if (ok) {
         setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, unread: false } : n)));
       }
     } catch (e) {
       console.error('Mark read error', e);
-      Alert.alert('Error', 'Could not mark notification as read');
+      Toast.show({
+        type: 'error',
+        text1: t('common.error'),
+        text2: t('notifications.markReadError'),
+      });
     }
   };
 
   const handleDelete = async (id: string) => {
-    Alert.alert('Delete', 'Are you sure you want to delete this notification?', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Delete', style: 'destructive', onPress: async () => {
-        try {
-          const ok = await deleteNotification(id);
-          if (ok) setNotifications((prev) => prev.filter((n) => n.id !== id));
-        } catch (e) {
-          console.error('Delete notification error', e);
-          Alert.alert('Error', 'Could not delete notification');
-        }
-      } },
-    ]);
+    // For confirmation dialogs, we'll keep using Alert for now as Toast doesn't support user interaction
+    // But we can show a toast after deletion
+    try {
+      const ok = await deleteNotification(id);
+      if (ok) {
+        setNotifications((prev) => prev.filter((n) => n.id !== id));
+        Toast.show({
+          type: 'success',
+          text1: t('common.success'),
+          text2: t('notifications.deleteSuccess'),
+        });
+      }
+    } catch (e) {
+      console.error('Delete notification error', e);
+      Toast.show({
+        type: 'error',
+        text1: t('common.error'),
+        text2: t('notifications.deleteError'),
+      });
+    }
   };
 
   if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
-        <ThemedText  type="title">Notification</ThemedText>
+        <ThemedText type="title">{t('notifications.title')}</ThemedText>
         <View style={styles.loadingPadding}>
           <SkeletonCard />
           <View style={{ height: 8 }} />
@@ -162,73 +197,84 @@ export default function NotificationsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {Platform.OS === "ios" ? 
-      (
-        <>
-        <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-            <Feather name="arrow-left" size={24} color="#1A2373" />
-        </TouchableOpacity>
-        <ThemedText style={styles.headerTitle} type="title" >Notification</ThemedText>
-        <TouchableOpacity style={styles.markAllButton} onPress={markAllRead} >
-          <ThemedText style={styles.markAllText}>Mark all as read</ThemedText>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.searchMargin}>
-        <View style={styles.searchContainer}>
-          <MaterialIcons name="search" size={18} color="#9BA1A6" />
-          <TextInput value={search} onChangeText={setSearch} placeholder="Search" placeholderTextColor="#C7C8C9" style={styles.searchInput} />
-        </View>
-      </View>
-      </>
-      ) : (
-        <>
-        <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-            <Feather name="arrow-left" size={24} color="#1A2373" />
-        </TouchableOpacity>
-        <ThemedText style={styles.androidheaderTitle} type="title" >Notification</ThemedText>
-        <TouchableOpacity style={styles.markAllButton} onPress={markAllRead} >
-          <ThemedText style={styles.markAllTextAndroid}>Mark all as read</ThemedText>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.searchMargin}>
-        <View style={styles.androidSearchContainer}>
-          <MaterialIcons name="search" size={18} color="#9BA1A6" />
-          <TextInput value={search} onChangeText={setSearch} placeholder="Search" placeholderTextColor="#C7C8C9" style={styles.searchInput} />
-        </View>
-      </View>
-      </>
-      )}
-
-      {error ? (
-        <View style={styles.errorPadding}>
-          <ThemedText>{error}</ThemedText>
-          <TouchableOpacity onPress={load} style={{ marginTop: 12 }}>
-            <ThemedText>Try again</ThemedText>
-          </TouchableOpacity>
-        </View>
-      ) : (
-        <FlatList
-          data={notifications.filter((n) => (
-            !search || n.title.toLowerCase().includes(search.toLowerCase()) || n.message.toLowerCase().includes(search.toLowerCase())
-          ))}
-          keyExtractor={(i) => i.id}
-          renderItem={({ item }) => <NotificationItem item={item} onMarkRead={handleMarkRead} onDelete={handleDelete} />}
-          ItemSeparatorComponent={() => <View style={styles.separator} />}
-          contentContainerStyle={styles.listContainer}
-          ListEmptyComponent={() => (
-            <View style={styles.emptyContainer}>
-              <View style={styles.emptyIconContainer}>
-                <Image source={require('@/assets/images/no-message-bell.png')} style={styles.emptyIcon} />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+      >
+        {Platform.OS === "ios" ?
+          (
+            <>
+              <View style={styles.header}>
+                <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+                  <Feather name="arrow-left" size={24} color="#1A2373" />
+                </TouchableOpacity>
+                <ThemedText style={styles.headerTitle} type="title" >{t('notifications.title')}</ThemedText>
+                <TouchableOpacity style={styles.markAllButton} onPress={markAllRead} >
+                  <ThemedText style={styles.markAllText}>{t('notifications.markAllRead')}</ThemedText>
+                </TouchableOpacity>
               </View>
-              <ThemedText type="subtitle" style={{ marginTop: 12 }}>No message yet</ThemedText>
-            </View>
+
+              <View style={styles.searchMargin}>
+                <View style={styles.searchContainer}>
+                  <MaterialIcons name="search" size={18} color="#9BA1A6" />
+                  <TextInput value={search} onChangeText={setSearch} placeholder="Search" placeholderTextColor="#C7C8C9" style={styles.searchInput} />
+                </View>
+              </View>
+            </>
+          ) : (
+            <>
+              <View style={styles.header}>
+                <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+                  <Feather name="arrow-left" size={24} color="#1A2373" />
+                </TouchableOpacity>
+                <ThemedText style={styles.androidheaderTitle} type="title" >Notification</ThemedText>
+                {notifications.length > 0 && (
+                  <TouchableOpacity style={styles.markAllButton} onPress={markAllRead} >
+                    <ThemedText style={styles.markAllTextAndroid}>Mark all as read</ThemedText>
+                  </TouchableOpacity>
+                )}
+              </View>
+
+              <View style={styles.searchMargin}>
+                <View style={styles.androidSearchContainer}>
+                  <MaterialIcons name="search" size={18} color="#9BA1A6" />
+                  <TextInput value={search} onChangeText={setSearch} placeholder={t('common.search')} placeholderTextColor="#C7C8C9" style={styles.searchInput} />
+                </View>
+              </View>
+            </>
           )}
-        />
-      )}
+
+        {error ? (
+          <View style={styles.errorPadding}>
+            <ThemedText>{error}</ThemedText>
+            <TouchableOpacity onPress={load} style={{ marginTop: 12 }}>
+              <ThemedText>{t('notifications.tryAgain')}</ThemedText>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <FlatList
+            data={notifications.filter((n) => (
+              !search || n.title.toLowerCase().includes(search.toLowerCase()) || n.message.toLowerCase().includes(search.toLowerCase())
+            ))}
+            keyExtractor={(i) => i.id}
+            renderItem={({ item }) => <NotificationItem item={item} onMarkRead={handleMarkRead} onDelete={handleDelete} />}
+            ItemSeparatorComponent={() => <View style={styles.separator} />}
+            contentContainerStyle={styles.listContainer}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+            ListEmptyComponent={() => (
+              <View style={styles.emptyContainer}>
+                <View style={styles.emptyIconContainer}>
+                  <Image source={require('@/assets/images/no-message-bell.png')} style={styles.emptyIcon} />
+                </View>
+                <ThemedText type="subtitle" style={{ marginTop: 12 }}>{t('notifications.noMessage')}</ThemedText>
+              </View>
+            )}
+          />
+        )}
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

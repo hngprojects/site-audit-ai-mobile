@@ -1,5 +1,7 @@
+import { useTranslation } from '@/utils/translations';
 import React, { useState, useEffect, useRef } from 'react';
-import { ActivityIndicator, TouchableOpacity, ScrollView, View, TextInput, Alert, Text } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, TouchableOpacity, ScrollView, View, TextInput, Text } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -9,6 +11,7 @@ import { useRouter } from 'expo-router';
 import styles from '@/stylesheets/delete-account-verification-stylesheet';
 
 const DeleteAccountVerificationContent = () => {
+  const { t } = useTranslation();
   const router = useRouter();
   const [code, setCode] = useState(['', '', '', '', '', '']);
   const [timer, setTimer] = useState(56);
@@ -58,7 +61,11 @@ const DeleteAccountVerificationContent = () => {
       // Verify code logic
       router.push('/(account)/delete-account-final-confirmation');
     } else {
-      Alert.alert('Error', 'Please enter the complete 6-digit code');
+      Toast.show({
+        type: 'error',
+        text1: t('common.error'),
+        text2: t('deleteAccount.codeRequired'),
+      });
     }
   };
 
@@ -66,29 +73,38 @@ const DeleteAccountVerificationContent = () => {
     setTimer(56);
     setCanResend(false);
     // Resend code logic
-    Alert.alert('Code Resent', 'A new verification code has been sent to your email');
+    Toast.show({
+      type: 'success',
+      text1: t('deleteAccount.codeResentTitle'),
+      text2: t('deleteAccount.codeResent'),
+    });
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView
-        style={styles.scrollContainer}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 100 }}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
       >
+        <ScrollView
+          style={styles.scrollContainer}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 100 }}
+        >
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
             <Feather name="arrow-left" size={24} color="#1A2373" />
           </TouchableOpacity>
           <View style={styles.titleContainer}>
-            <Text style={styles.title}>Delete Account</Text>
+            <Text style={styles.title}>{t('deleteAccount.title')}</Text>
           </View>
         </View>
 
         <View style={styles.content}>
-          <Text style={styles.mainTitle}>Verify your identity</Text>
+          <Text style={styles.mainTitle}>{t('deleteAccount.verifyIdentity')}</Text>
           <Text style={styles.subtitle}>
-            For security purposes, please enter the 6-digit code sent to da*********i20@gmail.com
+            {t('deleteAccount.subtitle')}
           </Text>
 
           <View style={styles.codeContainer}>
@@ -101,7 +117,7 @@ const DeleteAccountVerificationContent = () => {
                 style={styles.codeInput}
                 value={digit}
                 onChangeText={(text) => handleCodeChange(text, index)}
-                placeholder="*"
+                placeholder={t('deleteAccount.codePlaceholder')}
                 placeholderTextColor="#B9B9B9"
                 keyboardType="numeric"
                 maxLength={1}
@@ -112,14 +128,14 @@ const DeleteAccountVerificationContent = () => {
 
           <View style={styles.resendContainer}>
             <View style={styles.resendTextContainer}>
-              <Text style={styles.resendText}>Didn&lsquo;t receive a code?</Text>
+              <Text style={styles.resendText}>{t('deleteAccount.didntReceive')}</Text>
               <TouchableOpacity onPress={handleResend} disabled={!canResend}>
-                <Text style={[styles.resendLink, !canResend && styles.resendLinkDisabled]}>Resend</Text>
+                <Text style={[styles.resendLink, !canResend && styles.resendLinkDisabled]}>{t('deleteAccount.resend')}</Text>
               </TouchableOpacity>
             </View>
 
             {!canResend && (
-              <Text style={styles.timerText}>Resend code in [0:{timer.toString().padStart(2, '0')}]</Text>
+              <Text style={styles.timerText}>{t('deleteAccount.resendIn')} [0:{timer.toString().padStart(2, '0')}]</Text>
             )}
           </View>
         </View>
@@ -132,13 +148,14 @@ const DeleteAccountVerificationContent = () => {
           disabled={code.every(digit => digit === '')}
         >
           <Text style={[styles.verifyButtonText, code.some(digit => digit !== '') && styles.verifyButtonTextActive]}>
-            Verify and Confirm Deletion
+            {t('deleteAccount.verifyAndConfirm')}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.cancelButton} onPress={() => router.back()}>
-          <Text style={styles.cancelButtonText}>Cancel</Text>
+          <Text style={styles.cancelButtonText}>{t('common.cancel')}</Text>
         </TouchableOpacity>
       </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };

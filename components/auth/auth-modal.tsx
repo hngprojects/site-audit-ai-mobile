@@ -1,4 +1,6 @@
 import { useAuth } from '@/hooks/use-auth';
+import { appleAuthService } from '@/lib/apple-auth-service';
+import { RedirectService } from '@/lib/scan-service';
 import styles from '@/stylesheets/profile-stylesheet';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -8,25 +10,26 @@ import {
   Image,
   Keyboard,
   Modal,
-  Platform,
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { googleAuthService } from '../../lib/google-auth-service';
 
 interface AuthModalProps {
   visible: boolean;
   onClose: () => void;
   redirect?: string;
+  dismissible?: boolean;
 }
 
-const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose, redirect }) => {
+const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose, redirect, dismissible = true }) => {
   const [slideAnim] = useState(new Animated.Value(0));
   const router = useRouter();
   const inset = useSafeAreaInsets();
-  const { signInWithGoogle, isLoading, isAuthenticated } = useAuth();
+  const { signInWithGoogle, signInWithApple, isLoading, isAuthenticated } = useAuth();
 
   useEffect(() => {
     if (visible) {
@@ -48,13 +51,25 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose, redirect }) => 
   // Close modal when user successfully authenticates
   useEffect(() => {
     if (isAuthenticated && visible) {
-      if (redirect) {
-        (router.push as any)({ pathname: redirect });
+      const validatedRedirect = RedirectService.validateRedirect(redirect);
+
+      if (validatedRedirect) {
+        // Use secure redirect parsing
+        const { pathname, params } = RedirectService.parseRedirectUrl(validatedRedirect);
+
+        router.push({
+          pathname: pathname as any,
+          params: params
+        });
       } else {
-        onClose();
+        // Fallback to default route if redirect is invalid
+        router.push('/');
       }
+
+      // Clear any stored redirects
+      RedirectService.clearStoredRedirect();
     }
-  }, [isAuthenticated, visible, onClose, redirect, router]);
+  }, [isAuthenticated, visible, redirect, router]);
 
   const handleGoogleLogin = async () => {
     try {
@@ -66,19 +81,28 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose, redirect }) => 
     }
   };
 
-  const handleAppleLogin = () => {
-    console.log('Apple login pressed');
-    onClose();
-  };
-
-  const handleSignUp = () => {
-    onClose();
-    router.push({ pathname: '/(auth)/sign-up', params: redirect ? { redirect } : {} });
+  const handleAppleLogin = async () => {
+    try {
+      await signInWithApple();
+      // Modal will close automatically when isAuthenticated becomes true
+    } catch (error) {
+      // Error is handled by the store and shown via Alert
+      console.error('Apple sign-in error:', error);
+    }
   };
 
   const handleSignIn = () => {
     onClose();
-    router.push({ pathname: '/(auth)/sign-in', params: redirect ? { redirect } : {} });
+
+    // Store redirect for persistence across navigation
+    if (redirect) {
+      RedirectService.storeRedirect(redirect);
+    }
+
+    router.push({
+      pathname: '/(auth)/sign-in',
+      params: redirect ? { redirect } : {}
+    });
   };
 
   const translateY = slideAnim.interpolate({
@@ -100,7 +124,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose, redirect }) => 
     >
       <TouchableWithoutFeedback onPress={handleOverlayPress}>
         <View style={styles.modalOverlay}>
-          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <TouchableWithoutFeedback onPress={() => { }}>
             <Animated.View
               style={[
                 styles.modalContent,
@@ -109,6 +133,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose, redirect }) => 
                   paddingBottom: inset.bottom + 20,
                 },
               ]}
+              onStartShouldSetResponder={() => true}
             >
               <View style={styles.modalHeader}>
                 <View style={styles.dragHandle} />
@@ -123,46 +148,41 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose, redirect }) => 
               </View>
 
               <View style={styles.buttonsContainer}>
-                <TouchableOpacity
-                  style={[styles.socialButton, isLoading && { opacity: 0.6 }]}
-                  onPress={handleGoogleLogin}
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <ActivityIndicator size="small" color="#1c1c1c" style={{ marginRight: 12 }} />
-                  ) : (
-                    <Image
-                      source={require('../../assets/images/google.png')}
-                      style={styles.socialIcon}
-                    />
-                  )}
-                  <Text style={styles.socialButtonText}>Continue with Google</Text>
-                </TouchableOpacity>
-
-                {Platform.OS === "ios" && (
-                <TouchableOpacity
-                  style={styles.socialButton}
-                  onPress={handleAppleLogin}
-                >
-                  <Image
-                    source={require('../../assets/images/apple.png')}
-                    style={styles.appleIcon}
-                  />
-                  <Text style={styles.socialButtonText}>Continue with Apple</Text>
-                </TouchableOpacity>
+                {googleAuthService.isAvailable() && (
+                  <TouchableOpacity
+                    style={[styles.socialButton, isLoading && { opacity: 0.6 }]}
+                    onPress={handleGoogleLogin}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <ActivityIndicator size="small" color="#1c1c1c" style={{ marginRight: 12 }} />
+                    ) : (
+                      <Image
+                        source={require('../../assets/images/google.png')}
+                        style={styles.socialIcon}
+                      />
+                    )}
+                    <Text style={styles.socialButtonText}>Continue with Google</Text>
+                  </TouchableOpacity>
                 )}
 
-
-                <TouchableOpacity
-                  style={styles.socialButton}
-                  onPress={handleSignUp}
-                >
-                  <Image
-                    source={require('../../assets/images/Envelope.png')}
-                    style={styles.socialIcon}
-                  />
-                  <Text style={styles.emailButtonSecondaryText}>Sign up with email</Text>
-                </TouchableOpacity>
+                {appleAuthService.isAvailable() && (
+                  <TouchableOpacity
+                    style={[styles.socialButton, isLoading && { opacity: 0.6 }]}
+                    onPress={handleAppleLogin}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <ActivityIndicator size="small" color="#1c1c1c" style={{ marginRight: 12 }} />
+                    ) : (
+                      <Image
+                        source={require('../../assets/images/apple.png')}
+                        style={styles.appleIcon}
+                      />
+                    )}
+                    <Text style={styles.socialButtonText}>Continue with Apple</Text>
+                  </TouchableOpacity>
+                )}
 
                 <TouchableOpacity
                   style={styles.socialButton}
@@ -172,8 +192,19 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose, redirect }) => 
                     source={require('../../assets/images/Envelope.png')}
                     style={styles.socialIcon}
                   />
-                  <Text style={styles.emailButtonSecondaryText}>Sign in with email</Text>
+                  <Text style={styles.emailButtonSecondaryText}>Continue with email</Text>
                 </TouchableOpacity>
+
+                {/* <TouchableOpacity
+                  style={styles.socialButton}
+                  onPress={handleSignIn}
+                >
+                  <Image
+                    source={require('../../assets/images/Envelope.png')}
+                    style={styles.socialIcon}
+                  />
+                  <Text style={styles.emailButtonSecondaryText}>Sign in with email</Text>
+                </TouchableOpacity> */}
               </View>
 
               <View style={styles.footer}>

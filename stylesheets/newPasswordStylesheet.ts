@@ -12,21 +12,22 @@ export default StyleSheet.create({
 
   title: {
     fontSize: 24,
-    fontWeight: "700",
     marginBottom: 5,
   },
   headerSection: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 25
+        marginBottom: 25,
+        justifyContent: 'center',
     },
     backarrow: {
-        marginRight: 75,
-        marginLeft: 15,
+        position: 'absolute',
+        left: 16,
     },
     headerText: {
          fontSize: 20,
-        fontFamily: "RethinkSans-Bold"
+        fontFamily: "RethinkSans-Bold",
+        textAlign: 'center',
     },
 
   subTitle: {
@@ -68,7 +69,6 @@ export default StyleSheet.create({
   resetBtnText: {
     textAlign: "center",
     color: "#FFF",
-    fontWeight: "700",
     fontSize: 16,
   },
   errorText: {

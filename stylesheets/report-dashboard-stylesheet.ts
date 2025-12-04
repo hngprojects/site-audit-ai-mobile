@@ -26,10 +26,7 @@ const style = StyleSheet.create({
 
   pageTitle: {
     fontSize: 19,
-    fontWeight: "700",
     color: "#111",
-    marginLeft: 50,
-    marginHorizontal: 20,
     fontFamily: "RethinkSans-Bold",
   },
 
@@ -62,7 +59,6 @@ const style = StyleSheet.create({
 
   scoreText: {
     fontSize: 36,
-    fontWeight: "800",
     marginTop: 4,
     fontFamily: "RethinkSans-Bold",
     alignItems: "center",
@@ -73,7 +69,6 @@ const style = StyleSheet.create({
   statusText: {
     fontSize: 20,
     marginTop: 4,
-    fontWeight: "700",
     fontFamily: "RethinkSans",
   },
 
@@ -101,7 +96,6 @@ const style = StyleSheet.create({
     color: "#FFF",
     textAlign: "center",
     fontSize: 18,
-    fontWeight: "700",
     fontFamily: "RethinkSans",
   },
 
@@ -109,21 +103,19 @@ const style = StyleSheet.create({
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.45)",
-    justifyContent: "flex-end", 
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   modalBox: {
     width: "90%",
-    alignSelf: "center",
     backgroundColor: "#FFF",
     borderRadius: 18,
     padding: 22,
-    marginBottom: "25%", 
   },
 
   modalTitle: {
     fontSize: 20,
-    fontWeight: "700",
     fontFamily: "RethinkSans-Bold",
     marginBottom: 6,
     marginTop: 10
@@ -145,7 +137,6 @@ const style = StyleSheet.create({
   modalButtonText: {
     color: "#FFF",
     fontSize: 16,
-    fontWeight: "700",
     textAlign: "center",
     fontFamily: "RethinkSans-Bold",
   },

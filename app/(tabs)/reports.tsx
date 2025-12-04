@@ -1,13 +1,19 @@
+import { startScan } from "@/actions/scan-actions";
+import DeleteConfirmationSheet from "@/components/delete-confirmation-sheet";
+import EditUrlSheet from "@/components/edit-url-sheet";
 import { useSitesStore } from "@/store/sites-store";
 import styles from "@/stylesheets/report-screen-stylesheet";
 import { ReportItemProps, Status } from "@/type";
+import { useTranslation } from "@/utils/translations";
+import { normalizeUrl } from "@/utils/url-validation";
 import { MaterialIcons } from '@expo/vector-icons';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from "expo-router";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
-  Alert,
   FlatList,
+  KeyboardAvoidingView,
+  Platform,
   Text,
   TextInput,
   TouchableOpacity,
@@ -16,6 +22,7 @@ import {
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Toast from 'react-native-toast-message';
 
 const SkeletonCard = () => (
   <View style={styles.skeletonCard}>
@@ -40,22 +47,24 @@ interface SwipeableRowProps {
 
 const SwipeableRow: React.FC<SwipeableRowProps> = ({ item, url, onDelete, onEdit, onPress }) => {
   const swipeableRef = React.useRef<React.ComponentRef<typeof ReanimatedSwipeable>>(null);
+  const { t } = useTranslation();
 
   const renderRightActions = (_progress: any, _dragX: any) => (
+
     <View style={styles.rightActions}>
       <TouchableOpacity style={styles.editAction} onPress={() => {
         swipeableRef.current?.close();
         onEdit();
       }}>
         <MaterialIcons name="edit" size={20} color="#fff" />
-        <Text style={styles.actionText}>Edit</Text>
+        <Text style={styles.actionText}>{t('common.edit')}</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.deleteAction} onPress={() => {
         swipeableRef.current?.close();
         onDelete();
       }}>
         <MaterialIcons name="delete" size={20} color="#494949" />
-        <Text style={styles.actionText}>Delete</Text>
+        <Text style={styles.actionTextDelete}>{t('common.delete')}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -78,7 +87,7 @@ const SwipeableRow: React.FC<SwipeableRowProps> = ({ item, url, onDelete, onEdit
               <Text style={styles.urlText} numberOfLines={1}>{url}</Text>
               <Text style={styles.scanDateText}>{item.scanDate}</Text>
             </View>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.menuButton}
               onPress={handleMenuPress}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
@@ -93,11 +102,17 @@ const SwipeableRow: React.FC<SwipeableRowProps> = ({ item, url, onDelete, onEdit
 };
 
 const ReportsScreen: React.FC = () => {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const [search, setSearch] = React.useState("");
+  const [deleteSheetVisible, setDeleteSheetVisible] = useState(false);
+  const [editSheetVisible, setEditSheetVisible] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<{ siteId: string; url: string } | null>(null);
+  const [itemToEdit, setItemToEdit] = useState<{ siteId: string; url: string } | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
   const router = useRouter();
-  
-  const { sites, isLoading, fetchSites, deleteSite } = useSitesStore();
+
+  const { sites, isLoading, fetchSites, deleteSite, createSite } = useSitesStore();
 
   useEffect(() => {
     fetchSites();
@@ -106,10 +121,10 @@ const ReportsScreen: React.FC = () => {
   const formatDate = (dateString?: string): string => {
     if (!dateString) return 'N/A';
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric', 
-      year: 'numeric' 
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
     });
   };
 
@@ -126,11 +141,11 @@ const ReportsScreen: React.FC = () => {
     return {
       siteId: site.id,
       url: site.root_url || '',
-      domain,
+      domain: domain || 'N/A', // Ensure domain is always a string
       score: 0,
       status: getStatusFromScore(undefined),
       scanDate: formatDate(site.created_at),
-      onPress: () => {},
+      onPress: () => { },
     };
   };
 
@@ -138,54 +153,125 @@ const ReportsScreen: React.FC = () => {
     .filter((site) => site.status !== 'deleted')
     .map(mapSiteToReportItem);
 
-  const filteredData = reportData.filter(item =>
-    item.domain.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredData = React.useMemo(() => {
+    try {
+      return reportData.filter(item => {
+        const domain = (item.domain || '').toString();
+        const searchTerm = (search || '').toString();
+        return domain.toLowerCase().includes(searchTerm.toLowerCase());
+      });
+    } catch (error) {
+      console.error('Error filtering search results:', error);
+      // Return all data if filtering fails
+      return reportData;
+    }
+  }, [reportData, search]);
 
-  const handleDelete = (siteId: string, domain: string) => {
-    Alert.alert('Delete', 'Are you sure you want to delete this report?', [
-      { text: 'Cancel', style: 'cancel' },
-      { 
-        text: 'Delete', 
-        style: 'destructive', 
-        onPress: () => {
-          deleteSite(siteId).catch((error) => {
-            Alert.alert('Error', error instanceof Error ? error.message : 'Failed to delete report');
-          });
-        }
-      },
-    ]);
+  const handleDelete = (siteId: string, url: string) => {
+    setItemToDelete({ siteId, url });
+    setDeleteSheetVisible(true);
+  };
+
+  const confirmDelete = () => {
+    if (itemToDelete) {
+      deleteSite(itemToDelete.siteId).catch((error) => {
+        Toast.show({
+          type: 'error',
+          text1: t('common.error'),
+          text2: error instanceof Error ? error.message : t('reports.deleteError'),
+        });
+      });
+      setItemToDelete(null);
+    }
+  };
+
+  const closeDeleteSheet = () => {
+    setDeleteSheetVisible(false);
+    setItemToDelete(null);
   };
 
   const handleEdit = (item: typeof filteredData[0]) => {
-    // TODO: Implement edit functionality
-    Alert.alert('Edit', `Edit functionality for ${item.domain} will be implemented soon.`);
+    setItemToEdit({ siteId: item.siteId, url: item.url });
+    setEditSheetVisible(true);
+  };
+
+  const handleEditConfirm = async (newUrl: string) => {
+    if (!itemToEdit) return;
+
+    setIsEditing(true);
+    try {
+      // First, mark the old site as inactive (delete)
+      await deleteSite(itemToEdit.siteId);
+
+      // Normalize the URL
+      const normalizedUrl = normalizeUrl(newUrl.trim());
+
+      // Then, create the new site
+      await createSite(normalizedUrl);
+
+      // Start a new scan
+      const scanResponse = await startScan(normalizedUrl);
+
+      // Refresh the sites list
+      await fetchSites();
+
+      // Close the sheet
+      setEditSheetVisible(false);
+      setItemToEdit(null);
+
+      // Navigate to the auditing screen
+      router.push({
+        pathname: "/(main)/auditing-screen",
+        params: {
+          url: normalizedUrl,
+          jobId: scanResponse.job_id,
+        },
+      });
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: t('common.error'),
+        text2: error instanceof Error ? error.message : t('reports.updateError'),
+      });
+    } finally {
+      setIsEditing(false);
+    }
+  };
+
+  const closeEditSheet = () => {
+    setEditSheetVisible(false);
+    setItemToEdit(null);
   };
 
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <View
-        style={[
-          styles.container,
-          { paddingTop: insets.top, paddingBottom: insets.bottom },
-        ]}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
       >
+        <View
+          style={[
+            styles.container,
+            { paddingTop: insets.top, paddingBottom: insets.bottom },
+          ]}
+        >
         <View style={styles.headerWrap}>
-          <Text style={styles.title}>Report</Text>
+          <Text style={styles.title}>{t('reports.title')}</Text>
         </View>
 
         <View style={styles.searchContainer}>
           <Ionicons name="search" size={24} color="#c0c0c0ff" />
           <TextInput
-            placeholder="Search"
+            placeholder={t('common.search')}
             placeholderTextColor="#9CA3AF"
             style={styles.searchText}
             onChangeText={x => setSearch(x)}
             value={search}
           />
         </View>
-        
+
 
         {isLoading ? (
           <View style={styles.listWrap}>
@@ -208,18 +294,19 @@ const ReportsScreen: React.FC = () => {
                 <SwipeableRow
                   item={item}
                   url={item.url}
-                  onDelete={() => handleDelete(item.siteId, item.domain)}
+                  onDelete={() => handleDelete(item.siteId, item.url)}
                   onEdit={() => handleEdit(item)}
-                  onPress={() => router.push({
-                    pathname: "../(reports)/report-dashboard", 
-                    params: {
-                      domain: item.domain,
-                      score: String(item.score),
-                      status: item.status,
-                      scanDate: item.scanDate,
-                      siteId: item.siteId,
-                    }
-                  })}
+                  onPress={() => {
+                    // Since we don't have jobId for historical scans, navigate to auditing screen to re-run
+                    router.push({
+                      pathname: "/(main)/auditing-screen",
+                      params: {
+                        url: item.url,
+                        isReRun: 'true',
+                        fromReports: 'true'
+                      }
+                    });
+                  }}
                 />
               );
             }}
@@ -227,22 +314,38 @@ const ReportsScreen: React.FC = () => {
             ListFooterComponent={<View style={styles.footerSpacer} />}
             ListEmptyComponent={
               <View style={{ paddingVertical: 40, alignItems: 'center' }}>
-                <Text style={{ color: '#9CA3AF', fontSize: 14 }}>No reports found</Text>
+                <Text style={{ color: '#9CA3AF', fontSize: 14 }}>{t('reports.noReports')}</Text>
               </View>
             }
           />
         )}
 
         <View style={[styles.bottomButtonContainer, { paddingBottom: Math.max(insets.bottom, 20) }]}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.startNewScanButton}
             onPress={() => router.push('/(tabs)/')}
             activeOpacity={0.8}
           >
-            <Text style={styles.startNewScanText}>Start New Scan</Text>
+            <Text style={styles.startNewScanText}>{t('reports.startNewScan')}</Text>
           </TouchableOpacity>
         </View>
+
+        <DeleteConfirmationSheet
+          visible={deleteSheetVisible}
+          onClose={closeDeleteSheet}
+          onConfirm={confirmDelete}
+          url={itemToDelete?.url}
+        />
+
+        <EditUrlSheet
+          visible={editSheetVisible}
+          onClose={closeEditSheet}
+          onConfirm={handleEditConfirm}
+          currentUrl={itemToEdit?.url || ''}
+          isLoading={isEditing}
+        />
       </View>
+      </KeyboardAvoidingView>
     </GestureHandlerRootView>
   );
 };

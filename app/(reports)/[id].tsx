@@ -1,44 +1,94 @@
+import { getScanIssues } from '@/actions/scan-actions';
+import type { IssuesResult } from '@/lib/scan-service';
 import { useSelectedIssuesStore } from '@/store/audit-summary-selected-issue-store';
 import { useAuditInfoStore } from '@/store/audit-website-details-store';
 import styles, { reportColors } from '@/stylesheets/single-issue-detail-screen-stylesheet';
 import { Status } from '@/type';
+import { useTranslation } from '@/utils/translations';
 import { AntDesign, Feather, Ionicons } from '@expo/vector-icons';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useMemo } from 'react';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 
 
 
 const SingleIssueDetailScreen = () => {
+    const { t } = useTranslation();
     const inset = useSafeAreaInsets();
     const router = useRouter();
 
-    const { getAuditInfo } = useAuditInfoStore();
-    const { addIssue, availableIssues } = useSelectedIssuesStore();
+    const { getAuditInfo, setAuditInfo } = useAuditInfoStore();
+    const { addIssue, setFullIssuesData } = useSelectedIssuesStore();
 
-    const { domain, status, score, scanDate,} = getAuditInfo();
+    const [issuesData, setIssuesData] = useState<IssuesResult | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    const { domain, status, score, scanDate } = getAuditInfo();
 
     const params = useLocalSearchParams();
+    const categoryKey = Array.isArray(params.id) ? params.id[0] : params.id;
+    const jobId = Array.isArray(params.jobId) ? params.jobId[0] : params.jobId;
 
-    const { id, businessBenefits: _businessBenefits, impactMessage: _impactMessage } = params;
+    const category = issuesData?.categories.find(cat => cat.key === categoryKey);
 
-    const businessBenefitsStr = Array.isArray(_businessBenefits) ? _businessBenefits[0] : _businessBenefits;
-    const impactMessageStr = Array.isArray(_impactMessage) ? _impactMessage[0] : _impactMessage;
+    useEffect(() => {
+        const fetchIssues = async () => {
+            if (!jobId) {
+                setError('Job ID is required');
+                setIsLoading(false);
+                return;
+            }
 
-    const issue = useMemo(() => availableIssues.find(iss => iss.id === id), [availableIssues, id]);
+            try {
+                const result = await getScanIssues(jobId);
+                setIssuesData(result);
+                setFullIssuesData(result); // Save full data to store
 
-    const title = issue?.title || 'Unknown';
-    const miniscore = issue?.score || '0';
-    const description = issue?.description || 'No description';
-    const ministatus = issue?.status || 'Warning';
+                // Update audit info with overall data
+                setAuditInfo({
+                    domain: domain || '', // Keep existing domain
+                    status: result.website_score >= 80 ? 'Good' : result.website_score >= 50 ? 'Warning' : 'Critical',
+                    score: String(result.website_score),
+                    scanDate: new Date(result.scan_date).toLocaleDateString(),
+                });
+            } catch (err) {
+                setError(err instanceof Error ? err.message : 'Failed to load issue details');
+            } finally {
+                setIsLoading(false);
+            }
+        };
 
-    const businessBenefits = businessBenefitsStr ? JSON.parse(businessBenefitsStr) : [];
-    const impactMessage = impactMessageStr || '';
+        fetchIssues();
+    }, [jobId, setAuditInfo, domain]);
 
-    console.log(id, ministatus)
+    if (isLoading) {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <ActivityIndicator size="large" />
+            </View>
+        );
+    }
+
+    if (error || !category) {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
+                <Text style={{ textAlign: 'center', color: 'red' }}>
+                    {error || 'Category not found'}
+                </Text>
+            </View>
+        );
+    }
+
+    const title = category.title;
+    const description = category.description;
+    const categoryScore = category.score;
+    const businessBenefits = category.business_impact;
+    const suggestions = category.suggestion;
+    const problems = category.problems;
 
 
     const statusColor = (s: Status) =>
@@ -48,50 +98,40 @@ const SingleIssueDetailScreen = () => {
 
 
 
-        // Suppose numericScore is between 0-100
-const scoreStr = Array.isArray(miniscore) ? miniscore[0] : miniscore;
-const numericScore = parseInt(scoreStr, 10);
+    const numericScore = categoryScore;
 
-const scoreStatus =
-  numericScore <= 49 ? "Critical" :
-  numericScore <= 69 ? "Warning" :
-  "Good";
+    const scoreStatus =
+      numericScore <= 49 ? "Critical" :
+      numericScore <= 69 ? "Warning" :
+      "Good";
 
-const bgColor =
-  scoreStatus === "Good"
-    ? "rgba(14, 164, 114, 0.2)"
-    : scoreStatus === "Warning"
-    ? "rgba(255, 155, 46, 0.2)"
-    : "rgba(215, 45, 45, 0.2)";
+    const bgColor =
+      scoreStatus === "Good"
+        ? "rgba(14, 164, 114, 0.2)"
+        : scoreStatus === "Warning"
+        ? "rgba(255, 155, 46, 0.2)"
+        : "rgba(215, 45, 45, 0.2)";
 
-const fgColor =
-  scoreStatus === "Good"
-    ? "#0EA472"
-    : scoreStatus === "Warning"
-    ? "#FF9B2E"
-    : "#D72D2D";
+    const fgColor =
+      scoreStatus === "Good"
+        ? "#0EA472"
+        : scoreStatus === "Warning"
+        ? "#FF9B2E"
+        : "#D72D2D";
 
-
-const containerWidth = 200; 
-const progressWidth = (numericScore / 100) * containerWidth;
+    const progressWidth = `${numericScore}%`;
 
 
 const hireAPro = () => {
-  const rawId = Array.isArray(params.id) ? params.id[0] : params.id;
-const rawTitle = Array.isArray(params.title) ? params.title[0] : params.title;
-const rawMiniScore = Array.isArray(params.score) ? params.score[0] : params.score;
-const rawMiniStatus = Array.isArray(params.status) ? params.status[0] : params.status;
-const rawDescription = Array.isArray(params.description) ? params.description[0] : params.description;
-
   try {
     addIssue({
-      id: rawId,
-      title: rawTitle,
-      score: rawMiniScore,
-      status: rawMiniStatus,
-      description: rawDescription,
-   });
-    
+      id: categoryKey,
+      title: title,
+      score: String(categoryScore),
+      status: scoreStatus,
+      description: description,
+    });
+
     //navigate to  fix/hire professional
     router.push("/(hireRequest)/hire-request");
   } catch (error) {
@@ -110,12 +150,15 @@ const rawDescription = Array.isArray(params.description) ? params.description[0]
         flex: 1
     }}>
         <ScrollView>
-            <View style={{flexDirection: 'row', alignItems: 'center', gap: 20, marginBottom: 20,  paddingHorizontal: 20, paddingTop: 10, marginTop: 35,}}>
-            <TouchableOpacity onPress={() => router.back()}>
+        <View style={{position: 'relative', marginBottom: 20, paddingHorizontal: 20, paddingTop: 10, marginTop: 35,}}>
+            <TouchableOpacity
+                onPress={() => router.back()}
+                style={{position: 'absolute', left: 20, zIndex: 1}}
+            >
                 <Ionicons name="arrow-back-sharp" size={24} color="black" />
             </TouchableOpacity>
-            <Text style={styles.pageTitle}>Audit Summary</Text>
-            </View>
+            <Text style={styles.pageTitle}>{t('issueDetail.auditSummary')}</Text>
+        </View>
             
             
             <View style={{
@@ -150,7 +193,7 @@ const rawDescription = Array.isArray(params.description) ? params.description[0]
                   onPress={() => router.push({ pathname: '/(main)/auditing-screen', params: { url: domain, isReRun: 'true' } })}
                 >
                   <AntDesign name="reload" size={15} color="red" />
-                  <Text style={{color: "red", alignItems: "center", ...styles.domainText, fontSize: 13}}>Re-run audit</Text>
+                  <Text style={{color: "red", alignItems: "center", ...styles.domainText, fontSize: 13}}>{t('issueDetail.reRunAudit')}</Text>
                 </TouchableOpacity>
             </View>
             
@@ -167,13 +210,13 @@ const rawDescription = Array.isArray(params.description) ? params.description[0]
                         ...styles.cardLabel, 
                         color: "#000"
                     }}>
-                        Website Score
+                        {t('issueDetail.websiteScore')}
                     </Text>
                 <Text style={{
                     ...styles.cardLabel, 
                     color: "#dfdfdfff", 
                     marginTop: 5}}>
-                        Scan Date: {scanDate}
+                        {t('issueDetail.scanDate')}: {scanDate}
                 </Text>
                 <Text style={{
                     color: "#000", 
@@ -181,9 +224,9 @@ const rawDescription = Array.isArray(params.description) ? params.description[0]
                     fontSize: 13, 
                     marginTop: 20, 
                 }}>
-                    {status === "low" ? "Your website is performing poorly. Immediate improvements are needed to enhance user experience and SEO." : 
-                    status === "high" ? "Great job! Your website is performing well. Keep up the good work to maintain and further enhance user experience and SEO. Fix the issues below to make it even better."  : 
-                    "Your website has an average performance. There is room for improvement to boost user experience and SEO." }
+                    {status === "low" ? t('reportDashboard.statusCritical') : 
+                    status === "high" ? t('reportDashboard.statusGood') : 
+                    t('reportDashboard.statusWarning')}
                 </Text>
         </View>
 
@@ -210,7 +253,7 @@ const rawDescription = Array.isArray(params.description) ? params.description[0]
     <Text style={{
       ...styles.usabilityText
     }}>
-      {ministatus === 'UX' ? 'User Experience' : ministatus === 'Performance' ? 'Performance' : 'SEO'}
+      {categoryKey === 'usability' ? t('issueDetail.userExperience') : categoryKey === 'performance' ? t('issueDetail.performance') : t('issueDetail.seo')}
     </Text>
 
     <View style={{
@@ -219,7 +262,7 @@ const rawDescription = Array.isArray(params.description) ? params.description[0]
       <Text style={{
         ...styles.miniscoreText, color: fgColor
       }}>
-        {miniscore}/100
+        {categoryScore}/100
       </Text>
     </View>
   </View>
@@ -227,9 +270,9 @@ const rawDescription = Array.isArray(params.description) ? params.description[0]
   {/**Progress Bar */}
 
  <View style={[styles.progressBarBackground, { backgroundColor: bgColor }]}>
-  <View
-    style={[styles.progressBarForeground, { width: progressWidth, backgroundColor: fgColor }]}
-  />
+ <View
+   style={[styles.progressBarForeground, { width: progressWidth as any, backgroundColor: fgColor }]}
+ />
 </View>
 
 
@@ -240,7 +283,7 @@ const rawDescription = Array.isArray(params.description) ? params.description[0]
   <Text style={{
     ...styles.whatThisWillDoTitle
   }}>
-    WHAT this would do to your business
+    {t('issueDetail.whatThisWouldDo')}
   </Text>
 
   <Text style={{
@@ -248,73 +291,56 @@ const rawDescription = Array.isArray(params.description) ? params.description[0]
   }}>
     {businessBenefits.length > 0 ? businessBenefits.map((benefit: string, index: number) => (
       `• ${benefit}${index < businessBenefits.length - 1 ? '\n' : ''}`
-    )).join('') : '• Lower conversions for your website\n• Poor user experience\n• People leaving your website early'}
+    )).join('') : t('issueDetail.defaultBenefits')}
   </Text>
 
   {/* PROBLEMS */}
   <Text style={{
     ...styles.problemsTitle
   }}>
-    Problems
+    {t('issueDetail.problems')}
   </Text>
 
   <View style={{...styles.problemDetailsContainer }}>
-    <View style={{ ...styles.problemDetailInnerContainer }}>
+    {problems.map((problem, index) => (
+      <View key={index} style={{ ...styles.problemDetailInnerContainer }}>
         <View style={{...styles.warningIconBackground, backgroundColor: "rgba(232, 153, 25, 0.3)"}}>
             <FontAwesome name="warning" size={12} color="#E89919" />
         </View>
-      
-      <Text style={{
-        ...styles.problemText
-      }}>
-        {ministatus === 'UX' ? 'Issues with user interface and navigation' :
-         ministatus === 'Performance' ? 'Slow loading times and performance bottlenecks' :
-         'Problems with search engine optimization'}
-      </Text>
-    </View>
-
-    <View style={{ ...styles.problemDetailInnerContainer }}>
-
-      
-      <View style={{...styles.warningIconBackground, backgroundColor: "rgba(232, 153, 25, 0.3)"}}>
-            <FontAwesome name="warning" size={12} color="#E89919" />
+        <View style={{ flex: 1 }}>
+          <Text style={{
+            ...styles.problemText,
+            fontFamily: "RethinkSans-Bold",
+            fontSize: 14,
+            marginBottom: 4
+          }}>
+            {problem.title}
+          </Text>
+          <Text style={{
+            ...styles.problemText,
+            fontFamily: "RethinkSans-Regular",
+            fontSize: 13
+          }}>
+            {problem.description}
+          </Text>
         </View>
-
-      <Text style={{
-        ...styles.problemText
-      }}>
-        Missing features may drive customers away.
-      </Text>
-    </View>
-
-    <View style={{...styles.problemDetailInnerContainer }}>
-
-
-      <View style={{...styles.warningIconBackground, backgroundColor: "rgba(232, 153, 25, 0.3)"}}>
-            <FontAwesome name="warning" size={12} color="#E89919" />
-        </View>
-
-      <Text style={{
-        ...styles.problemText
-      }}>
-        Lack of visual hierarchy makes important content hard to notice.
-      </Text>
-    </View>
+      </View>
+    ))}
   </View>
 
   {/* SUGGESTIONS */}
   <Text style={{
     ...styles.suggestionTitle
   }}>
-    Suggestions
+    {t('issueDetail.suggestions')}
   </Text>
 
   <Text style={{
     ...styles.suggestionText
   }}>
-    {impactMessage || (ministatus === 'UX' ? 'Improve user interface design and navigation structure to enhance user experience.' :
-     ministatus === 'Performance' ? 'Optimize images, enable compression, and improve server response times for better performance.' :
-     'Fix meta tags, improve content structure, and enhance internal linking for better SEO.')}
+    {suggestions.map((suggestion, index) => (
+      `• ${suggestion}${index < suggestions.length - 1 ? '\n' : ''}`
+    )).join('')}
   </Text>
 
   {/* Continue Button */}
@@ -327,7 +353,7 @@ const rawDescription = Array.isArray(params.description) ? params.description[0]
     <Text style={{
      ...styles.continueButtonText
     }}>
-      Continue
+      {t('issueDetail.continue')}
     </Text>
   </TouchableOpacity>
 

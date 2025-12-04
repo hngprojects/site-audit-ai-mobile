@@ -1,6 +1,6 @@
 import { apiClient, formatErrorMessage, isAxiosError } from '@/lib/api-client';
+import { useAuthStore } from '@/store/auth-store';
 import { getPersistentDeviceInfo } from '@/utils/device-id';
-
 
 export interface StartScanRequest {
   top_n: number;
@@ -65,6 +65,62 @@ export interface ScanResultResponse {
   status: string;
   message: string;
   data: ScanResult;
+}
+
+export interface CategoryIssue {
+  title: string;
+  description: string;
+}
+
+export interface SummaryCategoryData {
+  key: string;
+  title: string;
+  severity: string;
+  score: number;
+  score_max: number;
+  short_description: string;
+}
+
+export interface CategoryData {
+  key: string;
+  title: string;
+  description: string;
+  section_title: string;
+  score: number;
+  score_max: number;
+  business_impact: string[];
+  problems: CategoryIssue[];
+  suggestion: string[];
+}
+
+export interface IssuesResult {
+  job_id: string;
+  website_score: number;
+  scan_date: string;
+  summary_message: string;
+  categories: CategoryData[];
+}
+
+export interface IssuesResultResponse {
+  status_code: number;
+  status: string;
+  message: string;
+  data: IssuesResult;
+}
+
+export interface SummaryResult {
+  job_id: string;
+  website_score: number;
+  scan_date: string;
+  summary_message: string;
+  categories: SummaryCategoryData[];
+}
+
+export interface SummaryResultResponse {
+  status_code: number;
+  status: string;
+  message: string;
+  data: SummaryResult;
 }
 
 function transformBackendDataToScanResult(backendData: any): ScanResult {
@@ -142,23 +198,43 @@ export const scanService = {
       throw new Error('URL is required');
     }
 
-    try {
+    // Get authentication state (optional)
+    const authState = useAuthStore.getState();
+    const isAuthenticated = authState.isAuthenticated;
+    const token = authState.token;
+    const userId = authState.user?.id;
 
+    // Prepare request payload
+    const payload: any = { url, top_n: topN };
+
+    // Include user_id if authenticated
+    if (isAuthenticated && userId) {
+      payload.user_id = userId;
+    }
+
+    // Prepare headers
+    const headers: any = {
+      'Content-Type': 'application/json',
+    };
+
+    // Include authorization header if authenticated
+    if (isAuthenticated && token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
+    try {
       const deviceInfo = await getPersistentDeviceInfo();
 
+      // Add device info to headers
+      headers['X-Device'] = JSON.stringify({
+        deviceId: deviceInfo.deviceId,
+        device: deviceInfo.device,
+      });
 
       const response = await apiClient.post<StartScanResponse>(
         '/api/v1/scan/start-async',
-        { url, top_n: topN },
-        {
-          headers: {
-            Authorization: `Bearer ${apiClient.defaults.headers.common['Authorization']}`,
-            "X-Device": JSON.stringify({
-            deviceId: deviceInfo.deviceId,
-            device: deviceInfo.device,
-          }), 
-          },
-        }
+        payload,
+        { headers }
       );
       const responseData = response.data;
 
@@ -192,14 +268,25 @@ export const scanService = {
       throw new Error('Job ID is required');
     }
 
+    // Get authentication state (optional)
+    const authState = useAuthStore.getState();
+    const isAuthenticated = authState.isAuthenticated;
+    const token = authState.token;
+
+    // Prepare headers
+    const headers: any = {
+      'Content-Type': 'application/json',
+    };
+
+    // Include authorization header if authenticated
+    if (isAuthenticated && token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
     try {
       const response = await apiClient.get<ScanStatusResponse>(
         `/api/v1/scan/${jobId}/status`,
-        {
-          headers: {
-            Authorization: `Bearer ${apiClient.defaults.headers.common['Authorization']}`,
-          },
-        }
+        { headers }
       );
       const responseData = response.data;
 
@@ -222,14 +309,25 @@ export const scanService = {
       throw new Error('Job ID is required');
     }
 
+    // Get authentication state (optional)
+    const authState = useAuthStore.getState();
+    const isAuthenticated = authState.isAuthenticated;
+    const token = authState.token;
+
+    // Prepare headers
+    const headers: any = {
+      'Content-Type': 'application/json',
+    };
+
+    // Include authorization header if authenticated
+    if (isAuthenticated && token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
     try {
       const response = await apiClient.get<ScanResultResponse>(
         `/api/v1/scan/${jobId}/results`,
-        {
-          headers: {
-            Authorization: `Bearer ${apiClient.defaults.headers.common['Authorization']}`,
-          },
-        }
+        { headers }
       );
       const responseData = response.data;
 
@@ -245,6 +343,88 @@ export const scanService = {
         throw error;
       }
       throw new Error('Failed to fetch scan result. Please try again.');
+    }
+  },
+
+  async getScanSummary(jobId: string): Promise<SummaryResult> {
+    if (!jobId) {
+      throw new Error('Job ID is required');
+    }
+
+    // Get authentication state (optional)
+    const authState = useAuthStore.getState();
+    const isAuthenticated = authState.isAuthenticated;
+    const token = authState.token;
+
+    // Prepare headers
+    const headers: any = {
+      'Content-Type': 'application/json',
+    };
+
+    // Include authorization header if authenticated
+    if (isAuthenticated && token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
+    try {
+      const response = await apiClient.get<SummaryResultResponse>(
+        `/api/v1/scan/${jobId}/results`,
+        { headers }
+      );
+      const responseData = response.data;
+
+      return responseData.data;
+    } catch (error) {
+      if (isAxiosError(error)) {
+        const errorData = error.response?.data || {};
+        const errorMessage = formatErrorMessage(errorData);
+        throw new Error(errorMessage);
+      }
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Failed to fetch scan summary. Please try again.');
+    }
+  },
+
+  async getScanIssues(jobId: string): Promise<IssuesResult> {
+    if (!jobId) {
+      throw new Error('Job ID is required');
+    }
+
+    // Get authentication state (optional)
+    const authState = useAuthStore.getState();
+    const isAuthenticated = authState.isAuthenticated;
+    const token = authState.token;
+
+    // Prepare headers
+    const headers: any = {
+      'Content-Type': 'application/json',
+    };
+
+    // Include authorization header if authenticated
+    if (isAuthenticated && token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
+    try {
+      const response = await apiClient.get<IssuesResultResponse>(
+        `/api/v1/scan/${jobId}/issues`,
+        { headers }
+      );
+      const responseData = response.data;
+
+      return responseData.data;
+    } catch (error) {
+      if (isAxiosError(error)) {
+        const errorData = error.response?.data || {};
+        const errorMessage = formatErrorMessage(errorData);
+        throw new Error(errorMessage);
+      }
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Failed to fetch scan issues. Please try again.');
     }
   },
 };

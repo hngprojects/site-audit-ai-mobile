@@ -17,7 +17,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontFamily: "RethinkSans-SemiBold",
     color: "#1A1A1A",
-    fontWeight: "500",
   },
   statusPill: {
     paddingVertical: 4,
@@ -26,7 +25,6 @@ const styles = StyleSheet.create({
     marginTop: -40
   },
   statusText: {
-    fontWeight: "600",
     fontFamily: "RethinkSans-Bold",
     fontSize: 14,
   },
@@ -34,14 +32,12 @@ const styles = StyleSheet.create({
     fontFamily: "RethinkSans-Medium",
     fontSize: 12,
     color: "#1A1A1A",
-    fontWeight: "400",
     marginTop: 5
   },
   time: {
     fontFamily: "RethinkSans-Regular",
     fontSize: 12,
     color: "#1A1A1A",
-    fontWeight: "400",
     marginTop: 8
   },
 });

@@ -5,29 +5,27 @@ import ProfileHeader from '@/components/profile/profile-header';
 // import ProfileSkeleton from '@/components/profile/profile-skeleton';
 import { useAuth } from '@/hooks/use-auth';
 import styles from '@/stylesheets/profile-stylesheet';
+import { useTranslation } from '@/utils/translations';
 import { useFocusEffect } from '@react-navigation/native';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ScrollView, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const Profile = () => {
+  const { t } = useTranslation();
   const { isAuthenticated, isInitialized, user } = useAuth();
   const [modalVisible, setModalVisible] = useState(false);
 
-  const handleAuthModal = () => {
-     if (isInitialized && !isAuthenticated) {
+  useFocusEffect(
+    useCallback(() => {
+      if (isInitialized && !isAuthenticated) {
         setModalVisible(true);
       } else if (isAuthenticated) {
         console.log(user);
-        
+
         setModalVisible(false);
       }
-  }
-
-  useFocusEffect(
-    useCallback(() => {
-     handleAuthModal()
-    }, [isAuthenticated, isInitialized, user])
+    }, [isInitialized, isAuthenticated, user])
   );
 
   useEffect(() => {
@@ -54,21 +52,21 @@ const Profile = () => {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 50 }}
         >
-          <ProfileHeader text="Profile" />
+          <ProfileHeader text={t('profile.edit')} />
           {isAuthenticated && user ? (
             <ProfileContent user={user} />
           ) : (
             <>
-            <ProfileEmptyState />
+              <ProfileEmptyState />
 
-            <TouchableOpacity style={styles.signUpsignInBtn} onPress={handleAuthModal}>
-              <Text style={styles.authText}>Sign Up / Sign In</Text>
-            </TouchableOpacity>
+              <TouchableOpacity style={styles.signUpsignInBtn} onPress={() => setModalVisible(true)}>
+                <Text style={styles.authText}>{t('auth.signUp')} / {t('auth.signIn')}</Text>
+              </TouchableOpacity>
             </>
           )}
         </ScrollView>
       </SafeAreaView>
-      <AuthModal visible={modalVisible && !isAuthenticated} onClose={closeModal} />
+      <AuthModal visible={modalVisible && !isAuthenticated} onClose={closeModal} dismissible={false} />
     </>
   );
 };

@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
   },
   privacyPolicy: {
     fontFamily: "RethinkSans-Regular",
-    color: "#8b8b8b", 
+    color: "#8b8b8b",
     fontSize: 13
   },
   link: {
@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     marginTop: -10
   },
   title: {
-    fontSize: 22,
+    fontSize: 24,
     fontFamily: "RethinkSans-Bold",
     textAlign: "center",
     marginBottom: 12,
@@ -97,7 +97,6 @@ const styles = StyleSheet.create({
   nextText: { 
     color: "#fff", 
     fontSize: 17, 
-    fontWeight: "600" 
  },
 });
 

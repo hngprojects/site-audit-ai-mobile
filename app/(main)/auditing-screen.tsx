@@ -1,20 +1,23 @@
 import { getScanStatus, startScan } from '@/actions/scan-actions';
 import { useAuditStore } from '@/store/website-domain';
 import styles from '@/stylesheets/auditing-screen-stylesheet';
+import { useTranslation } from '@/utils/translations';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Text, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, Animated, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 const AuditingScreen = () => {
+  const { t } = useTranslation();
   const router = useRouter();
   const params = useLocalSearchParams();
   const jobId = Array.isArray(params.jobId) ? params.jobId[0] : params.jobId;
   const url = Array.isArray(params.url) ? params.url[0] : params.url;
+  const fromReports = params.fromReports === 'true';
 
-  const {setDomain} = useAuditStore();
+  const { setDomain } = useAuditStore();
 
   const websiteUrl = url || '';
   const [progress, setProgress] = useState(0);
@@ -24,10 +27,10 @@ const AuditingScreen = () => {
 
   // Scanning checklist items with appropriate icons
   const scanSteps = [
-    { text: 'Analyzing for Critical SEO Errors...', icon: 'search', iconSet: 'FontAwesome' as const },
-    { text: 'Scanning content quality', icon: 'description', iconSet: 'MaterialIcons' as const },
-    { text: 'Checking for Costly Speed Issues...', icon: 'speed', iconSet: 'MaterialIcons' as const },
-    { text: 'Finding broken links', icon: 'link', iconSet: 'FontAwesome' as const }
+    { text: t('auditing.analyzing'), icon: 'search', iconSet: 'FontAwesome' as const },
+    { text: t('auditing.scanningContent'), icon: 'description', iconSet: 'MaterialIcons' as const },
+    { text: t('auditing.checkingSpeed'), icon: 'speed', iconSet: 'MaterialIcons' as const },
+    { text: t('auditing.findingLinks'), icon: 'link', iconSet: 'FontAwesome' as const }
   ];
 
   useEffect(() => {
@@ -61,6 +64,19 @@ const AuditingScreen = () => {
                 },
               });
             }, 1000);
+          } else if (statusResponse.status === 'failed') {
+            clearInterval(statusInterval);
+
+            // Redirect to error screen when scan fails
+            setTimeout(() => {
+              router.replace({
+                pathname: "/(main)/auditing-error-screen",
+                params: {
+                  url: websiteUrl,
+                  jobId,
+                },
+              });
+            }, 1000);
           }
         } catch (error) {
           console.error('Failed to poll scan status:', error);
@@ -69,7 +85,7 @@ const AuditingScreen = () => {
 
       // Poll status immediately and then every 15 seconds
       pollStatus();
-      statusInterval = setInterval(pollStatus, 15000);
+      statusInterval = Number(setInterval(pollStatus, 15000));
 
       return () => {
         clearInterval(statusInterval);
@@ -115,11 +131,19 @@ const AuditingScreen = () => {
     <SafeAreaView style={styles.container}>
       <View style={{ flex: 1 }}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Scanning Website...</Text>
+          <Text style={styles.headerTitle}>
+            {fromReports ? t('auditing.reScanning') : t('auditing.scanning')}
+          </Text>
           <Text style={styles.headerUrl}>{websiteUrl}</Text>
+          {fromReports && (
+            <Text style={styles.reScanNote}>{t('auditing.reScanNote')}</Text>
+          )}
         </View>
 
         <View style={styles.content}>
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#ff5a3d" style={{ transform: [{ scale: 2 }] }} />
+          </View>
           <View style={styles.progress}>
             <View style={styles.progressBarContainer}>
               <Animated.View
@@ -167,7 +191,7 @@ const AuditingScreen = () => {
           </View>
 
           <View style={styles.footer}>
-            <Text style={styles.footerText}>Status: {scanStatus}</Text>
+            <Text style={styles.footerText}>{t('auditing.status')}: {scanStatus}</Text>
           </View>
         </View>
       </View>

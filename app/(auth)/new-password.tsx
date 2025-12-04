@@ -1,13 +1,16 @@
 import { authService, MIN_PASSWORD_LENGTH } from '@/lib/auth-service';
 import styles from "@/stylesheets/newPasswordStylesheet";
+import { useTranslation } from '@/utils/translations';
 import { useResetPasswordEmailStore } from '@/zustardStore/resetPasswordEmailStore';
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { ActivityIndicator, Alert, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View } from "react-native";
+import Toast from 'react-native-toast-message';
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function NewPassword() {
+  const { t } = useTranslation();
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
@@ -28,27 +31,27 @@ export default function NewPassword() {
 
         if (password !== confirmPassword) {
             setMismatchedPassword(true);
-            setError("Passwords do not match");
+            setError(t('changePassword.passwordsDontMatch'));
             setLoading(false);
             return;   
         }
 
         if (password === "" || confirmPassword === "") {
             setMismatchedPassword(true);
-            setError("Please enter your desired password");
+            setError(t('newPassword.passwordRequired'));
             setLoading(false);
             return;   
         }
 
         if (password.length < MIN_PASSWORD_LENGTH) {
             setMismatchedPassword(true);
-            setError(`Password must be at least ${MIN_PASSWORD_LENGTH} characters`);
+            setError(t('changePassword.minLength').replace('{min}', String(MIN_PASSWORD_LENGTH)));
             setLoading(false);
             return;
         }
 
         if (!email || !otpToken) {
-            setError("Missing email or verification token. Please start the process again.");
+            setError(t('newPassword.missingCredentials'));
             setLoading(false);
             return;
         }
@@ -60,7 +63,11 @@ export default function NewPassword() {
             const errorMessage = err instanceof Error ? err.message : 'Failed to reset password. Please try again.';
             setError(errorMessage);
             setMismatchedPassword(true);
-            Alert.alert('Error', errorMessage);
+            Toast.show({
+              type: 'error',
+              text1: t('common.error'),
+              text2: errorMessage,
+            });
         } finally {
             setLoading(false);
         }
@@ -68,9 +75,13 @@ export default function NewPassword() {
     }
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-     
-       <View style= {styles.headerSection}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+    >
+      <View style={[styles.container, { paddingTop: insets.top }]}>
+        <View style= {styles.headerSection}>
             <TouchableOpacity 
                 onPress={router.back}
                 style={styles.backarrow}
@@ -79,19 +90,19 @@ export default function NewPassword() {
             </TouchableOpacity>
       
             <Text style={styles.headerText}>
-                New Password
+                {t('newPassword.title')}
             </Text>
                   
         </View>
 
       <Text style={styles.subTitle}>
-        Your new password must be different from the previous one.
+        {t('newPassword.subtitle')}
       </Text>
 
   
    
         <Text style={styles.label}>
-            Password
+            {t('auth.password')}
         </Text>
       
             <View style={{
@@ -100,7 +111,7 @@ export default function NewPassword() {
                 }}
             >
                   <TextInput
-                      placeholder="***********"
+                      placeholder={t('newPassword.passwordPlaceholder')}
                       style={styles.passwordTextInput}
                       placeholderTextColor="#dfdfdfff"
                       value={password}
@@ -122,7 +133,7 @@ export default function NewPassword() {
 
 
         <Text style={styles.label}>
-            Confirm Password
+            {t('changePassword.confirmPassword')}
         </Text>
       
             <View style={{
@@ -131,7 +142,7 @@ export default function NewPassword() {
                 }} 
             >
                   <TextInput
-                      placeholder="***********"
+                      placeholder={t('newPassword.passwordPlaceholder')}
                       style={styles.passwordTextInput}
                       placeholderTextColor="#dfdfdfff"
                       value={confirmPassword}
@@ -168,9 +179,10 @@ export default function NewPassword() {
                     style={styles.resetBtn}
                     onPress={Reset}
                 >
-                    <Text style={styles.resetBtnText}>Reset</Text>
+                    <Text style={styles.resetBtnText}>{t('newPassword.reset')}</Text>
                 </TouchableOpacity>
             )}
-    </View>
+      </View>
+    </KeyboardAvoidingView>
   );
 }

@@ -1,27 +1,48 @@
 {
-    "build": {
-      "preview": {
-        "android": {
-          "buildType": "apk"
-        }
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
       },
-      "preview2": {
-        "android": {
-          "gradleCommand": ":app:assembleRelease"
-        }
+      "env": {
+        "EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID": "546863276810-l24ttcjpguld9vpcifolbqk99t8soges.apps.googleusercontent.com",
+        "EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID": "546863276810-i0vhnk3u5q7sktomm3nnt9lemsh58239.apps.googleusercontent.com",
+        "EXPO_PUBLIC_GOOGLE_CLIENT_ID": "546863276810-38qi7o4fdmnocorob0172evfc38v6t18.apps.googleusercontent.com",
+        "EXPO_PUBLIC_BASE_URL": "https://api.sitelytics.app"
+      }
+    },
+    "preview": {
+      "android": {
+        "buildType": "apk"
       },
-      "preview3": {
-        "developmentClient": true
-      },
-      "preview4": {
-        "distribution": "internal"
-      },
-      "production": {},
-      "development": {
-        "android": {
-          "buildType": "apk"
-        }
+      "env": {
+        "EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID": "546863276810-l24ttcjpguld9vpcifolbqk99t8soges.apps.googleusercontent.com",
+        "EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID": "546863276810-i0vhnk3u5q7sktomm3nnt9lemsh58239.apps.googleusercontent.com",
+        "EXPO_PUBLIC_GOOGLE_CLIENT_ID": "546863276810-38qi7o4fdmnocorob0172evfc38v6t18.apps.googleusercontent.com",
+        "EXPO_PUBLIC_BASE_URL": "https://api.sitelytics.app"
+      }
+    },
+    "preview2": {
+      "android": {
+        "gradleCommand": ":app:assembleRelease"
+      }
+    },
+    "preview3": {
+      "developmentClient": true
+    },
+    "preview4": {
+      "distribution": "internal"
+    },
+    "production": {
+      "autoIncrement": true,
+      "android": {
+        "buildType": "app-bundle"
       }
     }
+  },
+  "cli": {
+    "appVersionSource": "remote"
   }
-  
+}

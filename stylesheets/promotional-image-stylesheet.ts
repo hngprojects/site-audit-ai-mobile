@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
 
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.35)", 
+    backgroundColor: "rgba(0,0,0,0.35)",
   },
 
   card: {
@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
     color: "#000",
     lineHeight: 24,
     paddingHorizontal: 12,
-    
+
   },
 
   brandAccent: {
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
     color: "#000",
     textAlign: "center",
   },
- iosFooter: {
+  iosFooter: {
     fontSize: 16,
     fontFamily: "RethinkSans-Bold",
     color: "#000",

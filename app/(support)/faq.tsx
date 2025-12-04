@@ -1,13 +1,15 @@
 import { Collapsible } from '@/components/ui/collapsible';
 import { FAQ_DATA } from '@/constants/faq';
 import styles from '@/stylesheets/faq-stylesheet';
+import { useTranslation } from '@/utils/translations';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const FAQContent = () => {
+  const { t } = useTranslation();
   const router = useRouter();
   const [openIndex, setOpenIndex] = useState<number>(-1);
 
@@ -17,10 +19,8 @@ const FAQContent = () => {
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
           <Feather name="arrow-left" size={24} color="#1A2373" />
         </TouchableOpacity>
-        <View style={styles.headerTextContainer}>
-          <Text style={styles.headerText}>FAQ</Text>
-        </View>
-        <View style={styles.backButtonPlaceholder} />
+        <Text style={styles.headerText}>{t('faq.title')}</Text>
+        <View style={styles.backButton} />
       </View>
       <ScrollView
         style={styles.scrollContainer}
@@ -42,8 +42,8 @@ const FAQContent = () => {
           ))}
         </View>
         <View style={styles.contactSection}>
-          <Text style={styles.confusedText}>Still Confused?</Text>
-          <Text style={styles.contactText} onPress={() => router.push('/send-message')}>Contact Us</Text>
+          <Text style={styles.confusedText}>{t('faq.stillConfused')}</Text>
+          <Text style={styles.contactText} onPress={() => router.push('/send-message')}>{t('faq.contactUs')}</Text>
         </View>
       </ScrollView>
     </SafeAreaView>

@@ -17,22 +17,23 @@ export default StyleSheet.create({
 
   title: {
     fontSize: 24,
-    fontWeight: "700",
     marginBottom: 10,
   },
 
    headerSection: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 25
+        marginBottom: 25,
+        justifyContent: 'center',
     },
     backarrow: {
-        marginRight: 75,
-        marginLeft: 15,
+        position: 'absolute',
+        left: 16,
     },
     headerText: {
          fontSize: 20,
-        fontFamily: "RethinkSans-Bold"
+        fontFamily: "RethinkSans-Bold",
+        textAlign: 'center',
     },
   subTitle: {
     fontSize: 14,
@@ -44,7 +45,6 @@ export default StyleSheet.create({
 
   email: { 
     color: "#FF6A45", 
-    fontWeight: "600" ,
     fontFamily: "RethinkSans-SemiBold",
 },
 
@@ -61,7 +61,12 @@ export default StyleSheet.create({
     borderWidth: 1.5,
   },
 
-  otpText: { fontSize: 18, fontWeight: "600" },
+  otpText: {
+    fontSize: 18,
+    fontFamily: "RethinkSans-Bold",
+    color: "#333",
+  },
+
 
   resendText: {
     color: "#777",
@@ -100,7 +105,6 @@ resendContainer: {
   },
   continueBtnText: {
     fontSize: 16,
-    fontWeight: "700",
     textAlign: "center",
   },
 });

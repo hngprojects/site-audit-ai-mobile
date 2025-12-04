@@ -1,3 +1,4 @@
+import { useTranslation } from '@/utils/translations';
 import styles from '@/stylesheets/profile-stylesheet';
 import { Feather } from '@expo/vector-icons';
 import React from 'react';
@@ -10,6 +11,7 @@ interface LogoutModalProps {
 }
 
 const LogoutModal: React.FC<LogoutModalProps> = ({ visible, onClose, onConfirm }) => {
+  const { t } = useTranslation();
   return (
     <Modal
       visible={visible}
@@ -19,27 +21,27 @@ const LogoutModal: React.FC<LogoutModalProps> = ({ visible, onClose, onConfirm }
     >
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.logoutModalOverlay}>
-          <TouchableWithoutFeedback>
+          <TouchableWithoutFeedback onPress={() => {}}>
             <View style={styles.logoutModalContent}>
               <View style={styles.logoutIconContainer}>
                 <Feather name="trash-2" size={24} color="#FF5A3D" />
               </View>
-              <Text style={styles.logoutModalTitle}>Logout?</Text>
+              <Text style={styles.logoutModalTitle}>{t('profile.logoutConfirmationTitle')}</Text>
               <Text style={styles.logoutModalMessage}>
-                Are you sure you want to log out?
+                {t('profile.logoutConfirmationMessage')}
               </Text>
               <View style={styles.logoutModalButtons}>
                 <TouchableOpacity
                   style={styles.logoutModalNoButton}
                   onPress={onClose}
                 >
-                  <Text style={styles.logoutModalNoButtonText}>No</Text>
+                  <Text style={styles.logoutModalNoButtonText}>{t('common.no')}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.logoutModalYesButton}
                   onPress={onConfirm}
                 >
-                  <Text style={styles.logoutModalYesButtonText}>Yes</Text>
+                  <Text style={styles.logoutModalYesButtonText}>{t('common.yes')}</Text>
                 </TouchableOpacity>
               </View>
             </View>

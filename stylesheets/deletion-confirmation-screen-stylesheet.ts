@@ -13,29 +13,26 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 24,
-    paddingTop: 60,
+    paddingTop: 40,
+    paddingBottom: 40,
     justifyContent: 'space-between',
-    alignItems: 'center',
   },
 
   header: {
     width: '100%',
     flexDirection: 'column',
     alignItems: 'center',
-    gap: 80,
-    paddingVertical: 6,
-    paddingHorizontal: 16,
-  },
-  backButton: {
-    marginRight: 16,
+    flex: 1,
+    justifyContent: 'center',
   },
   logoContainer: {
-    marginBottom: 32,
+    marginBottom: 48,
   },
   logoText: {
     fontSize: 32,
     fontFamily: 'RethinkSans-Bold',
     color: '#1A2373',
+    textAlign: 'center',
   },
   title: {
     fontSize: 24,
@@ -43,16 +40,14 @@ const styles = StyleSheet.create({
     color: '#1c1c1c',
     textAlign: 'center',
     marginBottom: 16,
-    fontWeight: 700,
   },
   description: {
     fontSize: 16,
     fontFamily: 'RethinkSans-Regular',
     color: '#494949',
     textAlign: 'center',
-    lineHeight: 20,
-    marginBottom: 48,
-    fontWeight: 500,
+    lineHeight: 24,
+    paddingHorizontal: 8,
   },
   buttonContainer: {
     width: '100%',
