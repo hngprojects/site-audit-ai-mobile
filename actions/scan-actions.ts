@@ -62,3 +62,37 @@ export const getScanResult = async (jobId: string): Promise<ScanResult> => {
 
   return await scanService.getScanResult(jobId);
 };
+
+export const getScanSummary = async (jobId: string) => {
+  const token = useAuthStore.getState().token;
+  // if (!token) {
+  //   throw new Error('Authentication required. Please sign in.');
+  // }
+
+  // Set the token in the apiClient headers
+  const { apiClient } = await import('@/lib/api-client');
+  if (token) {
+    apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  } else {
+    delete apiClient.defaults.headers.common['Authorization'];
+  }
+
+  return await scanService.getScanSummary(jobId);
+};
+
+export const getScanIssues = async (jobId: string) => {
+  const token = useAuthStore.getState().token;
+  // if (!token) {
+  //   throw new Error('Authentication required. Please sign in.');
+  // }
+
+  // Set the token in the apiClient headers
+  const { apiClient } = await import('@/lib/api-client');
+  if (token) {
+    apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  } else {
+    delete apiClient.defaults.headers.common['Authorization'];
+  }
+
+  return await scanService.getScanIssues(jobId);
+};

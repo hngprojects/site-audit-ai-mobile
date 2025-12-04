@@ -1,5 +1,6 @@
 import { useAuth } from '@/hooks/use-auth';
 import { appleAuthService } from '@/lib/apple-auth-service';
+import { RedirectService } from '@/lib/scan-service';
 import styles from '@/stylesheets/profile-stylesheet';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -50,13 +51,25 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose, redirect, dismi
   // Close modal when user successfully authenticates
   useEffect(() => {
     if (isAuthenticated && visible) {
-      if (redirect) {
-        (router.push as any)({ pathname: redirect });
+      const validatedRedirect = RedirectService.validateRedirect(redirect);
+
+      if (validatedRedirect) {
+        // Use secure redirect parsing
+        const { pathname, params } = RedirectService.parseRedirectUrl(validatedRedirect);
+
+        router.push({
+          pathname: pathname as any,
+          params: params
+        });
       } else {
-        onClose();
+        // Fallback to default route if redirect is invalid
+        router.push('/');
       }
+
+      // Clear any stored redirects
+      RedirectService.clearStoredRedirect();
     }
-  }, [isAuthenticated, visible, onClose, redirect, router]);
+  }, [isAuthenticated, visible, redirect, router]);
 
   const handleGoogleLogin = async () => {
     try {
@@ -80,7 +93,16 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose, redirect, dismi
 
   const handleSignIn = () => {
     onClose();
-    router.push({ pathname: '/(auth)/sign-in', params: redirect ? { redirect } : {} });
+
+    // Store redirect for persistence across navigation
+    if (redirect) {
+      RedirectService.storeRedirect(redirect);
+    }
+
+    router.push({
+      pathname: '/(auth)/sign-in',
+      params: redirect ? { redirect } : {}
+    });
   };
 
   const translateY = slideAnim.interpolate({

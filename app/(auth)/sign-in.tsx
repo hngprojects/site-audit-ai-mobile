@@ -1,6 +1,7 @@
 import { LoadingButton } from '@/components/ui/loading-button';
 import { useAuth } from '@/hooks/use-auth';
 import { biometricService } from '@/lib/biometric-service';
+import { RedirectService } from '@/lib/scan-service';
 import styles from '@/stylesheets/sign-in-stylesheet';
 import { useTranslation } from '@/utils/translations';
 import Feather from '@expo/vector-icons/Feather';
@@ -95,12 +96,6 @@ const SignIn = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      router.replace((params.redirect as any) || '/(tabs)');
-    }
-  }, [isAuthenticated, router, params.redirect]);
-
   // Show error toasts
   useEffect(() => {
     if (error) {
@@ -145,7 +140,33 @@ const SignIn = () => {
           password: password,
         });
       }
-      // Navigation is handled by useEffect when isAuthenticated changes
+      
+      // Handle redirect after successful sign-in
+      let redirectUrl = params.redirect as string;
+
+      if (!redirectUrl) {
+        const stored = await RedirectService.getStoredRedirect();
+        if (stored) {
+          redirectUrl = stored;
+          RedirectService.clearStoredRedirect();
+        }
+      }
+
+      if (redirectUrl) {
+        const validatedRedirect = RedirectService.validateRedirect(redirectUrl);
+
+        if (validatedRedirect) {
+          const { pathname, params: redirectParams } = RedirectService.parseRedirectUrl(validatedRedirect);
+          router.replace({
+            pathname: pathname as any,
+            params: redirectParams
+          });
+        } else {
+          router.replace('/');
+        }
+      } else {
+        router.replace('/');
+      }
     } catch (error) {
       // Error is handled by the store and shown via Alert
       console.error('Sign in error:', error);
@@ -286,7 +307,7 @@ const SignIn = () => {
             <Text style={styles.accountLinkText}>Don&apos;t have an account? </Text>
             <TouchableOpacity onPress={() => router.push({
               pathname: '/(auth)/sign-up',
-              params: params.redirect ? { redirect: params.redirect } : {}
+              params: params
             })}>
               <Text style={styles.accountLinkButton}>Sign up</Text>
             </TouchableOpacity>

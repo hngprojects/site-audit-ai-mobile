@@ -6,6 +6,7 @@ const STORAGE_KEYS = {
   ONBOARDING_COMPLETED: '@onboarding_completed',
   EMAIL_REPORTS_PREFERENCES: '@email_reports_preferences',
   LANGUAGE_PREFERENCES: '@language_preferences',
+  REDIRECT_URL: '@redirect_url',
 } as const;
 
 const SECURE_STORE_KEYS = [STORAGE_KEYS.AUTH_STATE];

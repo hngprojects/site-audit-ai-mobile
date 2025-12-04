@@ -3,8 +3,8 @@ import { apiClient, formatErrorMessage, isAxiosError } from '@/lib/api-client';
 export interface SubmitRequestFormRequest {
     user_id: string;
     job_id: string;
-    website: string;
-    selected_category: string[];
+    issues: string[];
+    additional_notes: string;
 }
 
 export interface SubmitRequestFormResponse {
@@ -16,7 +16,7 @@ export interface SubmitRequestFormResponse {
 
 export const requestFormService = {
     async submitRequestForm(data: SubmitRequestFormRequest): Promise<SubmitRequestFormResponse> {
-        const { user_id, job_id, website, selected_category } = data;
+        const { user_id, job_id, issues, additional_notes } = data;
         console.log("DATA:", data);
         // Validate required fields
         if (!user_id) {
@@ -25,11 +25,8 @@ export const requestFormService = {
         if (!job_id) {
             throw new Error('Job ID is required');
         }
-        if (!website) {
-            throw new Error('Website URL is required');
-        }
-        if (!selected_category || selected_category.length === 0) {
-            throw new Error('At least one category must be selected');
+        if (!issues || issues.length === 0) {
+            throw new Error('At least one issue must be selected');
         }
 
         try {
@@ -38,8 +35,8 @@ export const requestFormService = {
                 {
                     user_id: user_id.trim(),
                     job_id: job_id.trim(),
-                    website: website.trim(),
-                    selected_category: selected_category,
+                    issues: issues,
+                    additional_notes: additional_notes || '',
                 }
             );
 

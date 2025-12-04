@@ -8,7 +8,7 @@ import styles from "@/stylesheets/homeScreenStylesheet";
 import { getPersistentDeviceInfo } from "@/utils/device-id";
 import { useTranslation } from "@/utils/translations";
 import { normalizeUrl, validateWebsiteUrl } from "@/utils/url-validation";
-import { Octicons } from "@expo/vector-icons";
+import { Octicons } from '@expo/vector-icons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { router } from "expo-router";
 import { useCallback, useEffect, useState } from "react";

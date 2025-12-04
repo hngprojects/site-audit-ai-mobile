@@ -1,5 +1,6 @@
 import { submitLead } from "@/actions/leads-actions";
-import { getScanResult } from "@/actions/scan-actions";
+import { getScanSummary } from "@/actions/scan-actions";
+import type { SummaryResult } from "@/lib/scan-service";
 import styles, { reportColors } from "@/stylesheets/report-dashboard-stylesheet";
 import { useTranslation } from "@/utils/translations";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -38,7 +39,7 @@ export default function ReportDashboard() {
   const [showModal, setShowModal] = useState(false);
   const [modalTextInput, setModalTextInput] = useState<string>('')
   const [emptyModalTextInput, setEmptyModalTextInput] = useState<boolean>(false)
-  const [scanResult, setScanResult] = useState<any>(null);
+  const [summaryResult, setSummaryResult] = useState<SummaryResult | null>(null);
 
   const { addIssue, clearIssues, setIssues } = useSelectedIssuesStore();
 
@@ -129,28 +130,8 @@ export default function ReportDashboard() {
 
 
 
-  const ISSUE_LIST = scanResult?.issues || [];
+  const CATEGORIES = summaryResult?.categories || [];
 
-  // Function to toggle all issues selection
-  const toggleAllIssues = () => {
-    const allSelected = issues.length === ISSUE_LIST.length && ISSUE_LIST.length > 0;
-
-    if (allSelected) {
-      // Unmark all - clear the store
-      clearIssues();
-    } else {
-      // Mark all - add all issues
-      ISSUE_LIST.forEach((issue: any) => {
-        addIssue({
-          id: issue.id,
-          title: issue.title,
-          score: String(issue.score),
-          status: normalizeStatus(scanResult?.status || 'Warning'),
-          description: issue.description,
-        });
-      });
-    }
-  }
 
 
 
@@ -160,24 +141,23 @@ export default function ReportDashboard() {
     if (jobId) {
       const fetchResult = async () => {
         try {
-          const result = await getScanResult(jobId);
-          setScanResult(result);
-          setIssues(result.issues.map(issue => ({ ...issue, score: String(issue.score) })));
+          const result = await getScanSummary(jobId);
+          setSummaryResult(result);
 
           // Set audit info for details page
           setAuditInfo({
             domain: url,
-            status: result.status,
-            score: String(result.overall_score),
-            scanDate: result.scanned_at ? new Date(result.scanned_at).toLocaleDateString() : '',
+            status: result.website_score >= 80 ? 'Good' : result.website_score >= 50 ? 'Warning' : 'Critical',
+            score: String(result.website_score),
+            scanDate: new Date(result.scan_date).toLocaleDateString(),
           });
         } catch (error) {
-          console.error('Failed to fetch scan result:', error);
+          console.error('Failed to fetch scan issues:', error);
         }
       };
       fetchResult();
     }
-  }, [jobId, url, setAuditInfo, setIssues]);
+  }, [jobId, url, setAuditInfo]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -262,52 +242,33 @@ export default function ReportDashboard() {
 
 
         <View style={{ paddingHorizontal: 25, marginVertical: 5, marginTop: 15 }}>
-          <Text style={[styles.scoreText, { color: statusColor(normalizeStatus(scanResult?.status || 'Warning')) }]}>{scanResult?.overall_score || t('common.loading')}</Text>
+          <Text style={[styles.scoreText, { color: statusColor(normalizeStatus(summaryResult ? (summaryResult.website_score >= 80 ? 'Good' : summaryResult.website_score >= 50 ? 'Warning' : 'Critical') : 'Warning')) }]}>{summaryResult?.website_score || t('common.loading')}</Text>
           <Text style={{ ...styles.cardLabel, color: "#000" }}>{t('reportDashboard.websiteScore')}</Text>
-          <Text style={{ ...styles.cardLabel, color: "#dfdfdfff", marginTop: 5 }}>{t('reportDashboard.scanDate')}: {scanResult?.scanned_at ? new Date(scanResult.scanned_at).toLocaleDateString() : t('common.loading')}</Text>
-          <Text style={{ color: "#000", fontFamily: "RethinkSans-Medium", fontSize: 13, marginTop: 20, }}>
-            {normalizeStatus(scanResult?.status || 'Warning') === "Critical" ? t('reportDashboard.statusCritical') :
-              normalizeStatus(scanResult?.status || 'Warning') === "Good" ? t('reportDashboard.statusGood') :
+          <Text style={{ ...styles.cardLabel, color: "#dfdfdfff", marginTop: 5 }}>{t('reportDashboard.scanDate')}: {summaryResult?.scan_date ? new Date(summaryResult.scan_date).toLocaleDateString() : t('common.loading')}</Text>
+          <Text style={{ color: "#000", fontFamily: "RethinkSans-Medium", fontSize: 13, marginTop: 5, }}>
+            {normalizeStatus(summaryResult ? (summaryResult.website_score >= 80 ? 'Good' : summaryResult.website_score >= 50 ? 'Warning' : 'Critical') : 'Warning') === "Critical" ? t('reportDashboard.statusCritical') :
+              normalizeStatus(summaryResult ? (summaryResult.website_score >= 80 ? 'Good' : summaryResult.website_score >= 50 ? 'Warning' : 'Critical') : 'Warning') === "Good" ? t('reportDashboard.statusGood') :
                 t('reportDashboard.statusWarning')}
           </Text>
         </View>
 
-        {scanResult ? (
+        {summaryResult ? (
           <>
-            <TouchableOpacity onPress={toggleAllIssues}>
-              <Text
-                style={{
-                  marginLeft: "auto",
-                  marginTop: 20,
-                  marginBottom: 20,
-                  marginRight: 20,
-                  color: "blue"
-                }}
-              >
-                {issues.length === ISSUE_LIST.length && ISSUE_LIST.length > 0 ? t('reportDashboard.unmarkAll') : t('reportDashboard.markAll')}
-              </Text>
-            </TouchableOpacity>
-
             <View style={{ paddingHorizontal: "5%", }}>
-              {ISSUE_LIST.map((issue: any) => (
+              {CATEGORIES.map((category: any) => (
                 <IssueCard
-                  key={issue.id}
-                  id={issue.id}
-                  title={issue.title}
-                  score={String(issue.score)}
-                  description={issue.description}
-                  status={normalizeStatus(scanResult?.status || 'Warning')}
+                  key={category.key}
+                  id={category.key}
+                  title={category.title}
+                  score={String(category.score)}
+                  description={category.short_description}
+                  status={normalizeStatus(summaryResult ? (summaryResult.website_score >= 80 ? 'Good' : summaryResult.website_score >= 50 ? 'Warning' : 'Critical') : 'Warning')}
                   onPressDetails={() =>
                     router.push({
                       pathname: "/[id]",
                       params: {
-                        id: issue.id,
-                        title: issue.title,
-                        score: String(issue.score),
-                        description: issue.description,
-                        status: normalizeStatus(scanResult?.status || 'Warning'),
-                        businessBenefits: issue.business_benefits ? JSON.stringify(issue.business_benefits) : null,
-                        impactMessage: issue.impact_message || null,
+                        id: category.key,
+                        jobId: jobId,
                       },
                     })
                   }

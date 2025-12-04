@@ -296,16 +296,17 @@ const ReportsScreen: React.FC = () => {
                   url={item.url}
                   onDelete={() => handleDelete(item.siteId, item.url)}
                   onEdit={() => handleEdit(item)}
-                  onPress={() => router.push({
-                    pathname: "../(reports)/report-dashboard",
-                    params: {
-                      domain: item.domain,
-                      score: String(item.score),
-                      status: item.status,
-                      scanDate: item.scanDate,
-                      siteId: item.siteId,
-                    }
-                  })}
+                  onPress={() => {
+                    // Since we don't have jobId for historical scans, navigate to auditing screen to re-run
+                    router.push({
+                      pathname: "/(main)/auditing-screen",
+                      params: {
+                        url: item.url,
+                        isReRun: 'true',
+                        fromReports: 'true'
+                      }
+                    });
+                  }}
                 />
               );
             }}
