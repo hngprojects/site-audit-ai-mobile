@@ -1,4 +1,6 @@
 import { apiClient, formatErrorMessage, isAxiosError } from '@/lib/api-client';
+import { getPersistentDeviceInfo } from '@/utils/device-id';
+
 
 export interface StartScanRequest {
   top_n: number;
@@ -141,12 +143,20 @@ export const scanService = {
     }
 
     try {
+
+      const deviceInfo = await getPersistentDeviceInfo();
+
+
       const response = await apiClient.post<StartScanResponse>(
         '/api/v1/scan/start-async',
         { url, top_n: topN },
         {
           headers: {
             Authorization: `Bearer ${apiClient.defaults.headers.common['Authorization']}`,
+            "X-Device": JSON.stringify({
+            deviceId: deviceInfo.deviceId,
+            device: deviceInfo.device,
+          }), 
           },
         }
       );
