@@ -5,7 +5,6 @@ import { getUnreadCount } from "@/service/notifications";
 import { useAuthStore } from "@/store/auth-store";
 import { useSitesStore } from "@/store/sites-store";
 import styles from "@/stylesheets/homeScreenStylesheet";
-import { getPersistentDeviceInfo } from "@/utils/device-id";
 import { useTranslation } from "@/utils/translations";
 import { normalizeUrl, validateWebsiteUrl } from "@/utils/url-validation";
 import { Octicons } from '@expo/vector-icons';
@@ -43,14 +42,6 @@ export default function HomeScreen() {
   useEffect(() => {
     fetchSites();
     fetchUnreadCount();
-
-    const testDeviceId = async () => {
-      const info = await getPersistentDeviceInfo();
-      console.log(" DEVICE INFO:", info);
-    };
-
-    testDeviceId();
-
   }, [fetchSites, fetchUnreadCount]);
 
 
