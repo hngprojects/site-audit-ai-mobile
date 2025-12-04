@@ -257,94 +257,92 @@ const ReportsScreen: React.FC = () => {
             { paddingTop: insets.top, paddingBottom: insets.bottom },
           ]}
         >
-        <View style={styles.headerWrap}>
-          <Text style={styles.title}>{t('reports.title')}</Text>
-        </View>
-
-        <View style={styles.searchContainer}>
-          <Ionicons name="search" size={24} color="#c0c0c0ff" />
-          <TextInput
-            placeholder={t('common.search')}
-            placeholderTextColor="#9CA3AF"
-            style={styles.searchText}
-            onChangeText={x => setSearch(x)}
-            value={search}
-          />
-        </View>
-
-
-        {isLoading ? (
-          <View style={styles.listWrap}>
-            <SkeletonCard />
-            <View style={styles.separator} />
-            <SkeletonCard />
-            <View style={styles.separator} />
-            <SkeletonCard />
-            <View style={styles.separator} />
-            <SkeletonCard />
+          <View style={styles.headerWrap}>
+            <Text style={styles.title}>{t('reports.title')}</Text>
           </View>
-        ) : (
-          <FlatList
-            data={filteredData}
-            keyExtractor={(item) => item.siteId}
-            contentContainerStyle={styles.listWrap}
-            showsVerticalScrollIndicator={false}
-            renderItem={({ item }) => {
-              return (
-                <SwipeableRow
-                  item={item}
-                  url={item.url}
-                  onDelete={() => handleDelete(item.siteId, item.url)}
-                  onEdit={() => handleEdit(item)}
-                  onPress={() => {
-                    // Since we don't have jobId for historical scans, navigate to auditing screen to re-run
-                    router.push({
-                      pathname: "/(main)/auditing-screen",
-                      params: {
-                        url: item.url,
-                        isReRun: 'true',
-                        fromReports: 'true'
-                      }
-                    });
-                  }}
-                />
-              );
-            }}
-            ItemSeparatorComponent={() => <View style={styles.separator} />}
-            ListFooterComponent={<View style={styles.footerSpacer} />}
-            ListEmptyComponent={
-              <View style={{ paddingVertical: 40, alignItems: 'center' }}>
-                <Text style={{ color: '#9CA3AF', fontSize: 14 }}>{t('reports.noReports')}</Text>
-              </View>
-            }
+
+          <View style={styles.searchContainer}>
+            <Ionicons name="search" size={24} color="#c0c0c0ff" />
+            <TextInput
+              placeholder={t('common.search')}
+              placeholderTextColor="#9CA3AF"
+              style={styles.searchText}
+              onChangeText={x => setSearch(x)}
+              value={search}
+            />
+          </View>
+
+
+          {isLoading ? (
+            <View style={styles.listWrap}>
+              <SkeletonCard />
+              <View style={styles.separator} />
+              <SkeletonCard />
+              <View style={styles.separator} />
+              <SkeletonCard />
+              <View style={styles.separator} />
+              <SkeletonCard />
+            </View>
+          ) : (
+            <FlatList
+              data={filteredData}
+              keyExtractor={(item) => item.siteId}
+              contentContainerStyle={styles.listWrap}
+              showsVerticalScrollIndicator={false}
+              renderItem={({ item }) => {
+                return (
+                  <SwipeableRow
+                    item={item}
+                    url={item.url}
+                    onDelete={() => handleDelete(item.siteId, item.url)}
+                    onEdit={() => handleEdit(item)}
+                    onPress={() => {
+                      // Navigate to history page
+                      router.push({
+                        pathname: "/(reports)/history",
+                        params: {
+                          url: item.url,
+                        }
+                      });
+                    }}
+                  />
+                );
+              }}
+              ItemSeparatorComponent={() => <View style={styles.separator} />}
+              ListFooterComponent={<View style={styles.footerSpacer} />}
+              ListEmptyComponent={
+                <View style={{ paddingVertical: 40, alignItems: 'center' }}>
+                  <Text style={{ color: '#9CA3AF', fontSize: 14 }}>{t('reports.noReports')}</Text>
+                </View>
+              }
+            />
+          )}
+
+          <View style={[styles.bottomButtonContainer, { paddingBottom: Math.max(insets.bottom, 20) }]}>
+            <TouchableOpacity
+              style={styles.startNewScanButton}
+              onPress={() => router.push('/(tabs)/')}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.startNewScanText}>{t('reports.startNewScan')}</Text>
+            </TouchableOpacity>
+          </View>
+
+          <DeleteConfirmationSheet
+            visible={deleteSheetVisible}
+            onClose={closeDeleteSheet}
+            onConfirm={confirmDelete}
+            url={itemToDelete?.url}
           />
-        )}
 
-        <View style={[styles.bottomButtonContainer, { paddingBottom: Math.max(insets.bottom, 20) }]}>
-          <TouchableOpacity
-            style={styles.startNewScanButton}
-            onPress={() => router.push('/(tabs)/')}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.startNewScanText}>{t('reports.startNewScan')}</Text>
-          </TouchableOpacity>
+          <EditUrlSheet
+            visible={editSheetVisible}
+            onClose={closeEditSheet}
+            onConfirm={handleEditConfirm}
+            currentUrl={itemToEdit?.url || ''}
+            isLoading={isEditing}
+          />
         </View>
-
-        <DeleteConfirmationSheet
-          visible={deleteSheetVisible}
-          onClose={closeDeleteSheet}
-          onConfirm={confirmDelete}
-          url={itemToDelete?.url}
-        />
-
-        <EditUrlSheet
-          visible={editSheetVisible}
-          onClose={closeEditSheet}
-          onConfirm={handleEditConfirm}
-          currentUrl={itemToEdit?.url || ''}
-          isLoading={isEditing}
-        />
-      </View>
       </KeyboardAvoidingView>
     </GestureHandlerRootView>
   );
