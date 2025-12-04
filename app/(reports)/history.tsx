@@ -161,6 +161,25 @@ const HistoryScreen: React.FC = () => {
     return t('history.selectAll');
   };
 
+  const handleDelete = () => {
+    if (selectedItems.size === 0) return;
+    // TODO: Implement delete functionality
+    console.log('Deleting items:', Array.from(selectedItems));
+    setSelectedItems(new Set());
+    setIsSelectionMode(false);
+  };
+
+  const hasSelectedItems = selectedItems.size > 0;
+
+  const handleBackPress = () => {
+    if (isSelectionMode) {
+      setIsSelectionMode(false);
+      setSelectedItems(new Set());
+    } else {
+      router.back();
+    }
+  };
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <KeyboardAvoidingView
@@ -176,7 +195,7 @@ const HistoryScreen: React.FC = () => {
         >
           <View style={styles.header}>
             <TouchableOpacity
-              onPress={() => router.back()}
+              onPress={handleBackPress}
               style={styles.backButton}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
@@ -204,7 +223,7 @@ const HistoryScreen: React.FC = () => {
           <SectionList
             sections={groupedData}
             keyExtractor={(item) => item.id}
-            contentContainerStyle={styles.listWrap}
+            contentContainerStyle={[styles.listWrap, isSelectionMode && styles.listWrapWithButton]}
             showsVerticalScrollIndicator={false}
             renderSectionHeader={({ section }) => {
               const sectionIndex = groupedData.findIndex(s => s.title === section.title);
@@ -271,6 +290,20 @@ const HistoryScreen: React.FC = () => {
               </View>
             }
           />
+          {isSelectionMode && (
+            <View style={[styles.deleteButtonContainer, { paddingBottom: insets.bottom }]}>
+              <TouchableOpacity
+                style={[styles.deleteButton, !hasSelectedItems && styles.deleteButtonDisabled]}
+                onPress={handleDelete}
+                disabled={!hasSelectedItems}
+                activeOpacity={0.8}
+              >
+                <Text style={[styles.deleteButtonText, !hasSelectedItems && styles.deleteButtonTextDisabled]}>
+                  {t('common.delete')}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
       </KeyboardAvoidingView>
     </GestureHandlerRootView>

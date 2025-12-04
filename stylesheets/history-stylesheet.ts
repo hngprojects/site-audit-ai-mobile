@@ -21,9 +21,9 @@ export default StyleSheet.create({
   },
   siteName: {
     flex: 1,
-    fontFamily: "RethinkSans-SemiBold",
-    fontSize: 18,
-    color: "#111827",
+    fontFamily: "RethinkSans-Bold",
+    fontSize: 20,
+    color: "#393D44",
     textAlign: 'center',
     marginHorizontal: 12,
   },
@@ -42,7 +42,7 @@ export default StyleSheet.create({
     borderRadius: 12,
     backgroundColor: "#FFFFFF",
     borderWidth: 1,
-    borderColor: "#c0c0c0ff",
+    borderColor: "#BBBCBC",
     paddingHorizontal: 12,
     justifyContent: "flex-start",
     shadowColor: "#000",
@@ -142,6 +142,44 @@ export default StyleSheet.create({
   footerSpacer: {
     height: 20,
     width,
+  },
+  listWrapWithButton: {
+    paddingBottom: 100,
+  },
+  deleteButtonContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingHorizontal: 18,
+    paddingTop: 16,
+    backgroundColor: '#F9FAFB',
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
+  },
+  deleteButton: {
+    width: '100%',
+    height: 56,
+    borderRadius: 12,
+    backgroundColor: '#FF5A3D',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  deleteButtonDisabled: {
+    backgroundColor: '#D1D5DB',
+  },
+  deleteButtonText: {
+    fontFamily: 'RethinkSans-SemiBold',
+    fontSize: 16,
+    color: '#FFFFFF',
+  },
+  deleteButtonTextDisabled: {
+    color: '#9CA3AF',
   },
 });
 

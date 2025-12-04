@@ -20,6 +20,7 @@ interface AuthStore extends AuthState {
 const initialState: AuthState = {
   user: null,
   token: null,
+  refreshToken: null,
   isAuthenticated: false,
   isLoading: false,
   isInitialized: false,
@@ -38,6 +39,7 @@ export const useAuthStore = create<AuthStore>()(
           set({
             user: response.user,
             token: response.token,
+            refreshToken: response.refreshToken || null,
             isAuthenticated: true,
             isLoading: false,
             error: null,
@@ -58,6 +60,7 @@ export const useAuthStore = create<AuthStore>()(
           set({
             user: response.user,
             token: response.token,
+            refreshToken: response.refreshToken || null,
             isAuthenticated: true,
             isLoading: false,
             error: null,
@@ -78,6 +81,7 @@ export const useAuthStore = create<AuthStore>()(
           set({
             user: response.user,
             token: response.token,
+            refreshToken: response.refreshToken || null,
             isAuthenticated: true,
             isLoading: false,
             error: null,
@@ -98,6 +102,7 @@ export const useAuthStore = create<AuthStore>()(
           set({
             user: response.user,
             token: response.token,
+            refreshToken: response.refreshToken || null,
             isAuthenticated: true,
             isLoading: false,
             error: null,
@@ -213,6 +218,7 @@ export const useAuthStore = create<AuthStore>()(
       partialize: (state) => ({
         user: state.user,
         token: state.token,
+        refreshToken: state.refreshToken,
         isAuthenticated: state.isAuthenticated,
       }),
     }
