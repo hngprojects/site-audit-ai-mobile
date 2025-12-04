@@ -161,9 +161,9 @@ export const en = {
 
   // Auditing Screen
   'auditing.scanning': 'Scanning Website...',
-  'auditing.analyzing': 'Analyzing for Critical SEO Errors...',
+  'auditing.analyzing': 'Analyzing for critical SEO errors...',
   'auditing.scanningContent': 'Scanning content quality',
-  'auditing.checkingSpeed': 'Checking for Costly Speed Issues...',
+  'auditing.checkingSpeed': 'Checking for costly speed issues...',
   'auditing.findingLinks': 'Finding broken links',
   'auditing.status': 'Status',
   'auditing.pleaseWait': 'Please wait while we scan your website',

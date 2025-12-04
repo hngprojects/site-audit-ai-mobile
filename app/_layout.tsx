@@ -1,6 +1,6 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { router, Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import * as WebBrowser from 'expo-web-browser';
@@ -12,6 +12,7 @@ import Toast from 'react-native-toast-message';
 import { toastConfig } from '@/components/custom-toast';
 import { useAuthGuard } from '@/hooks/use-auth-guard';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { storage, STORAGE_KEYS } from '@/lib/storage';
 
 // Prevent the splash screen from auto-hiding before fonts are loaded
 SplashScreen.preventAutoHideAsync();
@@ -19,10 +20,6 @@ SplashScreen.preventAutoHideAsync();
 // CRITICAL: Complete any pending OAuth auth sessions when app starts
 // This ensures redirects from OAuth providers (like Google) work properly
 WebBrowser.maybeCompleteAuthSession();
-
-export const unstable_settings = {
-  anchor: '(tabs)',
-};
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -44,6 +41,15 @@ export default function RootLayout() {
   useEffect(() => {
     if (fontsLoaded || fontError) {
       console.log('Fonts loaded:', fontsLoaded, 'Font error:', fontError);
+      const checkOnboardingCompleted = async () => {
+        const onboardingCompleted = await storage.getItem<boolean>(STORAGE_KEYS.ONBOARDING_COMPLETED);
+        if (onboardingCompleted) {
+          router.replace('/(tabs)');
+        } else {
+          router.replace('/(onboarding)');
+        }
+      }
+      checkOnboardingCompleted();
       SplashScreen.hideAsync();
 
       // Initialize notifications
@@ -62,7 +68,7 @@ export default function RootLayout() {
   }
 
   return (
- 
+
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <Stack initialRouteName='splash'>
@@ -78,8 +84,8 @@ export default function RootLayout() {
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="(account)" options={{ headerShown: false }} />
           <Stack.Screen name="(notifications)" options={{ headerShown: false }} />
-           <Stack.Screen name="(hireRequest)" options={{ headerShown: false }} />
-           <Stack.Screen name="(socialShare)" options={{ headerShown: false }} />
+          <Stack.Screen name="(hireRequest)" options={{ headerShown: false }} />
+          <Stack.Screen name="(socialShare)" options={{ headerShown: false }} />
           <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
         </Stack>
         <StatusBar style="dark" />
