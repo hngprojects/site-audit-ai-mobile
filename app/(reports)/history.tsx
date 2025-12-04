@@ -151,12 +151,6 @@ const HistoryScreen: React.FC = () => {
     return result;
   }, [search, mockHistoryData, formatMonthHeader, formatDateHeader]);
 
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return '#0EA472';
-    if (score >= 50) return '#FF9B2E';
-    return '#D72D2D';
-  };
-
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <KeyboardAvoidingView
@@ -227,24 +221,12 @@ const HistoryScreen: React.FC = () => {
                   <Text style={styles.urlText} numberOfLines={1}>
                     {item.url}
                   </Text>
-                  <View style={styles.scoreRow}>
-                    <View
-                      style={[
-                        styles.scoreBadge,
-                        { backgroundColor: getScoreColor(item.score) + '20' }
-                      ]}
-                    >
-                      <Text
-                        style={[
-                          styles.scoreText,
-                          { color: getScoreColor(item.score) }
-                        ]}
-                      >
-                        {item.score}
-                      </Text>
-                    </View>
-                    <Text style={styles.scanDateText}>{item.scanDate}</Text>
-                  </View>
+                  <Text style={styles.scoreText}>
+                    Score: {item.score}/100
+                  </Text>
+                  <Text style={styles.scanDateText}>
+                    Scan Date: {item.scanDate}
+                  </Text>
                 </View>
                 <View style={styles.cardRight}>
                   <Text style={styles.scanTimeText}>{item.scanTime}</Text>
