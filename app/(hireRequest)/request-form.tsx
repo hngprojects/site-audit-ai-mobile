@@ -1,4 +1,4 @@
-import { getScanResult } from '@/actions/scan-actions';
+import { getScanSummary } from '@/actions/scan-actions';
 import IssueCard from '@/components/issue-card';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { requestFormService } from '@/lib/request-form-service';
@@ -18,7 +18,7 @@ const RequestForm = () => {
   const { t } = useTranslation();
   const router = useRouter();
   const params = useLocalSearchParams();
-  const { issues, addIssue, clearIssues, availableIssues, setIssues } = useSelectedIssuesStore();
+  const { issues, addIssue, clearIssues, availableIssues, setIssues, fullIssuesData } = useSelectedIssuesStore();
   const { auditInfo, getAuditInfo } = useAuditInfoStore();
   const { user } = useAuthStore();
   const [additionalNotes, setAdditionalNotes] = useState('');
@@ -28,31 +28,45 @@ const RequestForm = () => {
   // Get job_id from route params
   const jobId = Array.isArray(params.jobId) ? params.jobId[0] : params.jobId || '';
 
-  // Get website from audit info store
-  const website = auditInfo?.domain || getAuditInfo()?.domain || '';
 
-  // Fetch scan result if availableIssues is empty and we have a jobId
+  // Load categories from store if available, otherwise fetch
   useEffect(() => {
-    const fetchScanResult = async () => {
+    const loadCategories = async () => {
       // If we already have available issues, don't fetch
       if (availableIssues.length > 0 || !jobId) {
         return;
       }
 
+      // Check if we have full issues data in store
+      if (fullIssuesData && fullIssuesData.categories) {
+        // Convert categories to issues format for selection
+        const categoriesFromStore = fullIssuesData.categories.map(category => ({
+          id: category.key, // Use category key as ID
+          title: category.title,
+          score: String(category.score),
+          status: category.key,
+          description: category.description,
+        }));
+        setIssues(categoriesFromStore);
+        return;
+      }
+
+      // Fallback: fetch from API
       try {
         setIsLoading(true);
-        const result = await getScanResult(jobId);
+        const result = await getScanSummary(jobId);
 
-        // Set available issues from scan result
-        setIssues(result.issues.map(issue => ({
-          id: issue.id,
-          title: issue.title,
-          score: String(issue.score),
-          status: result.status || 'Warning',
-          description: issue.description,
-        })));
+        // Convert categories to issues format for selection
+        const categoriesFromApi = result.categories.map(category => ({
+          id: category.key, // Use category key as ID
+          title: category.title,
+          score: String(category.score),
+          status: category.key,
+          description: category.short_description,
+        }));
+        setIssues(categoriesFromApi);
       } catch (error) {
-        console.error('Failed to fetch scan result:', error);
+        console.error('Failed to load categories:', error);
         Toast.show({
           type: 'error',
           text1: t('common.error'),
@@ -63,8 +77,8 @@ const RequestForm = () => {
       }
     };
 
-    fetchScanResult();
-  }, [jobId, availableIssues.length, setIssues, t]);
+    loadCategories();
+  }, [jobId, availableIssues.length, setIssues, fullIssuesData, t]);
 
   const isAllSelected = issues.length === availableIssues.length && availableIssues.length > 0;
 
@@ -84,7 +98,7 @@ const RequestForm = () => {
       Toast.show({
         type: 'error',
         text1: t('common.error'),
-        text2: t('requestForm.noIssues'),
+        text2: t('requestForm.noCategories'),
       });
       return;
     }
@@ -95,15 +109,6 @@ const RequestForm = () => {
         type: 'error',
         text1: t('common.error'),
         text2: t('requestForm.pleaseSignIn'),
-      });
-      return;
-    }
-
-    if (!website) {
-      Toast.show({
-        type: 'error',
-        text1: t('common.error'),
-        text2: t('requestForm.websiteRequired'),
       });
       return;
     }
@@ -120,15 +125,15 @@ const RequestForm = () => {
     setIsSubmitting(true);
 
     try {
-      // Map selected issues to category array (using issue IDs)
-      const selectedCategories = issues.map(issue => issue.id);
+      // Map selected categories to category keys
+      const selectedCategories = issues.map(category => category.id);
 
       // Submit request form
       await requestFormService.submitRequestForm({
         user_id: user.id,
         job_id: jobId,
-        website: website,
-        selected_category: selectedCategories,
+        issues: selectedCategories,
+        additional_notes: additionalNotes,
       });
 
       // Show success message
@@ -217,28 +222,25 @@ const RequestForm = () => {
           {t('requestForm.subtitle')}
         </Text>
         <View style={styles.issuesContainer}>
-          {availableIssues.map((issue) => {
+          {availableIssues.map((category) => {
             // Determine status based on score
-            const scoreNum = parseInt(issue.score || '0', 10);
-            const issueStatus = scoreNum >= 80 ? 'Good' : scoreNum >= 50 ? 'Warning' : 'Critical';
+            const scoreNum = parseInt(category.score || '0', 10);
+            const categoryStatus = scoreNum >= 80 ? 'Good' : scoreNum >= 50 ? 'Warning' : 'Critical';
 
             return (
               <IssueCard
-                key={issue.id}
-                id={issue.id}
-                title={issue.title}
-                score={issue.score || '0'}
-                description={issue.description}
-                status={issueStatus}
+                key={category.id}
+                id={category.id}
+                title={category.title}
+                score={category.score || '0'}
+                description={category.description}
+                status={categoryStatus}
                 onPressDetails={() =>
                   router.push({
                     pathname: "/[id]",
                     params: {
-                      id: issue.id,
-                      title: issue.title,
-                      score: issue.score || '0',
-                      description: issue.description,
-                      status: issueStatus,
+                      id: category.id,
+                      jobId: jobId,
                     },
                   })
                 }

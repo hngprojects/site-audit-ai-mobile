@@ -8,19 +8,30 @@ export type SelectedIssue = {
   description?: string;
 };
 
+export type FullIssueData = {
+  job_id: string;
+  website_score: number;
+  scan_date: string;
+  summary_message: string;
+  categories: any[]; // Full category data from /issues endpoint
+};
+
 interface SelectedIssuesState {
   issues: SelectedIssue[];
   availableIssues: SelectedIssue[];
+  fullIssuesData: FullIssueData | null;
 
   addIssue: (issue: SelectedIssue) => void;
   removeIssue: (id: string) => void;
   clearIssues: () => void;
   setIssues: (issues: SelectedIssue[]) => void;
+  setFullIssuesData: (data: FullIssueData) => void;
 }
 
 export const useSelectedIssuesStore = create<SelectedIssuesState>((set) => ({
   issues: [],
   availableIssues: [],
+  fullIssuesData: null,
 
   addIssue: (issue) =>
     set((state) => {
@@ -36,4 +47,6 @@ export const useSelectedIssuesStore = create<SelectedIssuesState>((set) => ({
   clearIssues: () => set({ issues: [] }),
 
   setIssues: (issues) => set({ availableIssues: issues }),
+
+  setFullIssuesData: (data) => set({ fullIssuesData: data }),
 }));

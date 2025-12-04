@@ -16,35 +16,34 @@
  * - iOS: Bundle ID matches Google Cloud Console
  */
 
-import { GoogleSignin, isErrorWithCode, isSuccessResponse, statusCodes } from '@react-native-google-signin/google-signin';
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
+
 // Check if we're in Expo Go - conditionally import Google Sign-In
 const isExpoGo = Constants.executionEnvironment === 'storeClient';
 
-// let GoogleSignin: any = null;
-// let isErrorWithCode: any = null;
-// let isSuccessResponse: any = null;
-// let statusCodes: any = null;
-// let Platform: any = null;
+// Dynamic imports for Google Sign-In
+let GoogleSignin: any = null;
+let isErrorWithCode: any = null;
+let isSuccessResponse: any = null;
+let statusCodes: any = null;
 
 // Conditionally import native modules only when not in Expo Go
 if (!isExpoGo) {
   try {
-    // const googleSigninModule = require('@react-native-google-signin/google-signin');
-    // const platformModule = require('react-native');
-
-    // GoogleSignin = googleSigninModule.GoogleSignin;
-    // isErrorWithCode = googleSigninModule.isErrorWithCode;
-    // isSuccessResponse = googleSigninModule.isSuccessResponse;
-    // statusCodes = googleSigninModule.statusCodes;
-    // Platform = platformModule.Platform;
+    const googleSigninModule = require('@react-native-google-signin/google-signin');
+    GoogleSignin = googleSigninModule.GoogleSignin;
+    isErrorWithCode = googleSigninModule.isErrorWithCode;
+    isSuccessResponse = googleSigninModule.isSuccessResponse;
+    statusCodes = googleSigninModule.statusCodes;
   } catch (error) {
     console.error('Failed to import Google Sign-In modules:', error);
+    // Set to null so we can check later
+    GoogleSignin = null;
+    isErrorWithCode = null;
+    isSuccessResponse = null;
+    statusCodes = null;
   }
-} else {
-  // Mock Platform for Expo Go
-  // Platform = { OS: 'unknown' } as any;
 }
 
 // Environment variable names - using different naming convention
@@ -60,7 +59,7 @@ let isInitialized = false;
  * Uses a different initialization strategy
  */
 function initializeGoogleSignIn(): void {
-  if (isInitialized) {
+  if (isInitialized || !GoogleSignin) {
     return;
   }
 
@@ -162,14 +161,14 @@ function checkExpoGo(): void {
  * Check Google Play Services (Android only)
  */
 async function checkPlayServices(): Promise<void> {
-  if (Platform.OS !== 'android') {
+  if (Platform.OS !== 'android' || !GoogleSignin) {
     return;
   }
 
   try {
     await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
   } catch (error: any) {
-    if (isErrorWithCode(error) && error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+    if (isErrorWithCode && isErrorWithCode(error) && error.code === statusCodes?.PLAY_SERVICES_NOT_AVAILABLE) {
       throw new Error(
         'Google Play Services is not available or outdated.\n\n' +
         'Please install or update Google Play Services from the Play Store.'
@@ -183,6 +182,10 @@ async function checkPlayServices(): Promise<void> {
  * Extract id_token from sign-in response with multiple fallback strategies
  */
 async function extractIdToken(response: any): Promise<string> {
+  if (!GoogleSignin) {
+    throw new Error('Google Sign-In is not available');
+  }
+
   // Strategy 1: Direct idToken in response
   if (response?.data?.idToken) {
     console.log('✅ Found id_token in response.data.idToken');
@@ -236,6 +239,20 @@ export const googleAuthService = {
     try {
       // Check if running in Expo Go
       checkExpoGo();
+
+      // Check if Google Sign-In is available
+      if (!GoogleSignin) {
+        throw new Error(
+          'Google Sign-In is not available.\n\n' +
+          'This could be because:\n' +
+          '1. The app is running in Expo Go (use a development build)\n' +
+          '2. The @react-native-google-signin/google-signin package is not properly installed\n' +
+          '3. The native module is not linked\n\n' +
+          'To fix this:\n' +
+          '1. Create a development build: eas build --profile development --platform android\n' +
+          '2. Or run: npx expo run:android (if using Expo SDK)'
+        );
+      }
 
       // Initialize configuration
       initializeGoogleSignIn();
@@ -376,7 +393,7 @@ export const googleAuthService = {
    */
   async signOut(): Promise<void> {
     if (!GoogleSignin) {
-      console.warn('Google Sign-In not available in Expo Go');
+      console.warn('Google Sign-In not available');
       return;
     }
 
@@ -390,11 +407,11 @@ export const googleAuthService = {
   },
 
   /**
-   * Revoke access and sign out
-   */
+    * Revoke access and sign out
+    */
   async revokeAccess(): Promise<void> {
     if (!GoogleSignin) {
-      console.warn('Google Sign-In not available in Expo Go');
+      console.warn('Google Sign-In not available');
       return;
     }
 
@@ -434,6 +451,12 @@ export const googleAuthService = {
       );
       return false;
     }
+
+    if (!GoogleSignin) {
+      console.warn('⚠️ Google Sign-In module not loaded');
+      return false;
+    }
+
     return true;
   },
 };

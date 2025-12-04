@@ -25,6 +25,13 @@ const styles = StyleSheet.create({
     color: '#1A2373',
     textAlign: 'center',
   },
+  reScanNote: {
+    fontSize: 14,
+    fontFamily: 'RethinkSans-Regular',
+    color: '#666',
+    textAlign: 'center',
+    marginTop: 4,
+  },
   loadingContainer: {
     justifyContent: 'center',
     alignItems: 'center',

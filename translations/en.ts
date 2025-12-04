@@ -377,7 +377,7 @@ export const en = {
   'issueDetail.userExperience': 'User Experience',
   'issueDetail.performance': 'Performance',
   'issueDetail.seo': 'SEO',
-  'issueDetail.whatThisWouldDo': 'WHAT this would do to your business',
+  'issueDetail.whatThisWouldDo': 'What this would do to your business',
   'issueDetail.defaultBenefits': '• Lower conversions for your website\n• Poor user experience\n• People leaving your website early',
   'issueDetail.problems': 'Problems',
   'issueDetail.problemUX': 'Issues with user interface and navigation',

@@ -15,6 +15,7 @@ const AuditingScreen = () => {
   const params = useLocalSearchParams();
   const jobId = Array.isArray(params.jobId) ? params.jobId[0] : params.jobId;
   const url = Array.isArray(params.url) ? params.url[0] : params.url;
+  const fromReports = params.fromReports === 'true';
 
   const { setDomain } = useAuditStore();
 
@@ -130,8 +131,13 @@ const AuditingScreen = () => {
     <SafeAreaView style={styles.container}>
       <View style={{ flex: 1 }}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>{t('auditing.scanning')}</Text>
+          <Text style={styles.headerTitle}>
+            {fromReports ? t('auditing.reScanning') : t('auditing.scanning')}
+          </Text>
           <Text style={styles.headerUrl}>{websiteUrl}</Text>
+          {fromReports && (
+            <Text style={styles.reScanNote}>{t('auditing.reScanNote')}</Text>
+          )}
         </View>
 
         <View style={styles.content}>

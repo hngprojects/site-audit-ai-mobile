@@ -1,3 +1,5 @@
+import { getScanIssues } from '@/actions/scan-actions';
+import type { IssuesResult } from '@/lib/scan-service';
 import { useSelectedIssuesStore } from '@/store/audit-summary-selected-issue-store';
 import { useAuditInfoStore } from '@/store/audit-website-details-store';
 import styles, { reportColors } from '@/stylesheets/single-issue-detail-screen-stylesheet';
@@ -6,8 +8,8 @@ import { useTranslation } from '@/utils/translations';
 import { AntDesign, Feather, Ionicons } from '@expo/vector-icons';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useMemo } from 'react';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 
@@ -18,29 +20,75 @@ const SingleIssueDetailScreen = () => {
     const inset = useSafeAreaInsets();
     const router = useRouter();
 
-    const { getAuditInfo } = useAuditInfoStore();
-    const { addIssue, availableIssues } = useSelectedIssuesStore();
+    const { getAuditInfo, setAuditInfo } = useAuditInfoStore();
+    const { addIssue, setFullIssuesData } = useSelectedIssuesStore();
 
-    const { domain, status, score, scanDate,} = getAuditInfo();
+    const [issuesData, setIssuesData] = useState<IssuesResult | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    const { domain, status, score, scanDate } = getAuditInfo();
 
     const params = useLocalSearchParams();
+    const categoryKey = Array.isArray(params.id) ? params.id[0] : params.id;
+    const jobId = Array.isArray(params.jobId) ? params.jobId[0] : params.jobId;
 
-    const { id, businessBenefits: _businessBenefits, impactMessage: _impactMessage } = params;
+    const category = issuesData?.categories.find(cat => cat.key === categoryKey);
 
-    const businessBenefitsStr = Array.isArray(_businessBenefits) ? _businessBenefits[0] : _businessBenefits;
-    const impactMessageStr = Array.isArray(_impactMessage) ? _impactMessage[0] : _impactMessage;
+    useEffect(() => {
+        const fetchIssues = async () => {
+            if (!jobId) {
+                setError('Job ID is required');
+                setIsLoading(false);
+                return;
+            }
 
-    const issue = useMemo(() => availableIssues.find(iss => iss.id === id), [availableIssues, id]);
+            try {
+                const result = await getScanIssues(jobId);
+                setIssuesData(result);
+                setFullIssuesData(result); // Save full data to store
 
-    const title = issue?.title || t('issueDetail.unknown');
-    const miniscore = issue?.score || '0';
-    const description = issue?.description || t('issueDetail.noDescription');
-    const ministatus = issue?.status || 'Warning';
+                // Update audit info with overall data
+                setAuditInfo({
+                    domain: domain || '', // Keep existing domain
+                    status: result.website_score >= 80 ? 'Good' : result.website_score >= 50 ? 'Warning' : 'Critical',
+                    score: String(result.website_score),
+                    scanDate: new Date(result.scan_date).toLocaleDateString(),
+                });
+            } catch (err) {
+                setError(err instanceof Error ? err.message : 'Failed to load issue details');
+            } finally {
+                setIsLoading(false);
+            }
+        };
 
-    const businessBenefits = businessBenefitsStr ? JSON.parse(businessBenefitsStr) : [];
-    const impactMessage = impactMessageStr || '';
+        fetchIssues();
+    }, [jobId, setAuditInfo, domain]);
 
-    console.log(id, ministatus)
+    if (isLoading) {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <ActivityIndicator size="large" />
+            </View>
+        );
+    }
+
+    if (error || !category) {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
+                <Text style={{ textAlign: 'center', color: 'red' }}>
+                    {error || 'Category not found'}
+                </Text>
+            </View>
+        );
+    }
+
+    const title = category.title;
+    const description = category.description;
+    const categoryScore = category.score;
+    const businessBenefits = category.business_impact;
+    const suggestions = category.suggestion;
+    const problems = category.problems;
 
 
     const statusColor = (s: Status) =>
@@ -50,49 +98,40 @@ const SingleIssueDetailScreen = () => {
 
 
 
-        // Suppose numericScore is between 0-100
-const scoreStr = Array.isArray(miniscore) ? miniscore[0] : miniscore;
-const numericScore = parseInt(scoreStr, 10);
+    const numericScore = categoryScore;
 
-const scoreStatus =
-  numericScore <= 49 ? "Critical" :
-  numericScore <= 69 ? "Warning" :
-  "Good";
+    const scoreStatus =
+      numericScore <= 49 ? "Critical" :
+      numericScore <= 69 ? "Warning" :
+      "Good";
 
-const bgColor =
-  scoreStatus === "Good"
-    ? "rgba(14, 164, 114, 0.2)"
-    : scoreStatus === "Warning"
-    ? "rgba(255, 155, 46, 0.2)"
-    : "rgba(215, 45, 45, 0.2)";
+    const bgColor =
+      scoreStatus === "Good"
+        ? "rgba(14, 164, 114, 0.2)"
+        : scoreStatus === "Warning"
+        ? "rgba(255, 155, 46, 0.2)"
+        : "rgba(215, 45, 45, 0.2)";
 
-const fgColor =
-  scoreStatus === "Good"
-    ? "#0EA472"
-    : scoreStatus === "Warning"
-    ? "#FF9B2E"
-    : "#D72D2D";
+    const fgColor =
+      scoreStatus === "Good"
+        ? "#0EA472"
+        : scoreStatus === "Warning"
+        ? "#FF9B2E"
+        : "#D72D2D";
 
-
-const progressWidth = `${numericScore}%`;
+    const progressWidth = `${numericScore}%`;
 
 
 const hireAPro = () => {
-  const rawId = Array.isArray(params.id) ? params.id[0] : params.id;
-const rawTitle = Array.isArray(params.title) ? params.title[0] : params.title;
-const rawMiniScore = Array.isArray(params.score) ? params.score[0] : params.score;
-const rawMiniStatus = Array.isArray(params.status) ? params.status[0] : params.status;
-const rawDescription = Array.isArray(params.description) ? params.description[0] : params.description;
-
   try {
     addIssue({
-      id: rawId,
-      title: rawTitle,
-      score: rawMiniScore,
-      status: rawMiniStatus,
-      description: rawDescription,
-   });
-    
+      id: categoryKey,
+      title: title,
+      score: String(categoryScore),
+      status: scoreStatus,
+      description: description,
+    });
+
     //navigate to  fix/hire professional
     router.push("/(hireRequest)/hire-request");
   } catch (error) {
@@ -214,7 +253,7 @@ const rawDescription = Array.isArray(params.description) ? params.description[0]
     <Text style={{
       ...styles.usabilityText
     }}>
-      {ministatus === 'UX' ? t('issueDetail.userExperience') : ministatus === 'Performance' ? t('issueDetail.performance') : t('issueDetail.seo')}
+      {categoryKey === 'usability' ? t('issueDetail.userExperience') : categoryKey === 'performance' ? t('issueDetail.performance') : t('issueDetail.seo')}
     </Text>
 
     <View style={{
@@ -223,7 +262,7 @@ const rawDescription = Array.isArray(params.description) ? params.description[0]
       <Text style={{
         ...styles.miniscoreText, color: fgColor
       }}>
-        {miniscore}/100
+        {categoryScore}/100
       </Text>
     </View>
   </View>
@@ -231,9 +270,9 @@ const rawDescription = Array.isArray(params.description) ? params.description[0]
   {/**Progress Bar */}
 
  <View style={[styles.progressBarBackground, { backgroundColor: bgColor }]}>
-  <View
-    style={[styles.progressBarForeground, { width: progressWidth, backgroundColor: fgColor }]}
-  />
+ <View
+   style={[styles.progressBarForeground, { width: progressWidth as any, backgroundColor: fgColor }]}
+ />
 </View>
 
 
@@ -263,47 +302,30 @@ const rawDescription = Array.isArray(params.description) ? params.description[0]
   </Text>
 
   <View style={{...styles.problemDetailsContainer }}>
-    <View style={{ ...styles.problemDetailInnerContainer }}>
+    {problems.map((problem, index) => (
+      <View key={index} style={{ ...styles.problemDetailInnerContainer }}>
         <View style={{...styles.warningIconBackground, backgroundColor: "rgba(232, 153, 25, 0.3)"}}>
             <FontAwesome name="warning" size={12} color="#E89919" />
         </View>
-      
-      <Text style={{
-        ...styles.problemText
-      }}>
-        {ministatus === 'UX' ? t('issueDetail.problemUX') :
-         ministatus === 'Performance' ? t('issueDetail.problemPerformance') :
-         t('issueDetail.problemSEO')}
-      </Text>
-    </View>
-
-    <View style={{ ...styles.problemDetailInnerContainer }}>
-
-      
-      <View style={{...styles.warningIconBackground, backgroundColor: "rgba(232, 153, 25, 0.3)"}}>
-            <FontAwesome name="warning" size={12} color="#E89919" />
+        <View style={{ flex: 1 }}>
+          <Text style={{
+            ...styles.problemText,
+            fontFamily: "RethinkSans-Bold",
+            fontSize: 14,
+            marginBottom: 4
+          }}>
+            {problem.title}
+          </Text>
+          <Text style={{
+            ...styles.problemText,
+            fontFamily: "RethinkSans-Regular",
+            fontSize: 13
+          }}>
+            {problem.description}
+          </Text>
         </View>
-
-      <Text style={{
-        ...styles.problemText
-      }}>
-        {t('issueDetail.missingFeatures')}
-      </Text>
-    </View>
-
-    <View style={{...styles.problemDetailInnerContainer }}>
-
-
-      <View style={{...styles.warningIconBackground, backgroundColor: "rgba(232, 153, 25, 0.3)"}}>
-            <FontAwesome name="warning" size={12} color="#E89919" />
-        </View>
-
-      <Text style={{
-        ...styles.problemText
-      }}>
-        {t('issueDetail.visualHierarchy')}
-      </Text>
-    </View>
+      </View>
+    ))}
   </View>
 
   {/* SUGGESTIONS */}
@@ -316,9 +338,9 @@ const rawDescription = Array.isArray(params.description) ? params.description[0]
   <Text style={{
     ...styles.suggestionText
   }}>
-    {impactMessage || (ministatus === 'UX' ? t('issueDetail.suggestionUX') :
-     ministatus === 'Performance' ? t('issueDetail.suggestionPerformance') :
-     t('issueDetail.suggestionSEO'))}
+    {suggestions.map((suggestion, index) => (
+      `• ${suggestion}${index < suggestions.length - 1 ? '\n' : ''}`
+    )).join('')}
   </Text>
 
   {/* Continue Button */}
