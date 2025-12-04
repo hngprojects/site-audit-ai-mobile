@@ -140,6 +140,11 @@ const style = StyleSheet.create({
     textAlign: "center",
     fontFamily: "RethinkSans-Bold",
   },
+  modalActivityIndicator: {
+    justifyContent: "center",
+    alignItems: "center"
+  },
+
 });
 
 export default style;

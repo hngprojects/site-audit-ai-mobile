@@ -20,12 +20,17 @@ import {
 import Toast from "react-native-toast-message";
 
 import IssueCard from "@/components/issue-card";
+import TopAlert from "@/components/top-alert";
 import { useSelectedIssuesStore } from "@/store/audit-summary-selected-issue-store";
 import { useAuditInfoStore } from "@/store/audit-website-details-store";
-import { Status } from "@/type";
+import { LeadResponse, Status } from "@/type";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { leadService } from "../../lib/lead-generation-service";
+
+
+
 
 
 
@@ -40,7 +45,10 @@ export default function ReportDashboard() {
   const [modalTextInput, setModalTextInput] = useState<string>('')
   const [emptyModalTextInput, setEmptyModalTextInput] = useState<boolean>(false)
   const [summaryResult, setSummaryResult] = useState<SummaryResult | null>(null);
-
+  const [scanResult, setScanResult] = useState<any>(null);
+  const [leadResponse, setLeadResponse] = useState<LeadResponse | null>(null)
+  const [modalLoading, setModalLoading] = useState<boolean>(false);
+  const router = useRouter();
   const { addIssue, clearIssues, setIssues } = useSelectedIssuesStore();
 
   const { issues } = useSelectedIssuesStore();
@@ -59,10 +67,7 @@ export default function ReportDashboard() {
 
 
   const hireAPro = () => {
-
-
     try {
-
       if (issues.length < 1) {
         Toast.show({
           type: 'error',
@@ -72,21 +77,12 @@ export default function ReportDashboard() {
         return;
       }
 
-
-      //navigate to  fix/hire professional
-      router.push({
-        pathname: "/(hireRequest)/hire-request",
-        params: jobId ? { jobId } : {},
-      });
+      //navigate to  fix/hire professional 
+      router.push("/(hireRequest)/hire-request");
     } catch (error) {
       console.log(error)
     }
-  }
-
-
-  const router = useRouter();
-
-
+  };
 
   const statusColor = (s: Status) =>
     s === "Critical" ? reportColors.scoreLow :
@@ -103,12 +99,13 @@ export default function ReportDashboard() {
     }
   };
 
-
-  const modalContinueButton = async () => {
+  const modalContinueButton = async (modalTextInput: string) => {
     if (modalTextInput.trim() === "") {
       setEmptyModalTextInput(true);
       return;
     }
+
+    setModalLoading(true)
 
     try {
       const response = await submitLead(modalTextInput.trim());
@@ -119,11 +116,23 @@ export default function ReportDashboard() {
       });
       setShowModal(false);
     } catch (error) {
-      Toast.show({
-        type: 'error',
-        text1: t('common.error'),
-        text2: 'Failed to submit email. Please try again.',
-      });
+      try {
+        const response = await leadService.createLead(modalTextInput);
+
+        setLeadResponse(response)
+
+        if (response.status === "success") {
+          console.log("success")
+          setShowModal(false);
+        }
+      } catch (error: any) {
+        console.log("error")
+        const apiError = error?.response?.data ?? null;
+        console.log(apiError)
+        setLeadResponse(apiError);
+      }
+    } finally {
+      setModalLoading(false)
     }
   };
 
@@ -201,8 +210,9 @@ export default function ReportDashboard() {
           <Text style={[styles.pageTitle, { textAlign: 'center' }]}>{t('reportDashboard.auditSummary')}</Text>
         </View>
 
-
-
+        {leadResponse?.status === "success" && (
+          <TopAlert message={leadResponse.message} duration={4000} />
+        )}
 
         <View style={{
           flexDirection: "row",
@@ -304,7 +314,6 @@ export default function ReportDashboard() {
         <View style={{ height: 80 }} />
       </ScrollView>
 
-
       <Modal transparent visible={showModal} animationType="fade" onRequestClose={() => setShowModal(false)}>
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -315,61 +324,77 @@ export default function ReportDashboard() {
             <View style={styles.modalOverlay}>
               <TouchableWithoutFeedback>
                 <View style={styles.modalBox}>
+                  <TouchableOpacity
+                    onPress={() => setShowModal(false)}
+                    style={{ position: "absolute", right: 5, margin: 10, paddingBottom: 15 }}
+                  >
+                    <Ionicons name="close" size={30} color="#e24017ff" />
+                  </TouchableOpacity>
 
-            <TouchableOpacity
-              onPress={() => setShowModal(false)}
-              style={{ position: "absolute", right: 5, margin: 10, paddingBottom: 15 }}
-            >
-              <Ionicons name="close" size={30} color="#e24017ff" />
-            </TouchableOpacity>
+                  <Text style={styles.modalTitle}>{t('reportDashboard.modalTitle')}</Text>
 
-            <Text style={styles.modalTitle}>{t('reportDashboard.modalTitle')}</Text>
+                  <Text style={styles.modalSubtitle}>
+                    {t('reportDashboard.modalSubtitle')}
+                  </Text>
 
-            <Text style={styles.modalSubtitle}>
-              {t('reportDashboard.modalSubtitle')}
-            </Text>
+                  <View>
+                    <TextInput
+                      placeholder={t('reportDashboard.enterEmail')}
+                      onChangeText={(x) => {
+                        setModalTextInput(x);
+                        if (emptyModalTextInput && x !== "") setEmptyModalTextInput(false);
+                      }}
+                      placeholderTextColor={"#dbdbdbff"}
+                      style={{
+                        color: "#000",
+                        borderWidth: 1.5,
+                        borderColor: emptyModalTextInput || leadResponse?.status === "error" ? "#D72D2D" : "#E5E7EB",
+                        borderRadius: 5,
+                        padding: 10,
+                      }}
+                    />
+                  </View>
 
-            <View>
-              <TextInput
-                placeholder={t('reportDashboard.enterEmail')}
-                onChangeText={(x) => {
-                  setModalTextInput(x);
-                  if (emptyModalTextInput && x !== "") setEmptyModalTextInput(false);
-                }}
-                placeholderTextColor={"#dbdbdbff"}
-                style={{
-                  color: "#000",
-                  borderWidth: 1.5,
-                  borderColor: emptyModalTextInput ? "#D72D2D" : "#E5E7EB",
-                  borderRadius: 5,
-                  padding: 10,
-                }}
-              />
+                  {emptyModalTextInput && (
+                    <Text style={{
+                      fontFamily: "RethinkSans-Regular",
+                      fontSize: 13,
+                      color: "#D72D2D",
+                    }}>
+                      {t('reportDashboard.invalidEmail')}
+                    </Text>
+                  )}
 
+                  {leadResponse?.status === "error" && (
+                    <Text style={{
+                      fontFamily: "RethinkSans-Regular",
+                      fontSize: 13,
+                      color: "#D72D2D",
+                    }}>
+                      {leadResponse.message}
+                    </Text>
+                  )}
+
+                  <View style={{ marginBottom: 20 }} />
+
+                  {modalLoading ? (
+                    <ActivityIndicator
+                      size={"large"}
+                      color={"#e24017ff"}
+                      style={styles.modalActivityIndicator}
+                    />
+                  ) : (
+                    <TouchableOpacity
+                      style={styles.modalButton}
+                      onPress={() => modalContinueButton(modalTextInput)}
+                    >
+                      <Text style={styles.modalButtonText}>{t('reportDashboard.gotIt')}</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              </TouchableWithoutFeedback>
             </View>
-            {emptyModalTextInput && (
-              <Text style={{
-                fontFamily: "RethinkSans-Regular",
-                fontSize: 13,
-                color: "#D72D2D",
-
-              }}>
-                {t('reportDashboard.invalidEmail')}
-              </Text>
-            )}
-
-            <View style={{ marginBottom: 20 }} />
-
-            <TouchableOpacity
-              style={styles.modalButton}
-              onPress={modalContinueButton}
-            >
-              <Text style={styles.modalButtonText}>{t('reportDashboard.gotIt')}</Text>
-            </TouchableOpacity>
-          </View>
-        </TouchableWithoutFeedback>
-        </View>
-      </TouchableWithoutFeedback>
+          </TouchableWithoutFeedback>
         </KeyboardAvoidingView>
       </Modal>
     </View>
