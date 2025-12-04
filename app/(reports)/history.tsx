@@ -1,6 +1,6 @@
 import styles from '@/stylesheets/history-stylesheet';
 import { useTranslation } from '@/utils/translations';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
 import {
@@ -40,6 +40,8 @@ const HistoryScreen: React.FC = () => {
   const siteName = getSiteName(siteUrl);
 
   const [search, setSearch] = useState('');
+  const [isSelectionMode, setIsSelectionMode] = useState(false);
+  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
 
   const formatMonthHeader = React.useCallback((date: Date): string => {
     return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
@@ -151,6 +153,45 @@ const HistoryScreen: React.FC = () => {
     return result;
   }, [search, mockHistoryData, formatMonthHeader, formatDateHeader]);
 
+  const handleLongPress = (itemId: string) => {
+    if (!isSelectionMode) {
+      setIsSelectionMode(true);
+      setSelectedItems(new Set([itemId]));
+    }
+  };
+
+  const handleItemPress = (itemId: string) => {
+    if (isSelectionMode) {
+      setSelectedItems(prev => {
+        const newSet = new Set(prev);
+        if (newSet.has(itemId)) {
+          newSet.delete(itemId);
+        } else {
+          newSet.add(itemId);
+        }
+        if (newSet.size === 0) {
+          setIsSelectionMode(false);
+        }
+        return newSet;
+      });
+    }
+  };
+
+  const toggleItemSelection = (itemId: string) => {
+    setSelectedItems(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(itemId)) {
+        newSet.delete(itemId);
+      } else {
+        newSet.add(itemId);
+      }
+      if (newSet.size === 0) {
+        setIsSelectionMode(false);
+      }
+      return newSet;
+    });
+  };
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <KeyboardAvoidingView
@@ -215,24 +256,46 @@ const HistoryScreen: React.FC = () => {
                 </View>
               );
             }}
-            renderItem={({ item }) => (
-              <View style={styles.historyCard}>
-                <View style={styles.cardLeft}>
-                  <Text style={styles.urlText} numberOfLines={1}>
-                    {item.url}
-                  </Text>
-                  <Text style={styles.scoreText}>
-                    Score: {item.score}/100
-                  </Text>
-                  <Text style={styles.scanDateText}>
-                    Scan Date: {item.scanDate}
-                  </Text>
-                </View>
-                <View style={styles.cardRight}>
-                  <Text style={styles.scanTimeText}>{item.scanTime}</Text>
-                </View>
-              </View>
-            )}
+            renderItem={({ item }) => {
+              const isSelected = selectedItems.has(item.id);
+
+              return (
+                <TouchableOpacity
+                  style={styles.historyCard}
+                  onLongPress={() => handleLongPress(item.id)}
+                  onPress={() => handleItemPress(item.id)}
+                  activeOpacity={0.7}
+                >
+                  {isSelectionMode && (
+                    <TouchableOpacity
+                      style={styles.checkboxContainer}
+                      onPress={() => toggleItemSelection(item.id)}
+                      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                    >
+                      {isSelected ? (
+                        <Ionicons name="checkbox" size={24} color="#FF5A3D" />
+                      ) : (
+                        <MaterialCommunityIcons name="checkbox-blank-outline" size={24} color="#BBBCBC" />
+                      )}
+                    </TouchableOpacity>
+                  )}
+                  <View style={[styles.cardLeft, isSelectionMode && styles.cardLeftWithCheckbox]}>
+                    <Text style={styles.urlText} numberOfLines={1}>
+                      {item.url}
+                    </Text>
+                    <Text style={styles.scoreText}>
+                      Score: {item.score}/100
+                    </Text>
+                    <Text style={styles.scanDateText}>
+                      Scan Date: {item.scanDate}
+                    </Text>
+                  </View>
+                  <View style={styles.cardRight}>
+                    <Text style={styles.scanTimeText}>{item.scanTime}</Text>
+                  </View>
+                </TouchableOpacity>
+              );
+            }}
             ItemSeparatorComponent={() => <View style={styles.separator} />}
             SectionSeparatorComponent={() => <View style={styles.sectionSeparator} />}
             ListFooterComponent={<View style={styles.footerSpacer} />}

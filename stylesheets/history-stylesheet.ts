@@ -100,9 +100,16 @@ export default StyleSheet.create({
     shadowRadius: 4,
     elevation: 1,
   },
+  checkboxContainer: {
+    marginRight: 12,
+    padding: 4,
+  },
   cardLeft: {
     flex: 1,
     marginRight: 12,
+  },
+  cardLeftWithCheckbox: {
+    marginRight: 0,
   },
   cardRight: {
     alignItems: 'flex-end',
