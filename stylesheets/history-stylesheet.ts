@@ -181,5 +181,31 @@ export default StyleSheet.create({
   deleteButtonTextDisabled: {
     color: '#9CA3AF',
   },
+  skeletonCard: {
+    backgroundColor: '#FCFCFC',
+    borderRadius: 12,
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderWidth: 1,
+    borderColor: '#BBBCBC',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 1,
+  },
+  skeletonLeft: {
+    flex: 1,
+    marginRight: 12,
+  },
+  skeletonRight: {
+    alignItems: 'flex-end',
+  },
+  skeletonText: {
+    backgroundColor: '#E5E7EB',
+    borderRadius: 4,
+  },
 });
 

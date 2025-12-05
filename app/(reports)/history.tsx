@@ -24,6 +24,19 @@ interface HistoryItem {
   date: Date;
 }
 
+const SkeletonCard = () => (
+  <View style={styles.skeletonCard}>
+    <View style={styles.skeletonLeft}>
+      <View style={[styles.skeletonText, { width: 200, height: 16, marginBottom: 8 }]} />
+      <View style={[styles.skeletonText, { width: 120, height: 14, marginBottom: 6 }]} />
+      <View style={[styles.skeletonText, { width: 100, height: 12 }]} />
+    </View>
+    <View style={styles.skeletonRight}>
+      <View style={[styles.skeletonText, { width: 60, height: 12 }]} />
+    </View>
+  </View>
+);
+
 const HistoryScreen: React.FC = () => {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
@@ -42,6 +55,7 @@ const HistoryScreen: React.FC = () => {
   const [search, setSearch] = useState('');
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
+  const [isLoading, setIsLoading] = useState(true);
 
   const formatMonthHeader = React.useCallback((date: Date) =>
     date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }), []);
@@ -204,8 +218,10 @@ const HistoryScreen: React.FC = () => {
             <Text style={styles.siteName} numberOfLines={1} ellipsizeMode="tail">
               {siteName}
             </Text>
-            <TouchableOpacity onPress={handleSelectButton}>
-              <Text style={styles.selectButton}>{getSelectButtonText()}</Text>
+            <TouchableOpacity onPress={handleSelectButton} disabled={isLoading}>
+              <Text style={[styles.selectButton, isLoading && { opacity: 0.5 }]}>
+                {getSelectButtonText()}
+              </Text>
             </TouchableOpacity>
           </View>
 
@@ -217,79 +233,94 @@ const HistoryScreen: React.FC = () => {
               style={styles.searchText}
               onChangeText={setSearch}
               value={search}
+              editable={!isLoading}
             />
           </View>
 
-          <SectionList
-            sections={groupedData}
-            keyExtractor={(item) => item.id}
-            contentContainerStyle={[styles.listWrap, isSelectionMode && styles.listWrapWithButton]}
-            showsVerticalScrollIndicator={false}
-            renderSectionHeader={({ section }) => {
-              const sectionIndex = groupedData.findIndex(s => s.title === section.title);
-              const showMonthHeader = sectionIndex === 0 || groupedData[sectionIndex - 1].monthTitle !== section.monthTitle;
-              return (
-                <View>
-                  {showMonthHeader && (
-                    <View style={styles.monthHeader}>
-                      <Text style={styles.monthHeaderText}>{section.monthTitle}</Text>
+          {isLoading ? (
+            <View style={styles.listWrap}>
+              <SkeletonCard />
+              <View style={styles.separator} />
+              <SkeletonCard />
+              <View style={styles.separator} />
+              <SkeletonCard />
+              <View style={styles.separator} />
+              <SkeletonCard />
+              <View style={styles.separator} />
+              <SkeletonCard />
+            </View>
+          ) : (
+            <SectionList
+              sections={groupedData}
+              keyExtractor={(item) => item.id}
+              contentContainerStyle={[styles.listWrap, isSelectionMode && styles.listWrapWithButton]}
+              showsVerticalScrollIndicator={false}
+              renderSectionHeader={({ section }) => {
+                const sectionIndex = groupedData.findIndex(s => s.title === section.title);
+                const showMonthHeader = sectionIndex === 0 || groupedData[sectionIndex - 1].monthTitle !== section.monthTitle;
+                return (
+                  <View>
+                    {showMonthHeader && (
+                      <View style={styles.monthHeader}>
+                        <Text style={styles.monthHeaderText}>{section.monthTitle}</Text>
+                      </View>
+                    )}
+                    <View style={styles.sectionHeader}>
+                      <Text style={styles.sectionHeaderText}>{section.dateTitle}</Text>
                     </View>
-                  )}
-                  <View style={styles.sectionHeader}>
-                    <Text style={styles.sectionHeaderText}>{section.dateTitle}</Text>
                   </View>
+                );
+              }}
+              renderItem={({ item }) => {
+                const isSelected = selectedItems.has(item.id);
+                return (
+                  <TouchableOpacity
+                    style={styles.historyCard}
+                    onLongPress={() => {
+                      if (!isSelectionMode) {
+                        setIsSelectionMode(true);
+                        setSelectedItems(new Set([item.id]));
+                      }
+                    }}
+                    onPress={() => isSelectionMode && toggleSelection(item.id)}
+                    activeOpacity={0.7}
+                  >
+                    {isSelectionMode && (
+                      <TouchableOpacity
+                        style={styles.checkboxContainer}
+                        onPress={() => toggleSelection(item.id)}
+                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                      >
+                        {isSelected ? (
+                          <Ionicons name="checkbox" size={24} color="#FF5A3D" />
+                        ) : (
+                          <MaterialCommunityIcons name="checkbox-blank-outline" size={24} color="#BBBCBC" />
+                        )}
+                      </TouchableOpacity>
+                    )}
+                    <View style={[styles.cardLeft, isSelectionMode && styles.cardLeftWithCheckbox]}>
+                      <Text style={styles.urlText} numberOfLines={1}>{item.url}</Text>
+                      <Text style={styles.scoreText}>Score: {item.score}/100</Text>
+                      <Text style={styles.scanDateText}>Scan Date: {item.scanDate}</Text>
+                    </View>
+                    <View style={styles.cardRight}>
+                      <Text style={styles.scanTimeText}>{item.scanTime}</Text>
+                    </View>
+                  </TouchableOpacity>
+                );
+              }}
+              ItemSeparatorComponent={() => <View style={styles.separator} />}
+              SectionSeparatorComponent={() => <View style={styles.sectionSeparator} />}
+              ListFooterComponent={<View style={styles.footerSpacer} />}
+              ListEmptyComponent={
+                <View style={{ paddingVertical: 40, alignItems: 'center' }}>
+                  <Text style={{ color: '#9CA3AF', fontSize: 14 }}>
+                    {t('history.noHistory')}
+                  </Text>
                 </View>
-              );
-            }}
-            renderItem={({ item }) => {
-              const isSelected = selectedItems.has(item.id);
-              return (
-                <TouchableOpacity
-                  style={styles.historyCard}
-                  onLongPress={() => {
-                    if (!isSelectionMode) {
-                      setIsSelectionMode(true);
-                      setSelectedItems(new Set([item.id]));
-                    }
-                  }}
-                  onPress={() => isSelectionMode && toggleSelection(item.id)}
-                  activeOpacity={0.7}
-                >
-                  {isSelectionMode && (
-                    <TouchableOpacity
-                      style={styles.checkboxContainer}
-                      onPress={() => toggleSelection(item.id)}
-                      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                    >
-                      {isSelected ? (
-                        <Ionicons name="checkbox" size={24} color="#FF5A3D" />
-                      ) : (
-                        <MaterialCommunityIcons name="checkbox-blank-outline" size={24} color="#BBBCBC" />
-                      )}
-                    </TouchableOpacity>
-                  )}
-                  <View style={[styles.cardLeft, isSelectionMode && styles.cardLeftWithCheckbox]}>
-                    <Text style={styles.urlText} numberOfLines={1}>{item.url}</Text>
-                    <Text style={styles.scoreText}>Score: {item.score}/100</Text>
-                    <Text style={styles.scanDateText}>Scan Date: {item.scanDate}</Text>
-                  </View>
-                  <View style={styles.cardRight}>
-                    <Text style={styles.scanTimeText}>{item.scanTime}</Text>
-                  </View>
-                </TouchableOpacity>
-              );
-            }}
-            ItemSeparatorComponent={() => <View style={styles.separator} />}
-            SectionSeparatorComponent={() => <View style={styles.sectionSeparator} />}
-            ListFooterComponent={<View style={styles.footerSpacer} />}
-            ListEmptyComponent={
-              <View style={{ paddingVertical: 40, alignItems: 'center' }}>
-                <Text style={{ color: '#9CA3AF', fontSize: 14 }}>
-                  {t('history.noHistory')}
-                </Text>
-              </View>
-            }
-          />
+              }
+            />
+          )}
           {isSelectionMode && (
             <View style={[styles.deleteButtonContainer, { paddingBottom: insets.bottom }]}>
               <TouchableOpacity
