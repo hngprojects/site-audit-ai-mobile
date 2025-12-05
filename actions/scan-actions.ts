@@ -1,4 +1,4 @@
-import { scanService, type ScanResult, type ScanHistoryItem } from '@/lib/scan-service';
+import { scanService, type ScanHistoryItem, type ScanResult } from '@/lib/scan-service';
 import { useAuthStore } from '@/store/auth-store';
 
 export const startScan = async (url: string, topN: number = 15): Promise<{ job_id: string; status: string; message: string }> => {
