@@ -69,35 +69,13 @@ checklistContainer: {
   alignItems: "center",
 
 },
-
-checklistItem: {
-  flexDirection: 'row',
-  alignItems: 'center',
-  marginBottom: 12,
-  marginTop: 8,
-  borderWidth: 1,
-  backgroundColor: "#DFF4E7",
-  borderColor: "#00ac42ff",
-  borderRadius: 15,
-  padding: 15,
-  width: "100%"
-},
-
-checklistIcon: {
-  marginRight: 12,
-},
-
-checklistText: {
-  fontSize: 16,
-  fontFamily: 'RethinkSans-SemiBold',
-},
 hangTight: {
   fontFamily: 'RethinkSans-Medium',
   fontSize: 15,
   color: "#7a7474ff"
 },
 
-  glowCircle: {
+glowCircle: {
   position: "absolute",
   top: 2,
   width: 160,
