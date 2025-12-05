@@ -23,6 +23,10 @@ const AuditingScreen = () => {
   const [progress, setProgress] = useState(0);
   const [scanStatus, setScanStatus] = useState<string>('queued');
   const [completedSteps, setCompletedSteps] = useState<number>(0);
+  const [caretVisible, setCaretVisible] = useState<boolean>(true);
+  const [isTyping, setIsTyping] = useState<boolean>(false);
+
+  
   
 
   // Scanning checklist items with appropriate icons
@@ -47,7 +51,9 @@ const AuditingScreen = () => {
 
           // Update completed steps based on real progress from API
           const stepProgress = (statusResponse.progress_percent / 100) * scanSteps.length;
+          
           setCompletedSteps(Math.floor(stepProgress));
+          
 
           if (statusResponse.status === 'completed') {
             setProgress(100); // Ensure progress shows 100% on completion
@@ -113,13 +119,21 @@ const AuditingScreen = () => {
     }
   }, [jobId, router, websiteUrl, params.isReRun, scanSteps.length, setDomain]);
 
-  console.log(scanStatus)
-  console.log(progress)
+  //console.log(scanStatus)
+  //console.log(progress)
  
 
 
+  useEffect(() => {
+  const interval = setInterval(() => {
+    setCaretVisible(v => !v);
+  }, 500);
 
-  // 🔥 TEMPORARY: Simulate scan steps for testing animations
+  return () => clearInterval(interval);
+}, []);
+
+
+  //🔥 TEMPORARY: Simulate scan steps for testing animations
 useEffect(() => {
   if (jobId) return; // don't simulate if real scanning is happening
 
@@ -127,8 +141,10 @@ useEffect(() => {
 
   const simulate = () => {
     if (step < scanSteps.length) {
-      step++;
-      setCompletedSteps(step);
+      if (!isTyping) {
+        step++;
+        setCompletedSteps(step);
+      }
       setTimeout(simulate, 2500); // animate each step every 2.5 seconds..
     }
   };
@@ -165,12 +181,31 @@ const animatedOpacity = useRef(
   scanSteps.map(() => new Animated.Value(0))
 ).current;
 
+const typedText = useRef(
+  scanSteps.map(() => new Animated.Value(0))
+).current;
+
+  const [textProgress, setTextProgress] = useState(
+  scanSteps.map(() => 0));
+  const [targetStep, setTargetStep] = useState(0);
+
+  const nextStep = () => {
+  setCompletedSteps(prev => prev + 1);
+};
+
+
+
+
+
+
 
 
 useEffect(() => {
-  if (completedSteps > 0) {
-    const index = completedSteps - 1; // animate only the newly completed step
+  if (completedSteps > 0 && completedSteps <= scanSteps.length) {
+    const index = completedSteps - 1;
+    const textLength = scanSteps[index].text.length;
 
+    // Slide + fade animation
     Animated.parallel([
       Animated.timing(animatedSteps[index], {
         toValue: 0,
@@ -181,10 +216,83 @@ useEffect(() => {
         toValue: 1,
         duration: 300,
         useNativeDriver: true,
-      })
-    ]).start();
+      }),
+    ]).start(() => {
+      setIsTyping(true);
+
+      const anim = Animated.timing(typedText[index], {
+        toValue: textLength,
+        duration: textLength * 100,
+        useNativeDriver: false,
+      });
+
+      const listenerId = typedText[index].addListener(v => {
+        setTextProgress(prev => {
+          const next = [...prev];
+          next[index] = Math.floor(v.value);
+          return next;
+        });
+      });
+
+      anim.start(() => {
+        typedText[index].removeListener(listenerId);
+        setIsTyping(false);
+      });
+    });
   }
 }, [completedSteps]);
+
+
+
+// useEffect(() => {
+//   if (completedSteps > 0) {
+//     const index = completedSteps - 1;
+//     const textLength = scanSteps[index].text.length;
+
+//     // 1. Slide + fade
+//     Animated.parallel([
+//       Animated.timing(animatedSteps[index], {
+//         toValue: 0,
+//         duration: 400,
+//         useNativeDriver: true,
+//       }),
+//       Animated.timing(animatedOpacity[index], {
+//         toValue: 1,
+//         duration: 300,
+//         useNativeDriver: true,
+//       }),
+//     ]).start(() => {
+      
+//       // 🔥 Start typing — LOCK
+//       setIsTyping(true);
+
+//       const anim = Animated.timing(typedText[index], {
+//         toValue: textLength,
+//         duration: textLength * 100, // your 100ms per character
+//         useNativeDriver: false,
+//       });
+
+//       // Update text progress on every animation tick
+//       const listenerId = typedText[index].addListener(v => {
+//         setTextProgress(prev => {
+//           const next = [...prev];
+//           next[index] = Math.floor(v.value);
+//           return next;
+//         });
+//       });
+
+//       anim.start(() => {
+//         typedText[index].removeListener(listenerId);
+
+//         // 🔥 Finished typing — UNLOCK
+//         setIsTyping(false);
+//       });
+//     });
+//   }
+// }, [completedSteps]);
+
+
+
 
 
 
@@ -196,7 +304,7 @@ useEffect(() => {
           <Text style={styles.headerTitle}>
             {fromReports ? t('auditing.reScanning') : t('auditing.scanning')}
           </Text>
-          <Text style={styles.headerUrl}>{websiteUrl} www.trendhubnaija.com</Text>
+          <Text style={styles.headerUrl}>{websiteUrl}</Text>
           {fromReports && (
             <Text style={styles.reScanNote}>{t('auditing.reScanNote')}</Text>
           )}
@@ -241,7 +349,8 @@ useEffect(() => {
                   style={styles.checklistIcon}
                 />
                 <Text style={[styles.checklistText, { color: "#58A279" }]}>
-                  {step.text}
+                    {step.text.substring(0, textProgress[index])}
+                    {textProgress[index] < step.text.length && caretVisible ? "|" : ""}
                 </Text>
               </Animated.View>
             ))}
