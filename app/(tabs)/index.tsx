@@ -237,6 +237,9 @@ export default function HomeScreen() {
               ))
           )}
 
+            <TouchableOpacity onPress={() => router.push("../(main)/auditing-screen")}>
+              <Text>Navigate to auditing screen</Text>
+            </TouchableOpacity>
           <View style={{ height: 100 }} />
         </ScrollView>
       </KeyboardAvoidingView>

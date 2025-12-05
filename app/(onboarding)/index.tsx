@@ -53,14 +53,6 @@ const Onboarding = () => {
   return (
     <View style={{ ...styles.container, paddingTop: inset.top, paddingBottom: inset.bottom - 15, paddingHorizontal: "5%" }}>
 
-      <TouchableOpacity
-        onPress={handleNext}
-        style={styles.skipButton}
-      >
-        <Text style={styles.skipText}>Skip</Text>
-      </TouchableOpacity>
-
-
       <Image
         source={require('../../assets/images/onboarding.png')}
         style={styles.image}

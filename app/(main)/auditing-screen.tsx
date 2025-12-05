@@ -2,10 +2,10 @@ import { getScanStatus, startScan } from '@/actions/scan-actions';
 import { useAuditStore } from '@/store/website-domain';
 import styles from '@/stylesheets/auditing-screen-stylesheet';
 import { useTranslation } from '@/utils/translations';
-import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
+import { FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Animated, Text, View } from 'react-native';
+import { Animated, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 
@@ -23,7 +23,7 @@ const AuditingScreen = () => {
   const [progress, setProgress] = useState(0);
   const [scanStatus, setScanStatus] = useState<string>('queued');
   const [completedSteps, setCompletedSteps] = useState<number>(0);
-  const animatedWidth = useRef(new Animated.Value(0)).current;
+  
 
   // Scanning checklist items with appropriate icons
   const scanSteps = [
@@ -113,18 +113,80 @@ const AuditingScreen = () => {
     }
   }, [jobId, router, websiteUrl, params.isReRun, scanSteps.length, setDomain]);
 
-  useEffect(() => {
-    Animated.timing(animatedWidth, {
-      toValue: progress,
-      duration: 500,
-      useNativeDriver: false,
-    }).start();
-  }, [progress, animatedWidth]);
+  console.log(scanStatus)
+  console.log(progress)
+ 
 
-  const progressBarWidth = animatedWidth.interpolate({
-    inputRange: [0, 100],
-    outputRange: ['0%', '100%'],
-  });
+
+
+  // 🔥 TEMPORARY: Simulate scan steps for testing animations
+useEffect(() => {
+  if (jobId) return; // don't simulate if real scanning is happening
+
+  let step = 0;
+
+  const simulate = () => {
+    if (step < scanSteps.length) {
+      step++;
+      setCompletedSteps(step);
+      setTimeout(simulate, 2500); // animate each step every 2.5 seconds..
+    }
+  };
+
+  setTimeout(simulate, 1200);
+
+  return () => {};
+}, [jobId]);
+
+
+
+
+const isGrey = completedSteps < 2
+
+
+
+const getLoadingCircleStyle = () => {
+  if (completedSteps < 2) {
+    return { borderColor: "#B9B9B9" }; 
+  }
+
+  return { borderColor: "#58A279" }; 
+};
+
+
+
+
+
+const animatedSteps = useRef(
+  scanSteps.map(() => new Animated.Value(-20)) 
+).current;
+
+const animatedOpacity = useRef(
+  scanSteps.map(() => new Animated.Value(0))
+).current;
+
+
+
+useEffect(() => {
+  if (completedSteps > 0) {
+    const index = completedSteps - 1; // animate only the newly completed step
+
+    Animated.parallel([
+      Animated.timing(animatedSteps[index], {
+        toValue: 0,
+        duration: 400,
+        useNativeDriver: true,
+      }),
+      Animated.timing(animatedOpacity[index], {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      })
+    ]).start();
+  }
+}, [completedSteps]);
+
+
 
 
   return (
@@ -134,65 +196,57 @@ const AuditingScreen = () => {
           <Text style={styles.headerTitle}>
             {fromReports ? t('auditing.reScanning') : t('auditing.scanning')}
           </Text>
-          <Text style={styles.headerUrl}>{websiteUrl}</Text>
+          <Text style={styles.headerUrl}>{websiteUrl} www.trendhubnaija.com</Text>
           {fromReports && (
             <Text style={styles.reScanNote}>{t('auditing.reScanNote')}</Text>
           )}
         </View>
 
         <View style={styles.content}>
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#ff5a3d" style={{ transform: [{ scale: 2 }] }} />
-          </View>
-          <View style={styles.progress}>
-            <View style={styles.progressBarContainer}>
-              <Animated.View
-                style={[
-                  styles.progressBarFill,
-                  { width: progressBarWidth },
-                ]}
+          {completedSteps >= 3 && (
+            <View style={styles.glowCircle} />   
+          ) }
+            <View style={[styles.newLoadingContainer, getLoadingCircleStyle()]}>
+              <FontAwesome6
+                name="check"
+                size={30}
+                color={isGrey ? "#B9B9B9" : "#58A279"}
+                style={{ backgroundColor: "transparent" }}
               />
             </View>
-            <Text style={styles.progressText}>{Math.round(progress)}%</Text>
+
+            <View style={{marginBottom: 40}}/>
+
+          <View>
+            <Text style={styles.hangTight}>Hang tight, it takes about 30-60 seconds</Text>
           </View>
 
           {/* Scanning Checklist */}
           <View style={styles.checklistContainer}>
-            {scanSteps.map((step, index) => {
-              const isCompleted = index < completedSteps;
-              const IconComponent = step.iconSet === 'MaterialIcons' ? MaterialIcons : FontAwesome;
-
-              return (
-                <View key={index} style={styles.checklistItem}>
-                  {isCompleted ? (
-                    <FontAwesome
-                      name="check"
-                      size={16}
-                      color="#58A279"
-                      style={styles.checklistIcon}
-                    />
-                  ) : (
-                    <IconComponent
-                      name={step.icon as any}
-                      size={16}
-                      color="#B9B9B9"
-                      style={styles.checklistIcon}
-                    />
-                  )}
-                  <Text style={[
-                    styles.checklistText,
-                    { color: isCompleted ? "#58A279" : "#B9B9B9" }
-                  ]}>
-                    {step.text}
-                  </Text>
-                </View>
-              );
-            })}
+            {scanSteps.slice(0, completedSteps).map((step, index) => (
+              <Animated.View
+                key={index}
+                style={[
+                  styles.checklistItem,
+                  {
+                    opacity: animatedOpacity[index],
+                    transform: [{ translateY: animatedSteps[index] }],
+                  }
+                ]}
+              >
+                <MaterialCommunityIcons
+                  name="check-decagram"
+                  size={24}
+                  color="#58A279"
+                  style={styles.checklistIcon}
+                />
+                <Text style={[styles.checklistText, { color: "#58A279" }]}>
+                  {step.text}
+                </Text>
+              </Animated.View>
+            ))}
           </View>
 
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>{t('auditing.status')}: {scanStatus}</Text>
-          </View>
         </View>
       </View>
     </SafeAreaView>
