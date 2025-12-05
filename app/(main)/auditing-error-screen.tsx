@@ -1,8 +1,13 @@
+import { startScan } from "@/actions/scan-actions";
+import type { ScanEvent } from "@/store/useScanStore";
+import { useScanStore } from "@/store/useScanStore";
 import styles from "@/stylesheets/auditing-error-screen-stylesheet";
 import { useTranslation } from '@/utils/translations';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useState } from 'react';
 import {
+  ActivityIndicator,
   Text,
   TouchableOpacity,
   View
@@ -16,18 +21,79 @@ export default function WebsiteDown() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const url = Array.isArray(params.url) ? params.url[0] : params.url;
-  const jobId = Array.isArray(params.jobId) ? params.jobId[0] : params.jobId;
+  const [isRetrying, setIsRetrying] = useState(false);
 
-  const onTryAgain = () => {
-    // Navigate back to auditing screen to retry the scan
-    router.replace({
-      pathname: '/(main)/auditing-screen',
-      params: {
-        url: url || '',
-        jobId: jobId || '',
-        isReRun: 'true',
-      },
-    });
+  const onTryAgain = async () => {
+    if (!url || isRetrying) return;
+
+    setIsRetrying(true);
+
+    try {
+      useScanStore.getState().reset();
+
+      let hasNavigated = false;
+
+      const scanResponse = await startScan(
+        url,
+        (event, data) => {
+          if (event === 'scan_error' || event === 'scan_failed') {
+            const errorJobId = data.job_id || useScanStore.getState().jobId;
+            setIsRetrying(false);
+
+            router.replace({
+              pathname: "/(main)/auditing-error-screen",
+              params: {
+                url: url,
+                jobId: errorJobId || '',
+              },
+            });
+            return;
+          }
+
+          try {
+            useScanStore.getState().updateFromEvent(event as ScanEvent, data);
+          } catch (error) {
+            console.error('[AuditingErrorScreen] Error updating store:', error);
+          }
+
+          if (data.job_id && !useScanStore.getState().jobId) {
+            useScanStore.getState().setInitial(data.job_id, url);
+
+            if (!hasNavigated) {
+              hasNavigated = true;
+              setIsRetrying(false);
+
+              router.replace({
+                pathname: "/(main)/auditing-screen",
+                params: {
+                  url: url,
+                  jobId: data.job_id,
+                },
+              });
+            }
+          }
+        }
+      );
+
+      if (!hasNavigated && scanResponse.job_id) {
+        if (!useScanStore.getState().jobId) {
+          useScanStore.getState().setInitial(scanResponse.job_id, url);
+        }
+
+        setIsRetrying(false);
+
+        router.replace({
+          pathname: "/(main)/auditing-screen",
+          params: {
+            url: url,
+            jobId: scanResponse.job_id,
+          },
+        });
+      }
+    } catch (error) {
+      setIsRetrying(false);
+      console.error('[AuditingErrorScreen] Failed to retry scan:', error);
+    }
   };
 
   return (
@@ -62,8 +128,13 @@ export default function WebsiteDown() {
         <TouchableOpacity
           style={styles.tryAgainButton}
           onPress={onTryAgain}
+          disabled={isRetrying}
         >
-          <Text style={styles.tryAgainButtonText}>{t('auditingError.tryAgain')}</Text>
+          {isRetrying ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <Text style={styles.tryAgainButtonText}>{t('auditingError.tryAgain')}</Text>
+          )}
         </TouchableOpacity>
       </View>
     </View>

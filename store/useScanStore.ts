@@ -8,7 +8,9 @@ export type ScanEvent =
   | "seo_check"
   | "accessibility_check"
   | "performance_analysis"
-  | "scan_complete";
+  | "scan_complete"
+  | "scan_error"
+  | "scan_failed";
 
 
 interface ScanState {
@@ -19,6 +21,7 @@ interface ScanState {
   currentEvent: ScanEvent | null;
   lastEventData: any;
   isCompleted: boolean;
+  eventMessages: Record<string, string>;
 
   setInitial: (jobId: string, url: string) => void;
   updateFromEvent: (event: ScanEvent, data: any) => void;
@@ -33,6 +36,7 @@ export const useScanStore = create<ScanState>((set) => ({
   currentEvent: null,
   lastEventData: null,
   isCompleted: false,
+  eventMessages: {},
 
   setInitial: (jobId, url) =>
     set({
@@ -42,14 +46,18 @@ export const useScanStore = create<ScanState>((set) => ({
 
   updateFromEvent: (event: ScanEvent, data: any) =>
     set((state) => {
-      // mark completed
       const completed = event === "scan_complete";
+      const message = data?.message || '';
 
       return {
         currentEvent: event,
         lastEventData: data,
         progress: data.progress ?? state.progress,
         isCompleted: completed,
+        eventMessages: {
+          ...state.eventMessages,
+          [event]: message,
+        },
       };
     }),
 
@@ -61,5 +69,6 @@ export const useScanStore = create<ScanState>((set) => ({
       currentEvent: null,
       lastEventData: null,
       isCompleted: false,
+      eventMessages: {},
     }),
 }));
