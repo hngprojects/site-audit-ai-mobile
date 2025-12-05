@@ -193,7 +193,7 @@ function transformBackendDataToScanResult(backendData: any): ScanResult {
 }
 
 export const scanService = {
-  async startScan(url: string, topN: number = 15): Promise<{ job_id: string; status: string; message: string }> {
+  async startScan(url: string): Promise<{ job_id: string; status: string; message: string }> {
     if (!url) {
       throw new Error('URL is required');
     }
@@ -205,7 +205,7 @@ export const scanService = {
     const userId = authState.user?.id;
 
     // Prepare request payload
-    const payload: any = { url, top_n: topN };
+    const payload: any = { url };
 
     // Include user_id if authenticated
     if (isAuthenticated && userId) {
@@ -226,13 +226,16 @@ export const scanService = {
       const deviceInfo = await getPersistentDeviceInfo();
 
       // Add device info to headers
-      headers['X-Device'] = JSON.stringify({
-        deviceId: deviceInfo.deviceId,
-        device: deviceInfo.device,
-      });
+      // headers['X-Device'] = JSON.stringify({
+      //   deviceId: deviceInfo.deviceId,
+      //   device: deviceInfo.device,
+      // });
+
+      payload.device_id = deviceInfo.deviceId;
+
 
       const response = await apiClient.post<StartScanResponse>(
-        '/api/v1/scan/start-async',
+        '/api/v1/scan/start-scan-sse',
         payload,
         { headers }
       );

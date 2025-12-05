@@ -6,7 +6,7 @@ import { Animated, Text } from "react-native";
 interface Props {
   text: string;
   index: number;
-  active: boolean; // becomes true when completedSteps > index
+  active: boolean; 
 }
 
 const ScanStepItem = ({ text, index, active }: Props) => {
@@ -17,15 +17,16 @@ const ScanStepItem = ({ text, index, active }: Props) => {
   const [visibleChars, setVisibleChars] = useState(0);
 
   const [caretVisible, setCaretVisible] = useState(true);
-  
 
-  // blinking caret
+
+  // blinking caret for cursor effect
   useEffect(() => {
     const interval = setInterval(() => {
       setCaretVisible((v) => !v);
     }, 500);
     return () => clearInterval(interval);
   }, []);
+  
 
   // animation + typing
   useEffect(() => {

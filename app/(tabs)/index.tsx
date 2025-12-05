@@ -1,9 +1,12 @@
-import { startScan } from "@/actions/scan-actions";
+//import { startScan } from "@/actions/scan-actions";
 import AuditResultCard from "@/components/auditResultCard";
 import EmptyState from "@/components/homeScreenEmptyState";
+import { scanService } from "@/service/httpsRequest";
 import { getUnreadCount } from "@/service/notifications";
 import { useAuthStore } from "@/store/auth-store";
 import { useSitesStore } from "@/store/sites-store";
+import type { ScanEvent } from "@/store/useScanStore";
+import { useScanStore } from "@/store/useScanStore";
 import styles from "@/stylesheets/homeScreenStylesheet";
 import { useTranslation } from "@/utils/translations";
 import { normalizeUrl, validateWebsiteUrl } from "@/utils/url-validation";
@@ -13,6 +16,7 @@ import { router } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
 
 
 
@@ -55,48 +59,50 @@ export default function HomeScreen() {
   };
 
   const RunAudit = async () => {
-    const validation = validateWebsiteUrl(websiteUrl);
+  const validation = validateWebsiteUrl(websiteUrl);
 
-    if (!validation.isValid) {
-      setUrlAvailable(false);
-      setErrorMessage(validation.error);
-      return;
-    }
-
-
-    setUrlAvailable(true);
-    setErrorMessage('');
-    setIsCreating(true);
-
-
-    try {
-      const trimmedUrl = websiteUrl.trim();
-      const normalizedUrl = normalizeUrl(trimmedUrl);
-      console.log(normalizedUrl);
-      // if (isAuthenticated) {
-      //   const site = await createSite(normalizedUrl);
-      //   console.log(site);
-      // }
-      const scanResponse = await startScan(normalizedUrl);
-
-
-
-      setWebsiteUrl('');
-
-      router.push({
-        pathname: "/(main)/auditing-screen",
-        params: {
-          url: normalizedUrl,
-          jobId: scanResponse.job_id,
-        },
-      });
-    } catch (error) {
-      setUrlAvailable(false);
-      setErrorMessage(error instanceof Error ? error.message : t('home.failedToStart'));
-    } finally {
-      setIsCreating(false);
-    }
+  if (!validation.isValid) {
+    setUrlAvailable(false);
+    setErrorMessage(validation.error);
+    return;
   }
+
+  setUrlAvailable(true);
+  setErrorMessage('');
+  setIsCreating(true);
+
+  try {
+    const trimmedUrl = websiteUrl.trim();
+    const normalizedUrl = normalizeUrl(trimmedUrl);
+
+    const scanResponse = await scanService.startScan(
+      normalizedUrl,
+      (event, data) => {
+       
+        useScanStore.getState().updateFromEvent(event as ScanEvent, data);
+      }
+    );
+
+    
+    useScanStore.getState().setInitial(scanResponse.job_id!, normalizedUrl);
+
+    setWebsiteUrl('');
+
+    router.push({
+      pathname: "/(main)/auditing-screen",
+      params: {
+        url: normalizedUrl,
+        jobId: scanResponse.job_id,
+      },
+    });
+  } catch (error) {
+    setUrlAvailable(false);
+    setErrorMessage(error instanceof Error ? error.message : t('home.failedToStart'));
+  } finally {
+    setIsCreating(false);
+  }
+};
+
 
   const formatTimeAgo = (dateString?: string): string => {
     if (!dateString) return '0';
@@ -237,9 +243,9 @@ export default function HomeScreen() {
               ))
           )}
 
-            <TouchableOpacity onPress={() => router.push("../(main)/auditing-screen")}>
+            {/* <TouchableOpacity onPress={() => router.push("../(main)/auditing-screen")}>
               <Text>Navigate to auditing screen</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           <View style={{ height: 100 }} />
         </ScrollView>
       </KeyboardAvoidingView>
