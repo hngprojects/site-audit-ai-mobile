@@ -1,7 +1,6 @@
-//import { startScan } from "@/actions/scan-actions";
+import { startScan } from "@/actions/scan-actions";
 import AuditResultCard from "@/components/auditResultCard";
 import EmptyState from "@/components/homeScreenEmptyState";
-import { scanService } from "@/service/httpsRequest";
 import { getUnreadCount } from "@/service/notifications";
 import { useAuthStore } from "@/store/auth-store";
 import { useSitesStore } from "@/store/sites-store";
@@ -13,7 +12,7 @@ import { normalizeUrl, validateWebsiteUrl } from "@/utils/url-validation";
 import { Octicons } from '@expo/vector-icons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { router } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -59,49 +58,115 @@ export default function HomeScreen() {
   };
 
   const RunAudit = async () => {
-  const validation = validateWebsiteUrl(websiteUrl);
+    const validation = validateWebsiteUrl(websiteUrl);
 
-  if (!validation.isValid) {
-    setUrlAvailable(false);
-    setErrorMessage(validation.error);
-    return;
-  }
+    if (!validation.isValid) {
+      setUrlAvailable(false);
+      setErrorMessage(validation.error);
+      return;
+    }
 
-  setUrlAvailable(true);
-  setErrorMessage('');
-  setIsCreating(true);
+    setUrlAvailable(true);
+    setErrorMessage('');
+    setIsCreating(true);
 
-  try {
-    const trimmedUrl = websiteUrl.trim();
-    const normalizedUrl = normalizeUrl(trimmedUrl);
+    try {
+      const trimmedUrl = websiteUrl.trim();
+      const normalizedUrl = normalizeUrl(trimmedUrl);
 
-    const scanResponse = await scanService.startScan(
-      normalizedUrl,
-      (event, data) => {
-       
-        useScanStore.getState().updateFromEvent(event as ScanEvent, data);
+      useScanStore.getState().reset();
+
+      let hasNavigated = false;
+
+      const scanResponse = await startScan(
+        normalizedUrl,
+        (event, data) => {
+          console.log('[HomeScreen] SSE callback received:', {
+            event,
+            eventType: typeof event,
+            hasData: !!data,
+            dataKeys: data ? Object.keys(data) : [],
+            jobId: data?.job_id,
+            progress: data?.progress,
+            currentStoreState: {
+              jobId: useScanStore.getState().jobId,
+              currentEvent: useScanStore.getState().currentEvent,
+              progress: useScanStore.getState().progress,
+            },
+          });
+
+          if (event === 'scan_error' || event === 'scan_failed') {
+            console.log('[HomeScreen] Scan error detected, navigating to error screen');
+            const errorJobId = data.job_id || useScanStore.getState().jobId;
+
+            setWebsiteUrl('');
+            setIsCreating(false);
+
+            router.replace({
+              pathname: "/(main)/auditing-error-screen",
+              params: {
+                url: normalizedUrl,
+                jobId: errorJobId || '',
+              },
+            });
+            return;
+          }
+
+          try {
+            useScanStore.getState().updateFromEvent(event as ScanEvent, data);
+            console.log('[HomeScreen] Store updated successfully:', {
+              newCurrentEvent: useScanStore.getState().currentEvent,
+              newProgress: useScanStore.getState().progress,
+            });
+          } catch (error) {
+            console.error('[HomeScreen] Error updating store:', error);
+          }
+
+          if (data.job_id && !useScanStore.getState().jobId) {
+            console.log('[HomeScreen] Setting initial job_id in store:', data.job_id);
+            useScanStore.getState().setInitial(data.job_id, normalizedUrl);
+
+            if (!hasNavigated) {
+              hasNavigated = true;
+              setWebsiteUrl('');
+              setIsCreating(false);
+
+              console.log('[HomeScreen] Navigating to auditing screen immediately');
+              router.push({
+                pathname: "/(main)/auditing-screen",
+                params: {
+                  url: normalizedUrl,
+                  jobId: data.job_id,
+                },
+              });
+            }
+          }
+        }
+      );
+
+      if (!hasNavigated && scanResponse.job_id) {
+        if (!useScanStore.getState().jobId) {
+          useScanStore.getState().setInitial(scanResponse.job_id, normalizedUrl);
+        }
+
+        setWebsiteUrl('');
+        setIsCreating(false);
+
+        router.push({
+          pathname: "/(main)/auditing-screen",
+          params: {
+            url: normalizedUrl,
+            jobId: scanResponse.job_id,
+          },
+        });
       }
-    );
-
-    
-    useScanStore.getState().setInitial(scanResponse.job_id!, normalizedUrl);
-
-    setWebsiteUrl('');
-
-    router.push({
-      pathname: "/(main)/auditing-screen",
-      params: {
-        url: normalizedUrl,
-        jobId: scanResponse.job_id,
-      },
-    });
-  } catch (error) {
-    setUrlAvailable(false);
-    setErrorMessage(error instanceof Error ? error.message : t('home.failedToStart'));
-  } finally {
-    setIsCreating(false);
-  }
-};
+    } catch (error) {
+      setUrlAvailable(false);
+      setErrorMessage(error instanceof Error ? error.message : t('home.failedToStart'));
+    } finally {
+      setIsCreating(false);
+    }
+  };
 
 
   const formatTimeAgo = (dateString?: string): string => {
@@ -119,8 +184,7 @@ export default function HomeScreen() {
     return "Failed";
   };
 
-  // Note: Status values are kept as English strings for type safety
-  // They are translated in the AuditResultCard component
+  const inputBorderColor = useMemo(() => (!urlAvailable ? "#d32f2f" : "#C7C8C9"), [urlAvailable]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -153,7 +217,7 @@ export default function HomeScreen() {
 
         {Platform.OS === "ios" ?
           (
-            <View style={[styles.inputPlaceholder, { borderColor: !urlAvailable ? "#d32f2f" : "#C7C8C9", }]}>
+            <View style={[styles.inputPlaceholder, { borderColor: inputBorderColor }]}>
               <MaterialCommunityIcons
                 name="web" size={24}
                 color="#A0A0A0"
@@ -163,7 +227,7 @@ export default function HomeScreen() {
                 placeholder={t('home.enterUrl')}
                 placeholderTextColor={"#A0A0A0"}
                 style={styles.placeholderText}
-                value={websiteUrl ? websiteUrl.toLowerCase() : ''}
+                value={websiteUrl}
                 onChangeText={handleUrlChange}
                 autoCapitalize="none"
                 autoCorrect={false}
@@ -172,7 +236,7 @@ export default function HomeScreen() {
             </View>
           ) :
           (
-            <View style={[styles.androidInputPlaceholder, { borderColor: !urlAvailable ? "#d32f2f" : "#C7C8C9", }]}>
+            <View style={[styles.androidInputPlaceholder, { borderColor: inputBorderColor }]}>
               <MaterialCommunityIcons
                 name="web" size={24}
                 color="#A0A0A0"
@@ -182,7 +246,7 @@ export default function HomeScreen() {
                 placeholder={t('home.enterUrl')}
                 placeholderTextColor={"#A0A0A0"}
                 style={styles.androidPlaceholderText}
-                value={websiteUrl ? websiteUrl.toLowerCase() : ''}
+                value={websiteUrl}
                 onChangeText={handleUrlChange}
                 autoCapitalize="none"
                 autoCorrect={false}
@@ -243,9 +307,6 @@ export default function HomeScreen() {
               ))
           )}
 
-            {/* <TouchableOpacity onPress={() => router.push("../(main)/auditing-screen")}>
-              <Text>Navigate to auditing screen</Text>
-            </TouchableOpacity> */}
           <View style={{ height: 100 }} />
         </ScrollView>
       </KeyboardAvoidingView>

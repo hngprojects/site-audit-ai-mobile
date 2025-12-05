@@ -70,6 +70,7 @@ export default StyleSheet.create({
     paddingLeft: -10,
     flexDirection: "row",
     alignItems: "center",
+    width: '95%',
   },
   webIcon: {
     marginRight: 5
@@ -78,7 +79,8 @@ export default StyleSheet.create({
   placeholderText: {
     color: "#000",
     fontSize: 16,
-    width: '100%',
+    width: '95%',
+    backgroundColor: 'red',
   },
 
   invalidLink: {

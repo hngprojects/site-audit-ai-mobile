@@ -147,19 +147,16 @@ function transformBackendDataToScanResult(backendData: any): ScanResult {
   const { results } = backendData;
   const issues: Issue[] = [];
 
-  // Calculate category scores from backend data
   const categoryScores = {
-    ux: results.score_accessibility || 0, // Using accessibility as UX score
+    ux: results.score_accessibility || 0,
     performance: results.score_performance || 0,
     seo: results.score_seo || 0
   };
 
-  // Get sample category data from first page for descriptions
   const firstPage = results.selected_pages[0];
   if (firstPage) {
     const { analysis_details } = firstPage;
 
-    // Create one issue per category
     issues.push({
       id: `ux-overall`,
       title: 'User Experience Issues',
@@ -213,61 +210,186 @@ function transformBackendDataToScanResult(backendData: any): ScanResult {
 }
 
 export const scanService = {
-  async startScan(url: string): Promise<{ job_id: string; status: string; message: string }> {
+  async startScan(
+    url: string,
+    onEvent?: (eventName: string, data: any) => void
+  ): Promise<{ job_id: string; status: string; message: string }> {
     if (!url) {
       throw new Error('URL is required');
     }
 
-    // Get authentication state (optional)
     const authState = useAuthStore.getState();
     const isAuthenticated = authState.isAuthenticated;
     const token = authState.token;
     const userId = authState.user?.id;
 
-    // Prepare request payload
-    const payload: any = { url };
-
-    // Include user_id if authenticated
-    if (isAuthenticated && userId) {
-      payload.user_id = userId;
-    }
-
-    // Prepare headers
-    const headers: any = {
-      'Content-Type': 'application/json',
-    };
-
-    // Include authorization header if authenticated
-    if (isAuthenticated && token) {
-      headers.Authorization = `Bearer ${token}`;
-    }
-
     try {
       const deviceInfo = await getPersistentDeviceInfo();
+      const queryParams = new URLSearchParams({
+        url: url,
+        device_id: deviceInfo.deviceId,
+      });
 
-      // Add device info to headers
-      // headers['X-Device'] = JSON.stringify({
-      //   deviceId: deviceInfo.deviceId,
-      //   device: deviceInfo.device,
-      // });
-
-      payload.device_id = deviceInfo.deviceId;
-
-
-      const response = await apiClient.post<StartScanResponse>(
-        '/api/v1/scan/start-scan-sse',
-        payload,
-        { headers }
-      );
-      const responseData = response.data;
-
-      return responseData.data;
-    } catch (error) {
-      if (isAxiosError(error)) {
-        const errorData = error.response?.data || {};
-        const errorMessage = formatErrorMessage(errorData);
-        throw new Error(errorMessage);
+      if (isAuthenticated && userId) {
+        queryParams.append('user_id', userId);
       }
+
+      const baseUrl = process.env.EXPO_PUBLIC_BASE_URL || '';
+      const apiUrl = `${baseUrl}/api/v1/scan/start-scan-sse?${queryParams.toString()}`;
+
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        let lastProcessedIndex = 0;
+        let firstJobId: string | null = null;
+        let buffer = '';
+
+        xhr.open('POST', apiUrl);
+        xhr.setRequestHeader('Accept', 'text/event-stream');
+
+        if (isAuthenticated && token) {
+          xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+        }
+
+        const processedEvents = new Set<string>();
+
+        const processEventIfNew = (eventName: string, dataJson: string) => {
+          const eventKey = `${eventName}-${dataJson.substring(0, 50)}`;
+          if (!processedEvents.has(eventKey)) {
+            processedEvents.add(eventKey);
+            processEventImmediately(eventName, dataJson);
+          }
+        };
+
+        const parseAndProcessEvents = (lines: string[]) => {
+          let currentEvent: string | null = null;
+          let currentDataLines: string[] = [];
+          let processedUpTo = 0;
+
+          for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+
+            if (line.trim().startsWith(':')) {
+              processedUpTo = i + 1;
+              continue;
+            }
+
+            if (line.startsWith('event:')) {
+              if (currentEvent && currentDataLines.length > 0) {
+                processEventIfNew(currentEvent, currentDataLines.join('').trim());
+                processedUpTo = i;
+                currentDataLines = [];
+              }
+              currentEvent = line.replace('event:', '').trim();
+            } else if (line.startsWith('data:')) {
+              currentDataLines.push(line.replace('data:', '').trim());
+            } else if (line.trim() === '') {
+              if (currentEvent && currentDataLines.length > 0) {
+                processEventIfNew(currentEvent, currentDataLines.join('').trim());
+                processedUpTo = i + 1;
+                currentEvent = null;
+                currentDataLines = [];
+              } else {
+                processedUpTo = i + 1;
+              }
+            }
+          }
+
+          if (currentEvent && currentDataLines.length > 0) {
+            processEventIfNew(currentEvent, currentDataLines.join('').trim());
+            processedUpTo = lines.length;
+          }
+
+          return processedUpTo;
+        };
+
+        const processResponse = () => {
+          const responseText = xhr.responseText;
+          if (!responseText) return;
+
+          const newData = responseText.slice(lastProcessedIndex);
+          if (!newData) return;
+
+          lastProcessedIndex = responseText.length;
+          buffer += newData;
+
+          const lines = buffer.split('\n');
+          const processedUpTo = parseAndProcessEvents(lines);
+
+          if (processedUpTo > 0) {
+            buffer = lines.slice(processedUpTo).join('\n');
+          }
+        };
+
+        const processEventImmediately = (eventName: string, dataJson: string) => {
+          try {
+            const parsedData = JSON.parse(dataJson);
+            const finalEventName = eventName || parsedData.event_type || 'message';
+
+            if (!firstJobId && parsedData.job_id) {
+              firstJobId = parsedData.job_id;
+              resolve({
+                job_id: firstJobId!,
+                status: parsedData.status || parsedData.event_type || 'queued',
+                message: parsedData.message || 'Scan started',
+              });
+            }
+
+            // Forward to callback
+            if (onEvent && finalEventName) {
+              try {
+                onEvent(finalEventName, parsedData);
+              } catch (callbackError) {
+                console.error('[ScanService] Error in callback:', callbackError);
+              }
+            }
+          } catch (parseError) {
+            console.warn('[ScanService] Failed to parse SSE data:', parseError);
+          }
+        };
+
+        xhr.onreadystatechange = () => {
+          if (xhr.readyState === XMLHttpRequest.LOADING || xhr.readyState === XMLHttpRequest.DONE) {
+            processResponse();
+          }
+        };
+
+        xhr.onprogress = () => {
+          processResponse();
+        };
+
+        xhr.onload = () => {
+          // Process any remaining buffer data
+          if (buffer) {
+            processResponse();
+          }
+
+          // Fallback: Process entire response to catch any missed events
+          if (xhr.responseText) {
+            const lines = xhr.responseText.split('\n');
+            parseAndProcessEvents(lines);
+          }
+
+          if (!firstJobId) {
+            reject(new Error('No job_id received from scan'));
+          }
+        };
+
+        xhr.onerror = () => {
+          reject(new Error('Network error during scan'));
+        };
+
+        xhr.ontimeout = () => {
+          reject(new Error('Scan request timed out'));
+        };
+
+        xhr.send();
+      });
+    } catch (error) {
+      console.error('[ScanService] startScan error:', {
+        error,
+        url,
+        errorMessage: error instanceof Error ? error.message : 'Unknown error',
+      });
       if (error instanceof Error) {
         throw error;
       }
@@ -291,17 +413,14 @@ export const scanService = {
       throw new Error('Job ID is required');
     }
 
-    // Get authentication state (optional)
     const authState = useAuthStore.getState();
     const isAuthenticated = authState.isAuthenticated;
     const token = authState.token;
 
-    // Prepare headers
     const headers: any = {
       'Content-Type': 'application/json',
     };
 
-    // Include authorization header if authenticated
     if (isAuthenticated && token) {
       headers.Authorization = `Bearer ${token}`;
     }
@@ -332,17 +451,14 @@ export const scanService = {
       throw new Error('Job ID is required');
     }
 
-    // Get authentication state (optional)
     const authState = useAuthStore.getState();
     const isAuthenticated = authState.isAuthenticated;
     const token = authState.token;
 
-    // Prepare headers
     const headers: any = {
       'Content-Type': 'application/json',
     };
 
-    // Include authorization header if authenticated
     if (isAuthenticated && token) {
       headers.Authorization = `Bearer ${token}`;
     }
@@ -354,7 +470,6 @@ export const scanService = {
       );
       const responseData = response.data;
 
-      // Transform the backend data structure to our expected format
       return transformBackendDataToScanResult(responseData.data);
     } catch (error) {
       if (isAxiosError(error)) {
@@ -374,17 +489,14 @@ export const scanService = {
       throw new Error('Job ID is required');
     }
 
-    // Get authentication state (optional)
     const authState = useAuthStore.getState();
     const isAuthenticated = authState.isAuthenticated;
     const token = authState.token;
 
-    // Prepare headers
     const headers: any = {
       'Content-Type': 'application/json',
     };
 
-    // Include authorization header if authenticated
     if (isAuthenticated && token) {
       headers.Authorization = `Bearer ${token}`;
     }
@@ -415,17 +527,14 @@ export const scanService = {
       throw new Error('Job ID is required');
     }
 
-    // Get authentication state (optional)
     const authState = useAuthStore.getState();
     const isAuthenticated = authState.isAuthenticated;
     const token = authState.token;
 
-    // Prepare headers
     const headers: any = {
       'Content-Type': 'application/json',
     };
 
-    // Include authorization header if authenticated
     if (isAuthenticated && token) {
       headers.Authorization = `Bearer ${token}`;
     }

@@ -8,13 +8,6 @@ import { useEffect, useMemo } from 'react';
 import { Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const eventOrder = [
-  "scan_started",
-  "loading_page",
-  "extracting_content",
-  "performance_analysis",
-] as const;
-
 const AuditingScreen = () => {
   const { t } = useTranslation();
   const router = useRouter();
@@ -24,10 +17,15 @@ const AuditingScreen = () => {
   const url = Array.isArray(params.url) ? params.url[0] : params.url;
 
   const {
-    progress,
+    jobId: storeJobId,
+    url: storeUrl,
     currentEvent,
     isCompleted,
   } = useScanStore();
+
+  // Use store values if available, fallback to params
+  const finalJobId = storeJobId || jobId;
+  const finalUrl = storeUrl || url;
 
   const scanSteps = [
     { text: t('auditing.analyzing'), icon: 'search', iconSet: 'FontAwesome' as const },
@@ -36,26 +34,54 @@ const AuditingScreen = () => {
     { text: t('auditing.findingLinks'), icon: 'link', iconSet: 'FontAwesome' as const },
   ];
 
+  // Map events to steps
+  const eventToStepMap = useMemo<Record<string, number>>(() => ({
+    scan_started: 1,
+    loading_page: 1,
+    extracting_content: 2,
+    performance_check: 3,
+    seo_check: 3,
+    accessibility_check: 3,
+    performance_analysis: 3,
+    scan_complete: 4,
+  }), []);
+
   // Convert currentEvent to completed steps count
   const completedSteps = useMemo(() => {
+    if (isCompleted) return scanSteps.length;
     if (!currentEvent) return 0;
 
-    const index = eventOrder.indexOf(currentEvent as any);
-    if (index === -1) return 0;
-    return index + 1;
-  }, [currentEvent]);
+    const step = eventToStepMap[currentEvent] || 0;
+    return step;
+  }, [currentEvent, isCompleted, scanSteps.length, eventToStepMap]);
+
+  // Navigate to error screen if scan error occurs
+  useEffect(() => {
+    if (currentEvent === 'scan_error' || currentEvent === 'scan_failed') {
+      console.log('[AuditingScreen] Scan error detected, navigating to error screen');
+      router.replace({
+        pathname: "/(main)/auditing-error-screen",
+        params: {
+          url: finalUrl || '',
+          jobId: finalJobId || '',
+        },
+      });
+    }
+  }, [currentEvent, finalJobId, finalUrl, router]);
 
   // Navigate to summary screen once finished
   useEffect(() => {
-    if (isCompleted) {
-      setTimeout(() => {
+    if (isCompleted && finalJobId && finalUrl) {
+      const timeout = setTimeout(() => {
         router.replace({
           pathname: "/(reports)/report-dashboard",
-          params: { jobId, url },
+          params: { jobId: finalJobId, url: finalUrl },
         });
       }, 1200);
+
+      return () => clearTimeout(timeout);
     }
-  }, [isCompleted]);
+  }, [isCompleted, finalJobId, finalUrl, router]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -63,7 +89,7 @@ const AuditingScreen = () => {
 
         <View style={styles.header}>
           <Text style={styles.headerTitle}>{t("auditing.scanning")}</Text>
-          <Text style={styles.headerUrl}>{url}</Text>
+          <Text style={styles.headerUrl}>{finalUrl}</Text>
         </View>
 
         <View style={styles.content}>

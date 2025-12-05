@@ -1,21 +1,14 @@
 import { scanService, type ScanHistoryItem, type ScanResult } from '@/lib/scan-service';
 import { useAuthStore } from '@/store/auth-store';
 
-export const startScan = async (url: string, topN: number = 15): Promise<{ job_id: string; status: string; message: string }> => {
-  const token = useAuthStore.getState().token;
-  // if (!token) {
-  //   throw new Error('Authentication required. Please sign in.');
-  // }
+export const startScan = async (
+  url: string,
+  onEvent?: (eventName: string, data: any) => void
+): Promise<{ job_id: string; status: string; message: string }> => {
+  // Note: Authentication token is handled in scanService.startScan via fetch headers
+  // No need to set apiClient headers for SSE requests
 
-  // Set the token in the apiClient headers if token is available
-  const { apiClient } = await import('@/lib/api-client');
-  if (token) {
-    apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-  } else {
-    delete apiClient.defaults.headers.common['Authorization'];
-  }
-
-  return await scanService.startScan(url, topN);
+  return await scanService.startScan(url, onEvent);
 };
 
 export const getScanStatus = async (jobId: string): Promise<{

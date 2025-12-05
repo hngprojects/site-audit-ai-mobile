@@ -8,7 +8,9 @@ export type ScanEvent =
   | "seo_check"
   | "accessibility_check"
   | "performance_analysis"
-  | "scan_complete";
+  | "scan_complete"
+  | "scan_error"
+  | "scan_failed";
 
 
 interface ScanState {
