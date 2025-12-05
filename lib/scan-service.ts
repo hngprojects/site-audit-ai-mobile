@@ -544,20 +544,19 @@ export const scanService = {
   },
 
   async getScanHistory(): Promise<ScanHistoryItem[]> {
-    // Get authentication state (optional)
+    // Get authentication state (required for this endpoint)
     const authState = useAuthStore.getState();
-    const isAuthenticated = authState.isAuthenticated;
     const token = authState.token;
+
+    if (!token) {
+      throw new Error('Authentication required. Please sign in.');
+    }
 
     // Prepare headers
     const headers: any = {
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
     };
-
-    // Include authorization header if authenticated
-    if (isAuthenticated && token) {
-      headers.Authorization = `Bearer ${token}`;
-    }
 
     try {
       const response = await apiClient.get<ScanHistoryResponse>(
@@ -565,7 +564,12 @@ export const scanService = {
         { headers }
       );
       const responseData = response.data;
+      console.log('Scan history response:', responseData);
 
+      // Handle both wrapped response and direct array
+      if (Array.isArray(responseData)) {
+        return responseData;
+      }
       return responseData.data || [];
     } catch (error) {
       if (isAxiosError(error)) {

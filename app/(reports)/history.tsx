@@ -1,8 +1,15 @@
+import { getScanHistory, getScanSummary } from '@/actions/scan-actions';
 import styles from '@/stylesheets/history-stylesheet';
+import {
+  getHistoryBySiteUrl,
+  getJobIdsFromHistory,
+  transformHistoryItemForUI,
+  type HistoryItemForUI,
+} from '@/utils/history-utils';
 import { useTranslation } from '@/utils/translations';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -14,15 +21,7 @@ import {
 } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-interface HistoryItem {
-  id: string;
-  url: string;
-  score: number;
-  scanDate: string;
-  scanTime: string;
-  date: Date;
-}
+import Toast from 'react-native-toast-message';
 
 const SkeletonCard = () => (
   <View style={styles.skeletonCard}>
@@ -56,6 +55,7 @@ const HistoryScreen: React.FC = () => {
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState(true);
+  const [historyItems, setHistoryItems] = useState<HistoryItemForUI[]>([]);
 
   const formatMonthHeader = React.useCallback((date: Date) =>
     date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }), []);
@@ -76,52 +76,78 @@ const HistoryScreen: React.FC = () => {
     return `${weekday}. ${month} ${date.getDate().toString().padStart(2, '0')}`;
   }, []);
 
-  const mockHistoryData = useMemo<HistoryItem[]>(() => {
-    const now = new Date();
-    return [
-      {
-        id: '1',
-        url: siteUrl,
-        score: 85,
-        scanDate: 'Dec 15, 2024',
-        scanTime: '10:30 AM',
-        date: new Date(now.getFullYear(), now.getMonth(), now.getDate() - 0)
-      },
-      {
-        id: '2',
-        url: siteUrl,
-        score: 82,
-        scanDate: 'Dec 10, 2024',
-        scanTime: '2:15 PM',
-        date: new Date(now.getFullYear(), now.getMonth(), now.getDate() - 3)
-      },
-      {
-        id: '3',
-        url: siteUrl,
-        score: 78,
-        scanDate: 'Dec 5, 2024',
-        scanTime: '9:45 AM',
-        date: new Date(now.getFullYear(), now.getMonth(), now.getDate() - 5)
-      },
-      {
-        id: '4',
-        url: siteUrl,
-        score: 80,
-        scanDate: 'Nov 28, 2024',
-        scanTime: '4:20 PM',
-        date: new Date(now.getFullYear(), now.getMonth() - 1, 28)
-      },
-    ];
-  }, [siteUrl]);
+  // Fetch history data and scores
+  useEffect(() => {
+    const fetchHistoryData = async () => {
+      if (!siteUrl) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+
+        // Fetch all history
+        const allHistory = await getScanHistory();
+
+        // Filter by site URL
+        const siteHistory = getHistoryBySiteUrl(allHistory, siteUrl);
+
+        if (siteHistory.length === 0) {
+          setHistoryItems([]);
+          setIsLoading(false);
+          return;
+        }
+
+        // Get job IDs for score fetching
+        const jobIds = getJobIdsFromHistory(siteHistory);
+
+        // Fetch scores for all history items
+        const scoreMapLocal = new Map<string, number>();
+        await Promise.all(
+          jobIds.map(async (jobId) => {
+            try {
+              const summary = await getScanSummary(jobId);
+              scoreMapLocal.set(jobId, summary.website_score);
+            } catch (error) {
+              console.error(`Failed to fetch score for job ${jobId}:`, error);
+              // Continue even if one score fails
+            }
+          })
+        );
+
+        // Transform history items with scores
+        const transformedItems = siteHistory.map((item) =>
+          transformHistoryItemForUI(item, scoreMapLocal)
+        );
+
+        setHistoryItems(transformedItems);
+      } catch (error) {
+        console.error('Failed to fetch history:', error);
+        Toast.show({
+          type: 'error',
+          text1: t('common.error'),
+          text2: 'Failed to load scan history. Please try again.',
+        });
+        setHistoryItems([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchHistoryData();
+  }, [siteUrl, t]);
 
   const groupedData = useMemo(() => {
     const searchTerm = search.toLowerCase();
-    const filtered = mockHistoryData.filter(item =>
-      item.url.toLowerCase().includes(searchTerm) || item.scanDate.toLowerCase().includes(searchTerm)
+    const filtered = historyItems.filter(item =>
+      item.url.toLowerCase().includes(searchTerm) ||
+      item.scanDate.toLowerCase().includes(searchTerm) ||
+      (item.score !== undefined && item.score.toString().includes(searchTerm))
     );
 
     const sorted = [...filtered].sort((a, b) => b.date.getTime() - a.date.getTime());
-    const monthGroups = new Map<string, Map<string, HistoryItem[]>>();
+    const monthGroups = new Map<string, Map<string, HistoryItemForUI[]>>();
 
     sorted.forEach(item => {
       const monthKey = formatMonthHeader(item.date);
@@ -140,7 +166,7 @@ const HistoryScreen: React.FC = () => {
         data: items
       }))
     );
-  }, [search, mockHistoryData, formatMonthHeader, formatDateHeader]);
+  }, [search, historyItems, formatMonthHeader, formatDateHeader]);
 
   const allItemIds = useMemo(() => new Set(groupedData.flatMap(section => section.data.map(item => item.id))), [groupedData]);
   const isAllSelected = selectedItems.size > 0 && selectedItems.size === allItemIds.size;
@@ -282,7 +308,20 @@ const HistoryScreen: React.FC = () => {
                         setSelectedItems(new Set([item.id]));
                       }
                     }}
-                    onPress={() => isSelectionMode && toggleSelection(item.id)}
+                    onPress={() => {
+                      if (isSelectionMode) {
+                        toggleSelection(item.id);
+                      } else {
+                        // Navigate to report dashboard
+                        router.push({
+                          pathname: '/(reports)/report-dashboard',
+                          params: {
+                            jobId: item.jobId,
+                            url: item.url,
+                          },
+                        });
+                      }
+                    }}
                     activeOpacity={0.7}
                   >
                     {isSelectionMode && (
@@ -300,7 +339,11 @@ const HistoryScreen: React.FC = () => {
                     )}
                     <View style={[styles.cardLeft, isSelectionMode && styles.cardLeftWithCheckbox]}>
                       <Text style={styles.urlText} numberOfLines={1}>{item.url}</Text>
-                      <Text style={styles.scoreText}>Score: {item.score}/100</Text>
+                      {item.score !== undefined ? (
+                        <Text style={styles.scoreText}>Score: {item.score}/100</Text>
+                      ) : (
+                        <Text style={styles.scoreText}>Score: Loading...</Text>
+                      )}
                       <Text style={styles.scanDateText}>Scan Date: {item.scanDate}</Text>
                     </View>
                     <View style={styles.cardRight}>

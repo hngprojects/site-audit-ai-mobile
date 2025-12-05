@@ -1,12 +1,12 @@
-import { startScan } from "@/actions/scan-actions";
-import DeleteConfirmationSheet from "@/components/delete-confirmation-sheet";
-import EditUrlSheet from "@/components/edit-url-sheet";
-import { useSitesStore } from "@/store/sites-store";
+import { getScanHistory, getScanSummary } from "@/actions/scan-actions";
 import styles from "@/stylesheets/report-screen-stylesheet";
-import { ReportItemProps, Status } from "@/type";
+import { ReportItemProps } from "@/type";
+import {
+  getUniqueSitesWithLatestScan,
+  transformUniqueSiteToReportItem,
+  type ReportItemFromHistory,
+} from "@/utils/history-utils";
 import { useTranslation } from "@/utils/translations";
-import { normalizeUrl } from "@/utils/url-validation";
-import { MaterialIcons } from '@expo/vector-icons';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -20,7 +20,6 @@ import {
   View
 } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Toast from 'react-native-toast-message';
 
@@ -37,67 +36,22 @@ const SkeletonCard = () => (
   </View>
 );
 
-interface SwipeableRowProps {
+interface ReportRowProps {
   item: ReportItemProps;
   url: string;
-  onDelete: () => void;
-  onEdit: () => void;
   onPress: () => void;
 }
 
-const SwipeableRow: React.FC<SwipeableRowProps> = ({ item, url, onDelete, onEdit, onPress }) => {
-  const swipeableRef = React.useRef<React.ComponentRef<typeof ReanimatedSwipeable>>(null);
-  const { t } = useTranslation();
-
-  const renderRightActions = (_progress: any, _dragX: any) => (
-
-    <View style={styles.rightActions}>
-      <TouchableOpacity style={styles.editAction} onPress={() => {
-        swipeableRef.current?.close();
-        onEdit();
-      }}>
-        <MaterialIcons name="edit" size={20} color="#fff" />
-        <Text style={styles.actionText}>{t('common.edit')}</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.deleteAction} onPress={() => {
-        swipeableRef.current?.close();
-        onDelete();
-      }}>
-        <MaterialIcons name="delete" size={20} color="#494949" />
-        <Text style={styles.actionTextDelete}>{t('common.delete')}</Text>
-      </TouchableOpacity>
-    </View>
-  );
-
-  const handleMenuPress = () => {
-    swipeableRef.current?.openRight();
-  };
-
+const ReportRow: React.FC<ReportRowProps> = ({ item, url, onPress }) => {
   return (
-    <ReanimatedSwipeable
-      ref={swipeableRef}
-      renderRightActions={renderRightActions}
-      friction={2}
-      overshootRight={false}
-    >
-      <View style={styles.swipeableContent}>
-        <TouchableOpacity style={styles.reportCard} onPress={onPress} activeOpacity={0.7}>
-          <View style={styles.cardContent}>
-            <View style={styles.cardLeft}>
-              <Text style={styles.urlText} numberOfLines={1}>{url}</Text>
-              <Text style={styles.scanDateText}>{item.scanDate}</Text>
-            </View>
-            <TouchableOpacity
-              style={styles.menuButton}
-              onPress={handleMenuPress}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            >
-              <MaterialIcons name="more-vert" size={24} color="#6B7280" />
-            </TouchableOpacity>
-          </View>
-        </TouchableOpacity>
+    <TouchableOpacity style={styles.reportCard} onPress={onPress} activeOpacity={0.7}>
+      <View style={styles.cardContent}>
+        <View style={styles.cardLeft}>
+          <Text style={styles.urlText} numberOfLines={1}>{url}</Text>
+          <Text style={styles.scanDateText}>{item.scanDate}</Text>
+        </View>
       </View>
-    </ReanimatedSwipeable>
+    </TouchableOpacity>
   );
 };
 
@@ -105,61 +59,94 @@ const ReportsScreen: React.FC = () => {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const [search, setSearch] = React.useState("");
-  const [deleteSheetVisible, setDeleteSheetVisible] = useState(false);
-  const [editSheetVisible, setEditSheetVisible] = useState(false);
-  const [itemToDelete, setItemToDelete] = useState<{ siteId: string; url: string } | null>(null);
-  const [itemToEdit, setItemToEdit] = useState<{ siteId: string; url: string } | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [reportData, setReportData] = useState<ReportItemFromHistory[]>([]);
   const router = useRouter();
 
-  const { sites, isLoading, fetchSites, deleteSite, createSite } = useSitesStore();
-
   useEffect(() => {
-    fetchSites();
-  }, [fetchSites]);
+    const fetchReportData = async () => {
+      try {
+        setIsLoading(true);
 
-  const formatDate = (dateString?: string): string => {
-    if (!dateString) return 'N/A';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    });
-  };
+        // Fetch all history
+        const allHistory = await getScanHistory();
+        console.log('Fetched history count:', allHistory.length);
+        console.log('Raw history data:', JSON.stringify(allHistory, null, 2));
 
-  const getStatusFromScore = (score?: number): Status => {
-    if (!score) return "Warning";
-    if (score >= 80) return "Good";
-    if (score >= 50) return "Warning";
-    return "Critical";
-  };
+        if (allHistory.length === 0) {
+          console.log('No history found');
+          setReportData([]);
+          setIsLoading(false);
+          return;
+        }
 
-  const mapSiteToReportItem = (site: typeof sites[0]) => {
-    const url = site.root_url || '';
-    const domain = url.replace(/^https?:\/\//, '').replace(/^www\./, '') || 'N/A';
-    return {
-      siteId: site.id,
-      url: site.root_url || '',
-      domain: domain || 'N/A', // Ensure domain is always a string
-      score: 0,
-      status: getStatusFromScore(undefined),
-      scanDate: formatDate(site.created_at),
-      onPress: () => { },
+        // Get unique sites with latest scan
+        const uniqueSites = getUniqueSitesWithLatestScan(allHistory);
+        console.log('Unique sites count:', uniqueSites.length);
+
+        if (uniqueSites.length === 0) {
+          console.log('No unique sites found');
+          setReportData([]);
+          setIsLoading(false);
+          return;
+        }
+
+        // Get job IDs for score fetching (only for latest scans)
+        const jobIds = uniqueSites.map(site => site.latestScan.id);
+        console.log('Job IDs to fetch scores for:', jobIds.length);
+
+        // Fetch scores for all unique sites
+        const scoreMap = new Map<string, number>();
+        await Promise.all(
+          jobIds.map(async (jobId) => {
+            try {
+              const summary = await getScanSummary(jobId);
+              scoreMap.set(jobId, summary.website_score);
+            } catch (error) {
+              console.error(`Failed to fetch score for job ${jobId}:`, error);
+              // Continue even if one score fails
+            }
+          })
+        );
+
+        console.log('Score map size:', scoreMap.size);
+
+        // Transform to report items
+        const transformedItems = uniqueSites.map((site) =>
+          transformUniqueSiteToReportItem(site, scoreMap)
+        );
+
+        console.log('Transformed items count:', transformedItems.length);
+        console.log('Sample transformed item:', transformedItems[0]);
+
+        setReportData(transformedItems);
+      } catch (error) {
+        console.error('Failed to fetch report data:', error);
+        Toast.show({
+          type: 'error',
+          text1: t('common.error'),
+          text2: error instanceof Error ? error.message : 'Failed to load reports. Please try again.',
+        });
+        setReportData([]);
+      } finally {
+        setIsLoading(false);
+      }
     };
-  };
 
-  const reportData = sites
-    .filter((site) => site.status !== 'deleted')
-    .map(mapSiteToReportItem);
+    fetchReportData();
+  }, [t]);
 
   const filteredData = React.useMemo(() => {
     try {
-      return reportData.filter(item => {
+      const filtered = reportData.filter(item => {
         const domain = (item.domain || '').toString();
+        const url = (item.url || '').toString();
         const searchTerm = (search || '').toString();
-        return domain.toLowerCase().includes(searchTerm.toLowerCase());
+        return domain.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          url.toLowerCase().includes(searchTerm.toLowerCase());
       });
+      console.log('Filtered data count:', filtered.length, 'from', reportData.length);
+      return filtered;
     } catch (error) {
       console.error('Error filtering search results:', error);
       // Return all data if filtering fails
@@ -167,81 +154,8 @@ const ReportsScreen: React.FC = () => {
     }
   }, [reportData, search]);
 
-  const handleDelete = (siteId: string, url: string) => {
-    setItemToDelete({ siteId, url });
-    setDeleteSheetVisible(true);
-  };
-
-  const confirmDelete = () => {
-    if (itemToDelete) {
-      deleteSite(itemToDelete.siteId).catch((error) => {
-        Toast.show({
-          type: 'error',
-          text1: t('common.error'),
-          text2: error instanceof Error ? error.message : t('reports.deleteError'),
-        });
-      });
-      setItemToDelete(null);
-    }
-  };
-
-  const closeDeleteSheet = () => {
-    setDeleteSheetVisible(false);
-    setItemToDelete(null);
-  };
-
-  const handleEdit = (item: typeof filteredData[0]) => {
-    setItemToEdit({ siteId: item.siteId, url: item.url });
-    setEditSheetVisible(true);
-  };
-
-  const handleEditConfirm = async (newUrl: string) => {
-    if (!itemToEdit) return;
-
-    setIsEditing(true);
-    try {
-      // First, mark the old site as inactive (delete)
-      await deleteSite(itemToEdit.siteId);
-
-      // Normalize the URL
-      const normalizedUrl = normalizeUrl(newUrl.trim());
-
-      // Then, create the new site
-      await createSite(normalizedUrl);
-
-      // Start a new scan
-      const scanResponse = await startScan(normalizedUrl);
-
-      // Refresh the sites list
-      await fetchSites();
-
-      // Close the sheet
-      setEditSheetVisible(false);
-      setItemToEdit(null);
-
-      // Navigate to the auditing screen
-      router.push({
-        pathname: "/(main)/auditing-screen",
-        params: {
-          url: normalizedUrl,
-          jobId: scanResponse.job_id,
-        },
-      });
-    } catch (error) {
-      Toast.show({
-        type: 'error',
-        text1: t('common.error'),
-        text2: error instanceof Error ? error.message : t('reports.updateError'),
-      });
-    } finally {
-      setIsEditing(false);
-    }
-  };
-
-  const closeEditSheet = () => {
-    setEditSheetVisible(false);
-    setItemToEdit(null);
-  };
+  // Note: Delete and edit functionality removed since we're working with scan history
+  // History data is read-only
 
 
   return (
@@ -286,25 +200,30 @@ const ReportsScreen: React.FC = () => {
           ) : (
             <FlatList
               data={filteredData}
-              keyExtractor={(item) => item.siteId}
+              keyExtractor={(item) => item.jobId || item.siteId}
               contentContainerStyle={styles.listWrap}
               showsVerticalScrollIndicator={false}
               renderItem={({ item }) => {
+                const reportItem: ReportItemProps = {
+                  domain: item.domain,
+                  score: item.score,
+                  status: item.status,
+                  scanDate: item.scanDate,
+                  onPress: () => {
+                    // Navigate to history page
+                    router.push({
+                      pathname: "/(reports)/history",
+                      params: {
+                        url: item.url,
+                      }
+                    });
+                  },
+                };
                 return (
-                  <SwipeableRow
-                    item={item}
+                  <ReportRow
+                    item={reportItem}
                     url={item.url}
-                    onDelete={() => handleDelete(item.siteId, item.url)}
-                    onEdit={() => handleEdit(item)}
-                    onPress={() => {
-                      // Navigate to history page
-                      router.push({
-                        pathname: "/(reports)/history",
-                        params: {
-                          url: item.url,
-                        }
-                      });
-                    }}
+                    onPress={reportItem.onPress}
                   />
                 );
               }}
@@ -328,20 +247,6 @@ const ReportsScreen: React.FC = () => {
             </TouchableOpacity>
           </View>
 
-          <DeleteConfirmationSheet
-            visible={deleteSheetVisible}
-            onClose={closeDeleteSheet}
-            onConfirm={confirmDelete}
-            url={itemToDelete?.url}
-          />
-
-          <EditUrlSheet
-            visible={editSheetVisible}
-            onClose={closeEditSheet}
-            onConfirm={handleEditConfirm}
-            currentUrl={itemToEdit?.url || ''}
-            isLoading={isEditing}
-          />
         </View>
       </KeyboardAvoidingView>
     </GestureHandlerRootView>

@@ -99,17 +99,13 @@ export const getScanIssues = async (jobId: string) => {
 
 export const getScanHistory = async (): Promise<ScanHistoryItem[]> => {
   const token = useAuthStore.getState().token;
-  // if (!token) {
-  //   throw new Error('Authentication required. Please sign in.');
-  // }
+  if (!token) {
+    throw new Error('Authentication required. Please sign in.');
+  }
 
   // Set the token in the apiClient headers
   const { apiClient } = await import('@/lib/api-client');
-  if (token) {
-    apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-  } else {
-    delete apiClient.defaults.headers.common['Authorization'];
-  }
+  apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
   return await scanService.getScanHistory();
 };
