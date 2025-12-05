@@ -15,7 +15,7 @@ const SignIn = () => {
   const { t } = useTranslation();
   const router = useRouter();
   const params = useLocalSearchParams();
-  const { signIn, signInWithGoogle, isLoading, error, clearError, isAuthenticated } = useAuth();
+  const { signIn, signInWithGoogle, signInWithApple, isLoading, error, clearError, isAuthenticated } = useAuth();
 
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -186,9 +186,39 @@ const SignIn = () => {
     }
   };
 
-  const handleAppleLogin = () => {
-    // TODO: Implement Apple OAuth
-    console.log('Apple login pressed');
+  const handleAppleLogin = async () => {
+    try {
+      await signInWithApple();
+      // Navigation is handled by useEffect when isAuthenticated changes
+      
+      // Handle redirect after successful sign-in
+      let redirectUrl = params.redirect as string;
+
+      if (!redirectUrl) {
+        const stored = await RedirectService.getStoredRedirect();
+        if (stored) {
+          redirectUrl = stored;
+          RedirectService.clearStoredRedirect();
+        }
+      }
+
+      if (redirectUrl) {
+        const validatedRedirect = RedirectService.validateRedirect(redirectUrl);
+        if (validatedRedirect) {
+          const { pathname, params: redirectParams } = RedirectService.parseRedirectUrl(validatedRedirect);
+          router.replace({
+            pathname: pathname as any,
+            params: redirectParams
+          });
+        } else {
+          router.replace('/');
+        }
+      } else {
+        router.replace('/');
+      }
+    } catch (error) {
+      console.error('Apple sign-in error:', error);
+    }
   };
 
   return (
@@ -291,16 +321,19 @@ const SignIn = () => {
           <Text style={styles.socialButtonText}>{t('auth.continueGoogle')}</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.socialButton}
-          onPress={handleAppleLogin}
-        >
-          <Image
-            source={require('../../assets/images/apple.png')}
-            style={styles.appleIcon}
-          />
-          <Text style={styles.socialButtonText}>{t('auth.continueApple')}</Text>
-        </TouchableOpacity>
+        {Platform.OS === 'ios' && (
+          <TouchableOpacity
+            style={[styles.socialButton, isLoading && { opacity: 0.6 }]}
+            onPress={handleAppleLogin}
+            disabled={isLoading}
+          >
+            <Image
+              source={require('../../assets/images/apple.png')}
+              style={styles.appleIcon}
+            />
+            <Text style={styles.socialButtonText}>{t('auth.continueApple')}</Text>
+          </TouchableOpacity>
+        )}
 
         <View style={styles.accountLinkContainer}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>

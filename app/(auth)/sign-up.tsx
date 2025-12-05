@@ -6,7 +6,7 @@ import { useTranslation } from '@/utils/translations';
 import Feather from '@expo/vector-icons/Feather';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
-import { Image, KeyboardAvoidingView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Image, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
@@ -36,7 +36,7 @@ const SignUp = () => {
   const { t } = useTranslation();
   const router = useRouter();
   const params = useLocalSearchParams();
-  const { signUp, signInWithGoogle, isLoading, error, clearError, isAuthenticated } = useAuth();
+  const { signUp, signInWithGoogle, signInWithApple, isLoading, error, clearError, isAuthenticated } = useAuth();
 
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -164,9 +164,13 @@ const SignUp = () => {
     }
   };
 
-  const handleAppleLogin = () => {
-    // TODO: Implement Apple OAuth
-    console.log('Apple login pressed');
+  const handleAppleLogin = async () => {
+    try {
+      await signInWithApple();
+      // Navigation is handled by useEffect when isAuthenticated changes
+    } catch (error) {
+      console.error('Apple sign-in error:', error);
+    }
   };
 
   return (
@@ -353,16 +357,19 @@ const SignUp = () => {
           <Text style={styles.socialButtonText}>{t('auth.continueGoogle')}</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.socialButton}
-          onPress={handleAppleLogin}
-        >
-          <Image
-            source={require('../../assets/images/apple.png')}
-            style={styles.appleIcon}
-          />
-          <Text style={styles.socialButtonText}>{t('auth.continueApple')}</Text>
-        </TouchableOpacity>
+        {Platform.OS === 'ios' && (
+          <TouchableOpacity
+            style={[styles.socialButton, isLoading && { opacity: 0.6 }]}
+            onPress={handleAppleLogin}
+            disabled={isLoading}
+          >
+            <Image
+              source={require('../../assets/images/apple.png')}
+              style={styles.appleIcon}
+            />
+            <Text style={styles.socialButtonText}>{t('auth.continueApple')}</Text>
+          </TouchableOpacity>
+        )}
 
         <View style={styles.accountLinkContainer}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>

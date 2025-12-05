@@ -381,17 +381,47 @@ export const authService = {
 
   async signInWithApple(): Promise<AuthResponse> {
     try {
-      // Get identity_token from Apple
-      const identityToken = await appleAuthService.signIn();
-      const platform = appleAuthService.getPlatform();
+      // Get credential from Apple (includes authorization code)
+      const credential = await appleAuthService.signIn();
 
-      // Send identity_token to backend
-      const response = await apiClient.post('/api/v1/auth/oauth/apple', {
-        identity_token: identityToken,
-        platform: platform,
-      });
+      // Build the user data string if name/email available (first-time sign-in only)
+      let userData: string | undefined;
+      if (credential.email || credential.fullName) {
+        const userInfo: Record<string, any> = {};
+        if (credential.email) {
+          userInfo.email = credential.email;
+        }
+        if (credential.fullName) {
+          userInfo.name = {
+            firstName: credential.fullName.givenName,
+            lastName: credential.fullName.familyName,
+          };
+        }
+        userData = JSON.stringify(userInfo);
+      }
+
+      // Send authorization code to backend callback endpoint
+      // Using application/x-www-form-urlencoded as specified by the API
+      const formData = new URLSearchParams();
+      formData.append('code', credential.authorizationCode);
+      if (userData) {
+        formData.append('user', userData);
+      }
+      // state is optional, send empty if not available
+      formData.append('state', '');
+
+      const response = await apiClient.post(
+        '/api/v1/auth/oauth/apple/callback',
+        formData.toString(),
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        }
+      );
 
       const responseData = response.data;
+      console.log('Apple auth response:', responseData);
 
       // Extract token from response - API returns access_token at top level
       const token = responseData.access_token || responseData.data?.access_token;
@@ -420,6 +450,10 @@ export const authService = {
     } catch (error) {
       if (isAxiosError(error)) {
         const errorData = error.response?.data || {};
+        console.log('Apple auth error details:', {
+          status: error.response?.status,
+          data: errorData,
+        });
         // Prioritize API message
         if (errorData.message) {
           throw new Error(errorData.message);
