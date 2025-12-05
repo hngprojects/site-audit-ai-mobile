@@ -21,20 +21,12 @@ const AuditingScreen = () => {
     url: storeUrl,
     currentEvent,
     isCompleted,
+    eventMessages,
   } = useScanStore();
 
-  // Use store values if available, fallback to params
   const finalJobId = storeJobId || jobId;
   const finalUrl = storeUrl || url;
 
-  const scanSteps = [
-    { text: t('auditing.analyzing'), icon: 'search', iconSet: 'FontAwesome' as const },
-    { text: t('auditing.scanningContent'), icon: 'description', iconSet: 'MaterialIcons' as const },
-    { text: t('auditing.checkingSpeed'), icon: 'speed', iconSet: 'MaterialIcons' as const },
-    { text: t('auditing.findingLinks'), icon: 'link', iconSet: 'FontAwesome' as const },
-  ];
-
-  // Map events to steps
   const eventToStepMap = useMemo<Record<string, number>>(() => ({
     scan_started: 1,
     loading_page: 1,
@@ -45,6 +37,31 @@ const AuditingScreen = () => {
     performance_analysis: 3,
     scan_complete: 4,
   }), []);
+
+  const scanSteps = useMemo(() => {
+    return [
+      {
+        text: eventMessages['scan_started'] || eventMessages['loading_page'] || t('auditing.analyzing'),
+        icon: 'search' as const,
+        iconSet: 'FontAwesome' as const,
+      },
+      {
+        text: eventMessages['extracting_content'] || t('auditing.scanningContent'),
+        icon: 'description' as const,
+        iconSet: 'MaterialIcons' as const,
+      },
+      {
+        text: eventMessages['performance_check'] || eventMessages['seo_check'] || eventMessages['accessibility_check'] || eventMessages['performance_analysis'] || t('auditing.checkingSpeed'),
+        icon: 'speed' as const,
+        iconSet: 'MaterialIcons' as const,
+      },
+      {
+        text: eventMessages['scan_complete'] || t('auditing.findingLinks'),
+        icon: 'link' as const,
+        iconSet: 'FontAwesome' as const,
+      },
+    ];
+  }, [eventMessages, t]);
 
   // Convert currentEvent to completed steps count
   const completedSteps = useMemo(() => {
