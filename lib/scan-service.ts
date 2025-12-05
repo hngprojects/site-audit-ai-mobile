@@ -544,7 +544,6 @@ export const scanService = {
   },
 
   async getScanHistory(): Promise<ScanHistoryItem[]> {
-    // Get authentication state (required for this endpoint)
     const authState = useAuthStore.getState();
     const token = authState.token;
 
@@ -552,7 +551,6 @@ export const scanService = {
       throw new Error('Authentication required. Please sign in.');
     }
 
-    // Prepare headers
     const headers: any = {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
@@ -566,7 +564,6 @@ export const scanService = {
       const responseData = response.data;
       console.log('Scan history response:', responseData);
 
-      // Handle both wrapped response and direct array
       if (Array.isArray(responseData)) {
         return responseData;
       }
