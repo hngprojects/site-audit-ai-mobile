@@ -167,14 +167,17 @@ export const en = {
   'photoSheet.choosePhoto': 'Choose photo',
   'photoSheet.deletePhoto': 'Delete photo',
 
+  
+  
   // Auditing Screen
   'auditing.scanning': 'Scanning Website...',
-  'auditing.analyzing': 'Analyzing for critical SEO errors...',
-  'auditing.scanningContent': 'Scanning content quality',
-  'auditing.checkingSpeed': 'Checking for costly speed issues...',
-  'auditing.findingLinks': 'Finding broken links',
+  'auditing.analyzing': 'Evaluating website performance...',
+  'auditing.scanningContent': 'Analyzing for critical SEO errors...',
+  'auditing.checkingSpeed': 'Scanning content quality',
+  'auditing.findingLinks': 'Checking for costly speed issues...',
   'auditing.status': 'Status',
   'auditing.pleaseWait': 'Please wait while we scan your website',
+  'auditing.hangTight': 'Hang tight, this takes ~30-60 seconds',
 
   // Auditing Error Screen
   'auditingError.title': "Oops! URL Didn't Load",
