@@ -275,6 +275,7 @@ export const es = {
   'auditing.checkingSpeedIssues': 'Verificando problemas costosos de velocidad...',
   'auditing.findingBrokenLinks': 'Buscando enlaces rotos',
   // 'auditing.status': 'Estado: {status}',
+  'auditing.stopScan': 'Detener escaneo',
 
   // Auditing Error Screen
   'auditingError.title': '¡Ups! La URL no se cargó',

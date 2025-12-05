@@ -5,7 +5,7 @@ import styles from '@/stylesheets/auditing-screen-stylesheet';
 import { useTranslation } from '@/utils/translations';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useMemo } from 'react';
-import { Text, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const AuditingScreen = () => {
@@ -86,7 +86,6 @@ const AuditingScreen = () => {
     }
   }, [currentEvent, finalJobId, finalUrl, router]);
 
-  // Navigate to summary screen once finished
   useEffect(() => {
     if (isCompleted && finalJobId && finalUrl) {
       const timeout = setTimeout(() => {
@@ -100,6 +99,11 @@ const AuditingScreen = () => {
     }
   }, [isCompleted, finalJobId, finalUrl, router]);
 
+  const handleStopScan = () => {
+    useScanStore.getState().reset();
+    router.replace('/(tabs)');
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={{ flex: 1 }}>
@@ -112,7 +116,6 @@ const AuditingScreen = () => {
         <View style={styles.content}>
           {completedSteps >= 2 && <View style={styles.glowCircle} />}
 
-          {/* Wave animation */}
           <WaveCircle
             size={120}
             completedSteps={completedSteps}
@@ -133,6 +136,15 @@ const AuditingScreen = () => {
               />
             ))}
           </View>
+        </View>
+
+        <View style={styles.stopButtonContainer}>
+          <TouchableOpacity
+            style={styles.stopButton}
+            onPress={handleStopScan}
+          >
+            <Text style={styles.stopButtonText}>{t("auditing.stopScan") || "Stop Scan"}</Text>
+          </TouchableOpacity>
         </View>
       </View>
 

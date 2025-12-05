@@ -272,6 +272,7 @@ export const fr = {
   'auditing.checkingSpeedIssues': 'Vérification des problèmes de vitesse coûteux...',
   'auditing.findingBrokenLinks': 'Recherche de liens cassés',
   // 'auditing.status': 'Statut: {status}',
+  'auditing.stopScan': 'Arrêter le scan',
 
   // Auditing Error Screen
   'auditingError.title': 'Oups! L\'URL n\'a pas chargé',

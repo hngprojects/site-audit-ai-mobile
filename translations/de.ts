@@ -275,6 +275,7 @@ export const de = {
   'auditing.checkingSpeedIssues': 'Überprüfe kostspielige Geschwindigkeitsprobleme...',
   'auditing.findingBrokenLinks': 'Suche nach defekten Links',
   // 'auditing.status': 'Status: {status}',
+  'auditing.stopScan': 'Scan stoppen',
 
   // Auditing Error Screen
   'auditingError.title': 'Ups! URL konnte nicht geladen werden',

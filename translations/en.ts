@@ -178,6 +178,7 @@ export const en = {
   'auditing.status': 'Status',
   'auditing.pleaseWait': 'Please wait while we scan your website',
   'auditing.hangTight': 'Hang tight, this takes ~30-60 seconds',
+  'auditing.stopScan': 'Stop Scan',
 
   // Auditing Error Screen
   'auditingError.title': "Oops! URL Didn't Load",

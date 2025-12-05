@@ -88,6 +88,26 @@ glowCircle: {
   shadowRadius: 65,
   elevation: 40,
 },
+stopButtonContainer: {
+  paddingHorizontal: '5%',
+  paddingBottom: 20,
+  paddingTop: 10,
+},
+stopButton: {
+  borderWidth: 1.5,
+  borderColor: '#FF6B35',
+  borderRadius: 8,
+  paddingVertical: 14,
+  paddingHorizontal: 24,
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: 'transparent',
+},
+stopButtonText: {
+  fontSize: 16,
+  fontFamily: 'RethinkSans-SemiBold',
+  color: '#FF6B35',
+},
 
 });
 
