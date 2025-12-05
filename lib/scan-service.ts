@@ -1,109 +1,6 @@
 import { apiClient, formatErrorMessage, isAxiosError } from '@/lib/api-client';
 import { useAuthStore } from '@/store/auth-store';
-import { storage, STORAGE_KEYS } from './storage';
-
-// Redirect utilities for secure authentication flows
-export class RedirectService {
-  private static readonly ALLOWED_ROUTES = [
-    '/',
-    '/request-form',
-    '/report-dashboard',
-    '/auditing-screen',
-  ];
-
-  private static readonly MAX_REDIRECT_LENGTH = 500;
-
-  /**
-   * Validates and sanitizes redirect URLs
-   * @param redirect - The redirect URL to validate
-   * @returns Validated redirect URL or null if invalid
-   */
-  static validateRedirect(redirect: string | null | undefined): string | null {
-    if (!redirect || typeof redirect !== 'string') {
-      return null;
-    }
-
-    // Check length to prevent buffer overflow attacks
-    if (redirect.length > this.MAX_REDIRECT_LENGTH) {
-      return null;
-    }
-
-    // Remove any potentially dangerous characters
-    const sanitized = redirect.replace(/[<>'"&]/g, '');
-
-    // Check if it's an allowed route (starts with allowed patterns)
-    const isAllowed = this.ALLOWED_ROUTES.some(route =>
-      sanitized.startsWith(route) || sanitized === route
-    );
-
-    return isAllowed ? sanitized : null;
-  }
-
-  /**
-   * Parses redirect URL with query parameters
-   * @param redirect - Full redirect URL with optional query params
-   * @returns Object with pathname and params
-   */
-  static parseRedirectUrl(redirect: string): { pathname: string; params?: Record<string, string> } {
-    if (!redirect.includes('?')) {
-      return { pathname: redirect };
-    }
-
-    const [pathname, queryString] = redirect.split('?');
-    const params: Record<string, string> = {};
-
-    if (queryString) {
-      const searchParams = new URLSearchParams(queryString);
-      for (const [key, value] of searchParams.entries()) {
-        // Only allow safe parameter names and values
-        if (key.length <= 50 && value.length <= 200) {
-          params[key] = value;
-        }
-      }
-    }
-
-    return { pathname, params };
-  }
-
-  /**
-   * Stores redirect information in persistent storage
-   * @param redirect - Redirect information to store
-   */
-  static async storeRedirect(redirect: string): Promise<void> {
-    try {
-      const validated = this.validateRedirect(redirect);
-      if (validated) {
-        await storage.setItem(STORAGE_KEYS.REDIRECT_URL, validated);
-      }
-    } catch (error) {
-      console.error('Failed to store redirect:', error);
-    }
-  }
-
-  /**
-   * Retrieves stored redirect information
-   * @returns Stored redirect URL or null
-   */
-  static async getStoredRedirect(): Promise<string | null> {
-    try {
-      return await storage.getItem(STORAGE_KEYS.REDIRECT_URL);
-    } catch (error) {
-      console.error('Failed to get stored redirect:', error);
-      return null;
-    }
-  }
-
-  /**
-   * Clears stored redirect information
-   */
-  static async clearStoredRedirect(): Promise<void> {
-    try {
-      await storage.removeItem(STORAGE_KEYS.REDIRECT_URL);
-    } catch (error) {
-      console.error('Failed to clear stored redirect:', error);
-    }
-  }
-}
+import { getPersistentDeviceInfo } from '@/utils/device-id';
 
 export interface StartScanRequest {
   top_n: number;
@@ -316,7 +213,7 @@ function transformBackendDataToScanResult(backendData: any): ScanResult {
 }
 
 export const scanService = {
-  async startScan(url: string, topN: number = 15): Promise<{ job_id: string; status: string; message: string }> {
+  async startScan(url: string): Promise<{ job_id: string; status: string; message: string }> {
     if (!url) {
       throw new Error('URL is required');
     }
@@ -328,7 +225,7 @@ export const scanService = {
     const userId = authState.user?.id;
 
     // Prepare request payload
-    const payload: any = { url, top_n: topN };
+    const payload: any = { url };
 
     // Include user_id if authenticated
     if (isAuthenticated && userId) {
@@ -346,8 +243,19 @@ export const scanService = {
     }
 
     try {
+      const deviceInfo = await getPersistentDeviceInfo();
+
+      // Add device info to headers
+      // headers['X-Device'] = JSON.stringify({
+      //   deviceId: deviceInfo.deviceId,
+      //   device: deviceInfo.device,
+      // });
+
+      payload.device_id = deviceInfo.deviceId;
+
+
       const response = await apiClient.post<StartScanResponse>(
-        '/api/v1/scan/start-async',
+        '/api/v1/scan/start-scan-sse',
         payload,
         { headers }
       );

@@ -105,3 +105,16 @@ export type IssueCardProps = {
   noIssuesLabel?: string;
   onPressDetails?: () => void;
 };
+
+
+export interface LeadData {
+  id?: string;
+  email?: string;
+}
+
+export interface LeadResponse {
+  status_code: number;                
+  status: "success" | "error";        
+  message: string;                    
+  data: LeadData | {};                
+}

@@ -8,7 +8,7 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 45,
     marginBottom: 30,
     paddingHorizontal: 10,
   },
@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
   },
   headerUrl: {
     fontSize: 16,
-    fontFamily: 'RethinkSans-Regular',
+    fontFamily: 'RethinkSans-SemiBold',
     color: '#1A2373',
     textAlign: 'center',
   },
@@ -32,11 +32,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 4,
   },
-  loadingContainer: {
+  newLoadingContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginVertical: 40,
-    minHeight: 120,
+    height: 120,
+    width: 120,
+    borderWidth: 3,
+    borderRadius: 60,
+    backgroundColor: '#fff', 
   },
   content: {
     flex: 1,
@@ -57,85 +60,33 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 8,
   },
-  progress: {
-    width: '100%',
-    alignItems: 'center',
-    marginTop: 24,
-    paddingHorizontal: 20,
-  },
-  progressText: {
-    fontSize: 18,
-    fontFamily: 'RethinkSans-SemiBold',
-    color: '#000',
-    marginTop: 12,
-  },
-  footer: {
-    width: '100%',
-    marginTop: 30,
-    paddingHorizontal: 20,
-    alignItems: 'center',
-  },
-  activityIndicatorWrapper: {
-  justifyContent: "center",
-  alignItems: "center",
-},
-
-activityIndicator: {
-  width: 70,
-  height: 70,
-  backgroundColor: "#ffffff",
-  borderRadius: 50,
-  justifyContent: "center",
-  alignItems: "center",
-  elevation: 4, 
-  shadowColor: "#000",
-  shadowOpacity: 0.15,
-  shadowOffset: { width: 0, height: 2 },
-  shadowRadius: 4,
-},
-
-progressBarContainer: {
-  width: "100%",
-  height: 8,
-  backgroundColor: "#E4E7EB",
-  borderRadius: 10,
-  overflow: "hidden",
-  marginTop: 12,
-},
-
-progressBarFill: {
-  height: "100%",
-  backgroundColor: "#ff5a3d",
-  borderRadius: 10,
-},
-
-footerText: {
-  textAlign: "center",
-  fontSize: 13,
-  color: "#8a8a8a",
-  marginTop: 15,
-  fontFamily: "RethinkSans-Medium",
-},
 
 checklistContainer: {
   width: '100%',
-  marginTop: 20,
-  paddingHorizontal: 10,
+  marginTop: 30,
+  paddingHorizontal: "5%",
+  justifyContent: "center",
+  alignItems: "center",
+
+},
+hangTight: {
+  fontFamily: 'RethinkSans-Medium',
+  fontSize: 15,
+  color: "#7a7474ff"
 },
 
-checklistItem: {
-  flexDirection: 'row',
-  alignItems: 'center',
-  marginBottom: 12,
-},
-
-checklistIcon: {
-  marginRight: 12,
-},
-
-checklistText: {
-  fontSize: 16,
-  fontFamily: 'RethinkSans-Regular',
+glowCircle: {
+  position: "absolute",
+  top: 2,
+  width: 160,
+  height: 160,
+  borderRadius: 80,
+  backgroundColor: "transparent",
+  shadowColor: "#96bfa3",
+  shadowOffset: { width: 0, height: 0 },
+  shadowOpacity: 15,
+  shadowRadius: 65,
+  elevation: 40,
 },
 
 });
