@@ -65,7 +65,7 @@ const Onboarding = () => {
           Turn Your Website Into a Sales Driving Machine
         </Text>
         <Text style={styles.subtitle}>
-          Trusted by business owners who wants more profitable website conversion
+          Trusted by businesses who want their websites to bring in more customers.
         </Text>
       </View>
 
@@ -83,7 +83,10 @@ const Onboarding = () => {
 
       <View style={styles.privacyContainer}>
         <Text style={styles.privacyPolicy}>
-          By continuing you accept our <Link href={'../(profile)/privacy-policy'} style={styles.link}>Privacy Policy</Link>
+          By continuing you accept our <Link href={'../(profile)/privacy-policy'} style={styles.link}>Terms & Conditions</Link>
+        </Text>
+        <Text style={styles.privacyPolicy}>
+          and <Link href={'../(profile)/privacy-policy'} style={styles.link}>Privacy Policy</Link>
         </Text>
       </View>
 

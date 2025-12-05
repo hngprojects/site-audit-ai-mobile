@@ -12,21 +12,21 @@ const styles = StyleSheet.create({
     top: 45,
     zIndex: 10,
   },
-  skipText: { 
-    fontSize: 16, 
-    color: "#8b8b8b" 
- },
+  skipText: {
+    fontSize: 16,
+    color: "#8b8b8b"
+  },
 
-  slide: { 
-    alignItems: "center", 
-    justifyContent: "flex-start" 
- },
+  slide: {
+    alignItems: "center",
+    justifyContent: "flex-start"
+  },
 
   image: {
     width: width * 0.97,
     height: "63%",
     marginTop: 10,
-    marginLeft:- 8
+    marginLeft: - 8
   },
   privacyPolicy: {
     fontFamily: "RethinkSans-Regular",
@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center"
   },
-   waveCard: {
+  waveCard: {
     position: "absolute",
     bottom: 0,
     width: "100%",
@@ -55,15 +55,16 @@ const styles = StyleSheet.create({
     marginTop: -10
   },
   title: {
-    fontSize: 24,
+    fontSize: 30,
     fontFamily: "RethinkSans-Bold",
     textAlign: "center",
     marginBottom: 12,
+    color: "#1C1C1C"
   },
   subtitle: {
-    fontSize: 13,
+    fontSize: 16,
     fontFamily: "RethinkSans-Regular",
-    color: "#777",
+    color: "#494949",
     textAlign: "center",
     lineHeight: 22,
   },
@@ -94,10 +95,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  nextText: { 
-    color: "#fff", 
-    fontSize: 17, 
- },
+  nextText: {
+    color: "#fff",
+    fontSize: 17,
+  },
 });
 
 export default styles;

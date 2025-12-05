@@ -1,29 +1,22 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { router, Stack } from 'expo-router';
+import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import * as WebBrowser from 'expo-web-browser';
 import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 
 import { toastConfig } from '@/components/custom-toast';
-import { useAuthGuard } from '@/hooks/use-auth-guard';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { storage, STORAGE_KEYS } from '@/lib/storage';
 
-// Prevent the splash screen from auto-hiding before fonts are loaded
+// Prevent the native splash screen from auto-hiding before fonts are loaded
 SplashScreen.preventAutoHideAsync();
-
-// CRITICAL: Complete any pending OAuth auth sessions when app starts
-// This ensures redirects from OAuth providers (like Google) work properly
-WebBrowser.maybeCompleteAuthSession();
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
-  useAuthGuard(); // Protect routes based on auth state
+  // useAuthGuard(); // Protect routes based on auth state
 
   const [fontsLoaded, fontError] = useFonts({
     'RethinkSans-Regular': require('../assets/font/rethink_sans/RethinkSans-Regular.ttf'),
@@ -40,25 +33,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (fontsLoaded || fontError) {
-      console.log('Fonts loaded:', fontsLoaded, 'Font error:', fontError);
-      const checkOnboardingCompleted = async () => {
-        const onboardingCompleted = await storage.getItem<boolean>(STORAGE_KEYS.ONBOARDING_COMPLETED);
-        if (onboardingCompleted) {
-          router.replace('/(tabs)');
-        } else {
-          router.replace('/(onboarding)');
-        }
-      }
-      checkOnboardingCompleted();
       SplashScreen.hideAsync();
-
-      // Initialize notifications
-      // initializeNotifications().then(cleanup => {
-      //   // Store cleanup function if needed for app unmount
-      //   return cleanup;
-      // }).catch(error => {
-      //   console.error('Failed to initialize notifications:', error);
-      // });
     }
   }, [fontsLoaded, fontError]);
 
@@ -71,7 +46,7 @@ export default function RootLayout() {
 
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <Stack initialRouteName='splash'>
+        <Stack initialRouteName="splash">
           <Stack.Screen name="splash" options={{ headerShown: false }} />
           <Stack.Screen name="(main)" options={{ headerShown: false }} />
           <Stack.Screen name="(reports)" options={{ headerShown: false }} />
@@ -83,7 +58,6 @@ export default function RootLayout() {
           <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="(account)" options={{ headerShown: false }} />
-          <Stack.Screen name="(notifications)" options={{ headerShown: false }} />
           <Stack.Screen name="(hireRequest)" options={{ headerShown: false }} />
           <Stack.Screen name="(socialShare)" options={{ headerShown: false }} />
           <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />

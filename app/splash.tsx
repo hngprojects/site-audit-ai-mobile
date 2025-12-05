@@ -6,36 +6,21 @@ import { Image, ImageBackground, View } from 'react-native';
 const Splash = () => {
   const router = useRouter();
 
-
   useEffect(() => {
     const timer = setTimeout(async () => {
       try {
-        // Check if onboarding has been completed
         const onboardingCompleted = await storage.getItem<boolean>(STORAGE_KEYS.ONBOARDING_COMPLETED);
 
-        console.log('🔍 Splash Screen - Onboarding check:', {
-          key: STORAGE_KEYS.ONBOARDING_COMPLETED,
-          value: onboardingCompleted,
-          type: typeof onboardingCompleted,
-          isTrue: onboardingCompleted === true,
-        });
-
-        // Explicitly check for true value
         if (onboardingCompleted === true) {
-          // Onboarding already completed, go directly to homepage
-          console.log('✅ Onboarding completed, navigating to tabs');
           router.replace('/(tabs)');
         } else {
-          // First time, show onboarding
-          console.log('❌ Onboarding not completed, showing onboarding screen');
           router.replace('/(onboarding)');
         }
       } catch (error) {
         console.error('Error checking onboarding status:', error);
-        // On error, show onboarding to be safe
         router.replace('/(onboarding)');
       }
-    }, 3000);
+    }, 2500);
 
     return () => clearTimeout(timer);
   }, [router]);
