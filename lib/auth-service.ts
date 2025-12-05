@@ -19,6 +19,7 @@ export const authService = {
 
       // Extract token from response.data.access_token
       const token = responseData.data?.access_token;
+      const refreshToken = responseData.data?.refresh_token;
       const apiUser = responseData.data?.user;
 
       if (!apiUser || !token) {
@@ -39,7 +40,7 @@ export const authService = {
         profileImage: apiUser.profile_picture_url || undefined,
       };
 
-      return { user, token };
+      return { user, token, refreshToken };
     } catch (error) {
       if (isAxiosError(error)) {
         const errorData = error.response?.data || {};
@@ -112,6 +113,7 @@ export const authService = {
 
       // Extract token from response.data.access_token
       const token = responseData.data?.access_token;
+      const refreshToken = responseData.data?.refresh_token;
       const apiUser = responseData.data?.user;
 
       if (!apiUser || !token) {
@@ -132,7 +134,7 @@ export const authService = {
         profileImage: apiUser.profile_picture_url || undefined,
       };
 
-      return { user, token };
+      return { user, token, refreshToken };
     } catch (error) {
       if (isAxiosError(error)) {
         const errorData = error.response?.data || {};
@@ -338,6 +340,7 @@ export const authService = {
 
       // Extract token from response - API returns access_token at top level
       const token = responseData.access_token || responseData.data?.access_token;
+      const refreshToken = responseData.refresh_token || responseData.data?.refresh_token;
       const apiUser = responseData.user || responseData.data?.user;
 
       if (!apiUser || !token) {
@@ -358,7 +361,7 @@ export const authService = {
         profileImage: apiUser.profile_picture_url || undefined,
       };
 
-      return { user, token };
+      return { user, token, refreshToken };
     } catch (error) {
       if (isAxiosError(error)) {
         const errorData = error.response?.data || {};
@@ -392,6 +395,7 @@ export const authService = {
 
       // Extract token from response - API returns access_token at top level
       const token = responseData.access_token || responseData.data?.access_token;
+      const refreshToken = responseData.refresh_token || responseData.data?.refresh_token;
       const apiUser = responseData.user || responseData.data?.user;
 
       if (!apiUser || !token) {
@@ -412,7 +416,7 @@ export const authService = {
         profileImage: apiUser.profile_picture_url || undefined,
       };
 
-      return { user, token };
+      return { user, token, refreshToken };
     } catch (error) {
       if (isAxiosError(error)) {
         const errorData = error.response?.data || {};
@@ -453,6 +457,37 @@ export const authService = {
         throw error;
       }
       throw new Error('Failed to delete account. Please try again.');
+    }
+  },
+
+  async refreshToken(refreshToken: string): Promise<{ token: string; refreshToken?: string }> {
+    try {
+      const response = await apiClient.post('/api/v1/auth/refresh', {
+        refresh_token: refreshToken,
+      });
+      const responseData = response.data;
+      
+      const token = responseData.data?.access_token || responseData.access_token;
+      const newRefreshToken = responseData.data?.refresh_token || responseData.refresh_token;
+
+      if (!token) {
+        throw new Error('Invalid response from server');
+      }
+
+      return { token, refreshToken: newRefreshToken };
+    } catch (error) {
+      if (isAxiosError(error)) {
+        const errorData = error.response?.data || {};
+        if (errorData.message) {
+          throw new Error(errorData.message);
+        }
+        const errorMessage = formatErrorMessage(errorData);
+        throw new Error(errorMessage);
+      }
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Failed to refresh token. Please try again.');
     }
   },
 };

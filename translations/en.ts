@@ -19,6 +19,8 @@ export const en = {
   'common.search': 'Search',
   'common.or': 'OR',
   'common.tryAgain': 'Try Again',
+  'common.select': 'Select',
+  'common.unselect': 'Unselect',
 
   // Home Screen
   'home.title': 'Improve your website with a quick scan',
@@ -89,6 +91,12 @@ export const en = {
   'reports.startNewScan': 'Start New Scan',
   'reports.deleteError': 'Failed to delete report',
   'reports.updateError': 'Failed to update URL. Please try again.',
+
+  // History
+  'history.month': 'Month',
+  'history.week': 'Week',
+  'history.noHistory': 'No scan history found',
+  'history.selectAll': 'Select All',
 
   // Email Reports
   'emailReports.title': 'Email Reports',
