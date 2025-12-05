@@ -1,12 +1,14 @@
 import { getScanStatus, startScan } from '@/actions/scan-actions';
+import WaveCircle from '@/components/animated-wave-circle';
 import { useAuditStore } from '@/store/website-domain';
 import styles from '@/stylesheets/auditing-screen-stylesheet';
 import { useTranslation } from '@/utils/translations';
-import { FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { Animated, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
 
 
 const AuditingScreen = () => {
@@ -119,11 +121,12 @@ const AuditingScreen = () => {
     }
   }, [jobId, router, websiteUrl, params.isReRun, scanSteps.length, setDomain]);
 
-  //console.log(scanStatus)
-  //console.log(progress)
+  console.log(scanStatus)
+  console.log(progress)
+
  
 
-
+//for the cursor view effect in the typing status display format
   useEffect(() => {
   const interval = setInterval(() => {
     setCaretVisible(v => !v);
@@ -131,6 +134,8 @@ const AuditingScreen = () => {
 
   return () => clearInterval(interval);
 }, []);
+
+
 
 
   //🔥 TEMPORARY: Simulate scan steps for testing animations
@@ -156,23 +161,6 @@ useEffect(() => {
 
 
 
-
-const isGrey = completedSteps < 2
-
-
-
-const getLoadingCircleStyle = () => {
-  if (completedSteps < 2) {
-    return { borderColor: "#B9B9B9" }; 
-  }
-
-  return { borderColor: "#58A279" }; 
-};
-
-
-
-
-
 const animatedSteps = useRef(
   scanSteps.map(() => new Animated.Value(-20)) 
 ).current;
@@ -187,19 +175,14 @@ const typedText = useRef(
 
   const [textProgress, setTextProgress] = useState(
   scanSteps.map(() => 0));
-  const [targetStep, setTargetStep] = useState(0);
-
-  const nextStep = () => {
-  setCompletedSteps(prev => prev + 1);
-};
 
 
 
+const fillProgress = useRef(new Animated.Value(0)).current;
+const waveOffset = useRef(new Animated.Value(0)).current;
 
 
-
-
-
+//Use Effect for the progress status stages to display they typing texts animation 
 useEffect(() => {
   if (completedSteps > 0 && completedSteps <= scanSteps.length) {
     const index = completedSteps - 1;
@@ -244,54 +227,28 @@ useEffect(() => {
 
 
 
-// useEffect(() => {
-//   if (completedSteps > 0) {
-//     const index = completedSteps - 1;
-//     const textLength = scanSteps[index].text.length;
 
-//     // 1. Slide + fade
-//     Animated.parallel([
-//       Animated.timing(animatedSteps[index], {
-//         toValue: 0,
-//         duration: 400,
-//         useNativeDriver: true,
-//       }),
-//       Animated.timing(animatedOpacity[index], {
-//         toValue: 1,
-//         duration: 300,
-//         useNativeDriver: true,
-//       }),
-//     ]).start(() => {
-      
-//       // 🔥 Start typing — LOCK
-//       setIsTyping(true);
+//UseEffect for the circle getting filled
 
-//       const anim = Animated.timing(typedText[index], {
-//         toValue: textLength,
-//         duration: textLength * 100, // your 100ms per character
-//         useNativeDriver: false,
-//       });
+useEffect(() => {
+  const targetFill = completedSteps / scanSteps.length; 
+  Animated.timing(fillProgress, {
+    toValue: targetFill,
+    duration: 800,
+    useNativeDriver: false,
+  }).start();
+}, [completedSteps]);
 
-//       // Update text progress on every animation tick
-//       const listenerId = typedText[index].addListener(v => {
-//         setTextProgress(prev => {
-//           const next = [...prev];
-//           next[index] = Math.floor(v.value);
-//           return next;
-//         });
-//       });
-
-//       anim.start(() => {
-//         typedText[index].removeListener(listenerId);
-
-//         // 🔥 Finished typing — UNLOCK
-//         setIsTyping(false);
-//       });
-//     });
-//   }
-// }, [completedSteps]);
-
-
+//for wave movement inside the circle fill
+useEffect(() => {
+  Animated.loop(
+    Animated.timing(waveOffset, {
+      toValue: 1,
+      duration: 2000,
+      useNativeDriver: false,
+    })
+  ).start();
+}, []);
 
 
 
@@ -311,17 +268,15 @@ useEffect(() => {
         </View>
 
         <View style={styles.content}>
-          {completedSteps >= 3 && (
+          {completedSteps >= 2 && (
             <View style={styles.glowCircle} />   
           ) }
-            <View style={[styles.newLoadingContainer, getLoadingCircleStyle()]}>
-              <FontAwesome6
-                name="check"
-                size={30}
-                color={isGrey ? "#B9B9B9" : "#58A279"}
-                style={{ backgroundColor: "transparent" }}
-              />
-            </View>
+            
+            <WaveCircle
+              size={120}
+              completedSteps={completedSteps}
+              totalSteps={scanSteps.length}
+            />
 
             <View style={{marginBottom: 40}}/>
 
