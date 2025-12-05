@@ -26,7 +26,7 @@ export default function HomeScreen() {
   const [isCreating, setIsCreating] = useState<boolean>(false);
   const [unreadCount, setUnreadCount] = useState<number>(0);
   const { isAuthenticated } = useAuthStore();
-  const { sites, isLoading, fetchSites, createSite } = useSitesStore();
+  const { sites, isLoading, fetchSites } = useSitesStore();
 
   const fetchUnreadCount = useCallback(async () => {
     if (isAuthenticated) {
@@ -158,7 +158,7 @@ export default function HomeScreen() {
           (
             <View style={[styles.inputPlaceholder, { borderColor: !urlAvailable ? "#d32f2f" : "#C7C8C9", }]}>
               <MaterialCommunityIcons
-                name="web" size={15}
+                name="web" size={24}
                 color="#A0A0A0"
                 style={styles.webIcon}
               />
@@ -177,7 +177,7 @@ export default function HomeScreen() {
           (
             <View style={[styles.androidInputPlaceholder, { borderColor: !urlAvailable ? "#d32f2f" : "#C7C8C9", }]}>
               <MaterialCommunityIcons
-                name="web" size={15}
+                name="web" size={24}
                 color="#A0A0A0"
                 style={styles.webIcon}
               />

@@ -226,6 +226,26 @@ export interface SummaryResultResponse {
   data: SummaryResult;
 }
 
+export interface ScanHistorySite {
+  id: string;
+  root_url: string;
+}
+
+export interface ScanHistoryItem {
+  id: string;
+  status: string;
+  created_at: string;
+  completed_at: string;
+  site: ScanHistorySite;
+}
+
+export interface ScanHistoryResponse {
+  status_code: number;
+  status: string;
+  message: string;
+  data: ScanHistoryItem[];
+}
+
 function transformBackendDataToScanResult(backendData: any): ScanResult {
   const { results } = backendData;
   const issues: Issue[] = [];
@@ -520,6 +540,43 @@ export const scanService = {
         throw error;
       }
       throw new Error('Failed to fetch scan issues. Please try again.');
+    }
+  },
+
+  async getScanHistory(): Promise<ScanHistoryItem[]> {
+    // Get authentication state (optional)
+    const authState = useAuthStore.getState();
+    const isAuthenticated = authState.isAuthenticated;
+    const token = authState.token;
+
+    // Prepare headers
+    const headers: any = {
+      'Content-Type': 'application/json',
+    };
+
+    // Include authorization header if authenticated
+    if (isAuthenticated && token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
+    try {
+      const response = await apiClient.get<ScanHistoryResponse>(
+        '/api/v1/scan/history',
+        { headers }
+      );
+      const responseData = response.data;
+
+      return responseData.data || [];
+    } catch (error) {
+      if (isAxiosError(error)) {
+        const errorData = error.response?.data || {};
+        const errorMessage = formatErrorMessage(errorData);
+        throw new Error(errorMessage);
+      }
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Failed to fetch scan history. Please try again.');
     }
   },
 };

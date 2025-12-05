@@ -1,4 +1,4 @@
-import { scanService, type ScanResult } from '@/lib/scan-service';
+import { scanService, type ScanResult, type ScanHistoryItem } from '@/lib/scan-service';
 import { useAuthStore } from '@/store/auth-store';
 
 export const startScan = async (url: string, topN: number = 15): Promise<{ job_id: string; status: string; message: string }> => {
@@ -95,4 +95,21 @@ export const getScanIssues = async (jobId: string) => {
   }
 
   return await scanService.getScanIssues(jobId);
+};
+
+export const getScanHistory = async (): Promise<ScanHistoryItem[]> => {
+  const token = useAuthStore.getState().token;
+  // if (!token) {
+  //   throw new Error('Authentication required. Please sign in.');
+  // }
+
+  // Set the token in the apiClient headers
+  const { apiClient } = await import('@/lib/api-client');
+  if (token) {
+    apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  } else {
+    delete apiClient.defaults.headers.common['Authorization'];
+  }
+
+  return await scanService.getScanHistory();
 };
