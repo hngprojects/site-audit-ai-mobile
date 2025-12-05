@@ -102,3 +102,17 @@ export const getScanHistory = async (): Promise<ScanHistoryItem[]> => {
 
   return await scanService.getScanHistory();
 };
+
+export const stopScan = async (jobId: string): Promise<{ success: boolean; message?: string }> => {
+  const token = useAuthStore.getState().token;
+
+  // Set the token in the apiClient headers
+  const { apiClient } = await import('@/lib/api-client');
+  if (token) {
+    apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  } else {
+    delete apiClient.defaults.headers.common['Authorization'];
+  }
+
+  return await scanService.stopScan(jobId);
+};

@@ -597,4 +597,45 @@ export const scanService = {
       throw new Error('Failed to fetch scan history. Please try again.');
     }
   },
+
+  async stopScan(jobId: string): Promise<{ success: boolean; message?: string }> {
+    if (!jobId) {
+      throw new Error('Job ID is required');
+    }
+
+    const authState = useAuthStore.getState();
+    const isAuthenticated = authState.isAuthenticated;
+    const token = authState.token;
+
+    const headers: any = {
+      'Content-Type': 'application/json',
+    };
+
+    if (isAuthenticated && token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
+    try {
+      const response = await apiClient.post(
+        `/api/v1/scan/${jobId}/stop`,
+        {},
+        { headers }
+      );
+
+      return {
+        success: true,
+        message: response.data?.message || 'Scan stopped successfully',
+      };
+    } catch (error) {
+      if (isAxiosError(error)) {
+        const errorData = error.response?.data || {};
+        const errorMessage = formatErrorMessage(errorData);
+        throw new Error(errorMessage);
+      }
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Failed to stop scan. Please try again.');
+    }
+  },
 };

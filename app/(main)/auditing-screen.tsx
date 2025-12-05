@@ -1,12 +1,14 @@
+import { stopScan } from '@/actions/scan-actions';
 import WaveCircle from '@/components/animated-wave-circle';
 import ScanStepItem from '@/components/scan-step-item';
 import { useScanStore } from '@/store/useScanStore';
 import styles from '@/stylesheets/auditing-screen-stylesheet';
 import { useTranslation } from '@/utils/translations';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useMemo } from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { useEffect, useMemo, useState } from 'react';
+import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 
 const AuditingScreen = () => {
   const { t } = useTranslation();
@@ -26,6 +28,7 @@ const AuditingScreen = () => {
 
   const finalJobId = storeJobId || jobId;
   const finalUrl = storeUrl || url;
+  const [isStopping, setIsStopping] = useState(false);
 
   const eventToStepMap = useMemo<Record<string, number>>(() => ({
     scan_started: 1,
@@ -99,9 +102,24 @@ const AuditingScreen = () => {
     }
   }, [isCompleted, finalJobId, finalUrl, router]);
 
-  const handleStopScan = () => {
-    useScanStore.getState().reset();
-    router.replace('/(tabs)');
+  const handleStopScan = async () => {
+    if (!finalJobId || isStopping) return;
+
+    setIsStopping(true);
+
+    try {
+      await stopScan(finalJobId);
+      useScanStore.getState().reset();
+      router.replace('/(tabs)');
+    } catch (error) {
+      console.error('[AuditingScreen] Failed to stop scan:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: error instanceof Error ? error.message : 'Failed to stop scan. Please try again.',
+      });
+      setIsStopping(false);
+    }
   };
 
   return (
@@ -142,8 +160,13 @@ const AuditingScreen = () => {
           <TouchableOpacity
             style={styles.stopButton}
             onPress={handleStopScan}
+            disabled={isStopping}
           >
-            <Text style={styles.stopButtonText}>{t("auditing.stopScan") || "Stop Scan"}</Text>
+            {isStopping ? (
+              <ActivityIndicator size="small" color="#FF6B35" />
+            ) : (
+              <Text style={styles.stopButtonText}>{t("auditing.stopScan") || "Stop Scan"}</Text>
+            )}
           </TouchableOpacity>
         </View>
       </View>
