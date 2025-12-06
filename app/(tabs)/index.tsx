@@ -307,10 +307,6 @@ export default function HomeScreen() {
               ))
           )}
 
-
-          <TouchableOpacity onPress={() => router.push('../(onboarding)/')}>
-            <Text> Go to onboarding Screen</Text>
-          </TouchableOpacity>
           <View style={{ height: 100 }} />
         </ScrollView>
       </KeyboardAvoidingView>
