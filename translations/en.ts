@@ -426,4 +426,13 @@ export const en = {
   'auth.serverError': 'Server error. Please try again later.',
   'auth.signUpErrorGeneric': 'Failed to sign up. Please try again.',
 
+
+  //onboarding
+  "onboarding.title" : "Turn Your Website Into a Sales Driving Machine",
+  "onboarding.subTitle" : "Trusted by businesses who want their\n websites to bring in more customers",
+  "button.getStarted" : "Get Started",
+  "privacy.policy1" : "By continuing you accept our",
+  "privacy.policy2" : "Privacy Policy",
+  
+
 };
