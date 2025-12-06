@@ -638,4 +638,84 @@ export const scanService = {
       throw new Error('Failed to stop scan. Please try again.');
     }
   },
+
+  async deleteScan(jobId: string): Promise<{ success: boolean; message?: string }> {
+    if (!jobId) {
+      throw new Error('Job ID is required');
+    }
+
+    const authState = useAuthStore.getState();
+    const token = authState.token;
+
+    if (!token) {
+      throw new Error('Authentication required. Please sign in.');
+    }
+
+    const headers: any = {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    };
+
+    try {
+      const response = await apiClient.delete(
+        `/api/v1/scan/${jobId}`,
+        { headers }
+      );
+
+      return {
+        success: true,
+        message: response.data?.message || 'Scan deleted successfully',
+      };
+    } catch (error) {
+      if (isAxiosError(error)) {
+        const errorData = error.response?.data || {};
+        const errorMessage = formatErrorMessage(errorData);
+        throw new Error(errorMessage);
+      }
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Failed to delete scan. Please try again.');
+    }
+  },
+
+  async deleteMultipleScans(jobIds: string[]): Promise<{
+    success: boolean;
+    deleted: string[];
+    failed: { jobId: string; error: string }[];
+  }> {
+    if (!jobIds || jobIds.length === 0) {
+      throw new Error('At least one Job ID is required');
+    }
+
+    const authState = useAuthStore.getState();
+    const token = authState.token;
+
+    if (!token) {
+      throw new Error('Authentication required. Please sign in.');
+    }
+
+    const deleted: string[] = [];
+    const failed: { jobId: string; error: string }[] = [];
+
+    await Promise.all(
+      jobIds.map(async (jobId) => {
+        try {
+          await this.deleteScan(jobId);
+          deleted.push(jobId);
+        } catch (error) {
+          failed.push({
+            jobId,
+            error: error instanceof Error ? error.message : 'Unknown error',
+          });
+        }
+      })
+    );
+
+    return {
+      success: failed.length === 0,
+      deleted,
+      failed,
+    };
+  },
 };

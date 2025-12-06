@@ -111,3 +111,31 @@ export const stopScan = async (jobId: string): Promise<{ success: boolean; messa
 
   return await scanService.stopScan(jobId);
 };
+
+export const deleteScan = async (jobId: string): Promise<{ success: boolean; message?: string }> => {
+  const token = useAuthStore.getState().token;
+  if (!token) {
+    throw new Error('Authentication required. Please sign in.');
+  }
+
+  // Set the token in the apiClient headers
+  apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+  return await scanService.deleteScan(jobId);
+};
+
+export const deleteMultipleScans = async (jobIds: string[]): Promise<{
+  success: boolean;
+  deleted: string[];
+  failed: { jobId: string; error: string }[];
+}> => {
+  const token = useAuthStore.getState().token;
+  if (!token) {
+    throw new Error('Authentication required. Please sign in.');
+  }
+
+  // Set the token in the apiClient headers
+  apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+  return await scanService.deleteMultipleScans(jobIds);
+};
