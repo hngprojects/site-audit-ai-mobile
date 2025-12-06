@@ -1,4 +1,4 @@
-import { scanService, type ScanHistoryItem, type ScanResult } from '@/lib/scan-service';
+import { scanService, type PageDiscoveryResult, type ScanHistoryItem, type ScanResult } from '@/lib/scan-service';
 import { useAuthStore } from '@/store/auth-store';
 
 export const startScan = async (
@@ -115,4 +115,15 @@ export const stopScan = async (jobId: string): Promise<{ success: boolean; messa
   }
 
   return await scanService.stopScan(jobId);
+};
+
+export const startPageDiscovery = async (
+  url: string,
+  onEvent?: (eventName: string, data: any) => void
+): Promise<{ job_id: string; status: string; message: string }> => {
+  return await scanService.startPageDiscovery(url, onEvent);
+};
+
+export const getDiscoveredPages = async (jobId: string): Promise<PageDiscoveryResult> => {
+  return await scanService.getDiscoveredPages(jobId);
 };

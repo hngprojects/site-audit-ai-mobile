@@ -1,6 +1,6 @@
 import { useAuth } from '@/hooks/use-auth';
 import { appleAuthService } from '@/lib/apple-auth-service';
-import { RedirectService } from '@/lib/scan-service';
+import { RedirectService } from '@/lib/redirect-service';
 import styles from '@/stylesheets/profile-stylesheet';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';

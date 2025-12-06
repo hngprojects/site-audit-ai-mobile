@@ -1,6 +1,6 @@
 import { LoadingButton } from '@/components/ui/loading-button';
 import { useAuth } from '@/hooks/use-auth';
-import { RedirectService } from '@/lib/scan-service';
+import { RedirectService } from '@/lib/redirect-service';
 import styles from '@/stylesheets/sign-up-stylesheet';
 import { useTranslation } from '@/utils/translations';
 import Feather from '@expo/vector-icons/Feather';
@@ -54,7 +54,7 @@ const SignUp = () => {
 
       if (!redirectUrl) {
         // Try to get stored redirect
-        RedirectService.getStoredRedirect().then(stored => {
+        RedirectService.getStoredRedirect().then((stored: string | null) => {
           if (stored) {
             redirectUrl = stored;
             RedirectService.clearStoredRedirect();

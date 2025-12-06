@@ -1,7 +1,7 @@
 import { LoadingButton } from '@/components/ui/loading-button';
 import { useAuth } from '@/hooks/use-auth';
 import { biometricService } from '@/lib/biometric-service';
-import { RedirectService } from '@/lib/scan-service';
+import { RedirectService } from '@/lib/redirect-service';
 import styles from '@/stylesheets/sign-in-stylesheet';
 import { useTranslation } from '@/utils/translations';
 import Feather from '@expo/vector-icons/Feather';

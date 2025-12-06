@@ -9,6 +9,11 @@ export type ScanEvent =
   | "accessibility_check"
   | "performance_analysis"
   | "scan_complete"
+  | "discovery_started"
+  | "crawling_pages"
+  | "analyzing_structure"
+  | "prioritizing_pages"
+  | "discovery_complete"
   | "scan_error"
   | "scan_failed";
 
@@ -46,7 +51,7 @@ export const useScanStore = create<ScanState>((set) => ({
 
   updateFromEvent: (event: ScanEvent, data: any) =>
     set((state) => {
-      const completed = event === "scan_complete";
+      const completed = event === "scan_complete" || event === "discovery_complete";
       const message = data?.message || '';
 
       return {

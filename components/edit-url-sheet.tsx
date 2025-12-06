@@ -151,7 +151,7 @@ const styles = {
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end',
+    justifyContent: 'flex-end' as any,
   },
   modalContent: {
     backgroundColor: '#fff',
@@ -161,7 +161,7 @@ const styles = {
     paddingTop: 12,
   },
   modalHeader: {
-    alignItems: 'center',
+    alignItems: 'center' as any,
     marginBottom: 24,
   },
   dragHandle: {
@@ -179,7 +179,7 @@ const styles = {
     fontSize: 20,
     fontFamily: 'RethinkSans-Bold',
     color: '#111827',
-    textAlign: 'center',
+    textAlign: 'center' as any,
   },
   inputContainer: {
     marginBottom: 20,
@@ -191,7 +191,7 @@ const styles = {
     marginBottom: 8,
   },
   input: {
-    width: '100%',
+    width: '100%' as any,
     height: 48,
     backgroundColor: '#F9FAFB',
     borderWidth: 1,
@@ -207,16 +207,16 @@ const styles = {
     color: '#6B7280',
   },
   buttonsContainer: {
-    width: '100%',
+    width: '100%' as any,
     gap: 12,
   },
   scanButton: {
-    width: '100%',
+    width: '100%' as any,
     backgroundColor: '#ff5a3d',
     borderRadius: 12,
     paddingVertical: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: 'center' as any,
+    justifyContent: 'center' as any,
   },
   scanButtonText: {
     fontSize: 16,
@@ -224,12 +224,12 @@ const styles = {
     color: '#FFFFFF',
   },
   cancelButton: {
-    width: '100%',
+    width: '100%' as any,
     backgroundColor: 'transparent',
     borderRadius: 12,
     paddingVertical: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: 'center' as any,
+    justifyContent: 'center' as any,
     borderWidth: 1,
     borderColor: '#ff5a3d',
   },

@@ -93,7 +93,7 @@ const AuditingScreen = () => {
     if (isCompleted && finalJobId && finalUrl) {
       const timeout = setTimeout(() => {
         router.replace({
-          pathname: "/(reports)/report-dashboard",
+          pathname: "/(reports)/audit-summary-first",
           params: { jobId: finalJobId, url: finalUrl },
         });
       }, 1200);

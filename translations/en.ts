@@ -177,7 +177,7 @@ export const en = {
   'auditing.findingLinks': 'Checking for costly speed issues...',
   'auditing.status': 'Status',
   'auditing.pleaseWait': 'Please wait while we scan your website',
-  'auditing.hangTight': 'Hang tight, this takes ~30-60 seconds',
+  'auditing.hangTight': 'Hang tight, this takes 5-10 seconds',
   'auditing.stopScan': 'Stop Scan',
 
   // Auditing Error Screen

@@ -1,3 +1,5 @@
+import { emailReportsService } from '@/lib/email-reports-service';
+import { useAuthStore } from '@/store/auth-store';
 import { useEmailReportsStore, type EmailFrequency } from '@/store/email-reports-store';
 import styles from '@/stylesheets/email-reports-stylesheet';
 import { useTranslation } from '@/utils/translations';
@@ -12,11 +14,33 @@ const EmailReportsContent = () => {
   const { t } = useTranslation();
   const router = useRouter();
   const { frequency, setFrequency } = useEmailReportsStore();
+  const { token } = useAuthStore();
   const [selectedFrequency, setSelectedFrequency] = useState<EmailFrequency | null>(frequency);
+  const [isLoadingSettings, setIsLoadingSettings] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    setSelectedFrequency(frequency);
-  }, [frequency]);
+    const loadSettings = async () => {
+      if (!token) {
+        setIsLoadingSettings(false);
+        return;
+      }
+
+      try {
+        const settings = await emailReportsService.getEmailReportsSettings(token);
+        setFrequency(settings.email_reports_frequency);
+        setSelectedFrequency(settings.email_reports_frequency);
+      } catch (error) {
+        // If API fails, fall back to local storage
+        console.warn('Failed to load email reports settings from API:', error);
+        setSelectedFrequency(frequency);
+      } finally {
+        setIsLoadingSettings(false);
+      }
+    };
+
+    loadSettings();
+  }, [token, frequency, setFrequency]);
 
   const frequencies: { value: EmailFrequency; label: string }[] = [
     { value: 'weekly', label: t('emailReports.weekly') },
@@ -25,8 +49,12 @@ const EmailReportsContent = () => {
     { value: 'never', label: t('emailReports.never') },
   ];
 
-  const handleSave = () => {
-    if (selectedFrequency) {
+  const handleSave = async () => {
+    if (!selectedFrequency || !token) return;
+
+    setIsSaving(true);
+    try {
+      await emailReportsService.updateEmailReportsSettings(selectedFrequency, token);
       setFrequency(selectedFrequency);
       Toast.show({
         type: 'success',
@@ -34,8 +62,26 @@ const EmailReportsContent = () => {
         text2: t('emailReports.updated'),
       });
       router.back();
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: t('common.error'),
+        text2: error instanceof Error ? error.message : t('emailReports.updateError'),
+      });
+    } finally {
+      setIsSaving(false);
     }
   };
+
+  if (isLoadingSettings) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#ff5a3d" />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -56,6 +102,7 @@ const EmailReportsContent = () => {
               <TouchableOpacity
                 style={styles.optionRow}
                 onPress={() => setSelectedFrequency(frequency.value)}
+                disabled={isSaving}
               >
                 <Text style={styles.optionText}>{frequency.label}</Text>
                 <View style={styles.radioContainer}>
@@ -78,17 +125,21 @@ const EmailReportsContent = () => {
           <TouchableOpacity
             style={[
               styles.saveButton,
-              selectedFrequency ? styles.saveButtonActive : styles.saveButtonInactive,
+              (selectedFrequency && !isSaving) ? styles.saveButtonActive : styles.saveButtonInactive,
             ]}
-            disabled={!selectedFrequency}
+            disabled={!selectedFrequency || isSaving}
             onPress={handleSave}
           >
-            <Text style={[
-              styles.saveButtonText,
-              selectedFrequency ? styles.saveButtonTextActive : styles.saveButtonTextInactive,
-            ]}>
-              {t('common.save')}
-            </Text>
+            {isSaving ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Text style={[
+                styles.saveButtonText,
+                (selectedFrequency && !isSaving) ? styles.saveButtonTextActive : styles.saveButtonTextInactive,
+              ]}>
+                {t('common.save')}
+              </Text>
+            )}
           </TouchableOpacity>
         </View>
       </ScrollView>

@@ -29,16 +29,7 @@ import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { leadService } from "../../lib/lead-generation-service";
 
-
-
-
-
-
-
-
-
-
-export default function ReportDashboard() {
+export default function AuditSummaryFirst() {
   const { t } = useTranslation();
   const [isLoaded, setIsLoaded] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -55,33 +46,25 @@ export default function ReportDashboard() {
 
   const { setAuditInfo } = useAuditInfoStore();
 
-
-
-
   const params = useLocalSearchParams();
 
   const jobId = Array.isArray(params.jobId) ? params.jobId[0] : params.jobId;
   const url = Array.isArray(params.url) ? params.url[0] : params.url;
 
+  const selectIssuesForReview = () => {
+    // Navigate to the current report dashboard (second page)
+    router.push({
+      pathname: "/(reports)/report-dashboard",
+      params: { jobId: jobId, url: url },
+    });
+  };
 
-
-
-  const hireAPro = () => {
-    try {
-      if (issues.length < 1) {
-        Toast.show({
-          type: 'error',
-          text1: t('common.error'),
-          text2: t('reports.selectIssuesForPro'),
-        });
-        return;
-      }
-
-      //navigate to  fix/hire professional 
-      router.push("/(hireRequest)/hire-request");
-    } catch (error) {
-      console.log(error)
-    }
+  const discoverNewPages = () => {
+    // Navigate to page discovery screen
+    router.push({
+      pathname: "/(main)/page-discovery-screen",
+      params: { url: url },
+    });
   };
 
   const statusColor = (s: Status) =>
@@ -136,15 +119,7 @@ export default function ReportDashboard() {
     }
   };
 
-
-
-
   const CATEGORIES = summaryResult?.categories || [];
-
-
-
-
-
 
   useEffect(() => {
     if (jobId) {
@@ -176,9 +151,7 @@ export default function ReportDashboard() {
     return () => clearTimeout(timer);
   }, []);
 
-
   // for modal to come-up automatically
-
   useEffect(() => {
     const modalTimer = setTimeout(() => {
       setShowModal(true);
@@ -186,7 +159,6 @@ export default function ReportDashboard() {
 
     return () => clearTimeout(modalTimer);
   }, []);
-
 
   if (!isLoaded) {
     return (
@@ -250,7 +222,6 @@ export default function ReportDashboard() {
           </TouchableOpacity>
         </View>
 
-
         <View style={{ paddingHorizontal: 25, marginVertical: 5, marginTop: 15 }}>
           <Text style={[styles.scoreText, { color: statusColor(normalizeStatus(summaryResult ? (summaryResult.website_score >= 80 ? 'Good' : summaryResult.website_score >= 50 ? 'Warning' : 'Critical') : 'Warning')) }]}>{summaryResult?.website_score || t('common.loading')}</Text>
           <Text style={{ ...styles.cardLabel, color: "#000" }}>{t('reportDashboard.websiteScore')}</Text>
@@ -293,23 +264,50 @@ export default function ReportDashboard() {
           </View>
         )}
 
-        <View>
-          <Text
-            style={{ textAlign: "center", marginTop: 18, fontSize: 16, fontFamily: "RethinkSans-Medium", color: "#656566ff", }}
+        {/* Two buttons stacked in column */}
+        <View style={{ paddingHorizontal: 20, marginTop: 30, gap: 15 }}>
+          <TouchableOpacity
+            style={{
+              backgroundColor: '#FF5A3D',
+              paddingVertical: 15,
+              paddingHorizontal: 20,
+              borderRadius: 8,
+              alignItems: 'center',
+            }}
+            onPress={selectIssuesForReview}
           >
-            {t('reportDashboard.getSalesUp')}
-          </Text>
+            <Text style={{
+              color: 'white',
+              fontSize: 16,
+              fontFamily: 'RethinkSans-Medium',
+              textAlign: 'center'
+            }}>
+              Select Issues for Review
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={{
+              backgroundColor: 'white',
+              paddingVertical: 15,
+              paddingHorizontal: 20,
+              borderRadius: 8,
+              borderWidth: 2,
+              borderColor: '#FF5A3D',
+              alignItems: 'center',
+            }}
+            onPress={discoverNewPages}
+          >
+            <Text style={{
+              color: '#FF5A3D',
+              fontSize: 16,
+              fontFamily: 'RethinkSans-Medium',
+              textAlign: 'center'
+            }}>
+              Discover New Pages to Scan
+            </Text>
+          </TouchableOpacity>
         </View>
-
-
-
-        <TouchableOpacity
-          style={styles.continueBtn}
-          onPress={hireAPro}
-        >
-          <Text style={styles.continueText}>{t('common.continue')}</Text>
-        </TouchableOpacity>
-
 
         <View style={{ height: 80 }} />
       </ScrollView>
