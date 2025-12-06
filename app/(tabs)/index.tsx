@@ -9,7 +9,6 @@ import { useScanStore } from "@/store/useScanStore";
 import styles from "@/stylesheets/homeScreenStylesheet";
 import { useTranslation } from "@/utils/translations";
 import { normalizeUrl, validateWebsiteUrl } from "@/utils/url-validation";
-import { Octicons } from '@expo/vector-icons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { router } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -193,7 +192,7 @@ export default function HomeScreen() {
         style={{ flex: 1 }}
         keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
       >
-        {isAuthenticated && (
+        {/* {isAuthenticated && (
           <TouchableOpacity style={styles.notificationContainer} onPress={() => router.push('/(main)/notifications')}>
             <View>
               <Octicons name="bell" size={24} color="black" />
@@ -204,7 +203,7 @@ export default function HomeScreen() {
               )}
             </View>
           </TouchableOpacity>
-        )}
+        )} */}
 
 
         <View style={styles.headingSection}>
@@ -273,7 +272,7 @@ export default function HomeScreen() {
           )}
         </TouchableOpacity>
 
-        <Text style={styles.sectionTitle}>{t('home.recentAudits')}</Text>
+        {/* <Text style={styles.sectionTitle}>{t('home.recentAudits')}</Text> */}
 
         <ScrollView showsVerticalScrollIndicator={false}>
           {isLoading ? (

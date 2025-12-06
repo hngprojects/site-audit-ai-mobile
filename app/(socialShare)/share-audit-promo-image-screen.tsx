@@ -1,4 +1,5 @@
 import { PromotionalImage } from "@/components/promotional-image";
+import { useScanStore } from "@/store/useScanStore";
 import styles from "@/stylesheets/share-audit-promo-image-screen-stylesheet";
 import { useTranslation } from "@/utils/translations";
 import { Feather } from "@expo/vector-icons";
@@ -27,7 +28,10 @@ export default function ShareAuditPromoImageScreen() {
 
   const router = useRouter();
   const params = useLocalSearchParams<{ website?: string }>();
-  const website = params.website ?? "";
+  const { url: storeUrl } = useScanStore();
+
+  // Get website from params, fallback to store
+  const website = params.website || storeUrl || "";
 
 
 

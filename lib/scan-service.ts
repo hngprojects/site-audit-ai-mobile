@@ -1,4 +1,5 @@
 import { apiClient, formatErrorMessage, isAxiosError } from '@/lib/api-client';
+import { storage } from '@/lib/storage';
 import { useAuthStore } from '@/store/auth-store';
 import { getPersistentDeviceInfo } from '@/utils/device-id';
 
@@ -224,14 +225,17 @@ export const scanService = {
     const userId = authState.user?.id;
 
     try {
-      const deviceInfo = await getPersistentDeviceInfo();
       const queryParams = new URLSearchParams({
         url: url,
-        device_id: deviceInfo.deviceId,
       });
 
       if (isAuthenticated && userId) {
+        // Authenticated users: send user_id, no device_id
         queryParams.append('user_id', userId);
+      } else {
+        // Anonymous users: send device_id
+        const deviceInfo = await getPersistentDeviceInfo();
+        queryParams.append('device_id', deviceInfo.deviceId);
       }
 
       const baseUrl = process.env.EXPO_PUBLIC_BASE_URL || '';
@@ -358,6 +362,32 @@ export const scanService = {
         };
 
         xhr.onload = () => {
+          // Check HTTP status first
+          if (xhr.status !== 200) {
+            console.error('[ScanService] HTTP error:', {
+              status: xhr.status,
+              statusText: xhr.statusText,
+              response: xhr.responseText?.substring(0, 500),
+            });
+
+            let errorMessage = `Scan request failed with status ${xhr.status}`;
+            try {
+              const errorData = JSON.parse(xhr.responseText);
+              errorMessage = errorData.message || errorData.detail || errorMessage;
+            } catch {
+              // Response is not JSON, use status-based message
+              if (xhr.status === 401) {
+                errorMessage = 'Authentication failed. Please sign in again.';
+              } else if (xhr.status === 403) {
+                errorMessage = 'Access denied. You do not have permission to perform this scan.';
+              } else if (xhr.status >= 500) {
+                errorMessage = 'Server error. Please try again later.';
+              }
+            }
+            reject(new Error(errorMessage));
+            return;
+          }
+
           // Process any remaining buffer data
           if (buffer) {
             processResponse();
@@ -370,6 +400,11 @@ export const scanService = {
           }
 
           if (!firstJobId) {
+            console.error('[ScanService] No job_id found in response:', {
+              responseLength: xhr.responseText?.length,
+              responsePreview: xhr.responseText?.substring(0, 500),
+              processedEventsCount: processedEvents.size,
+            });
             reject(new Error('No job_id received from scan'));
           }
         };
@@ -717,5 +752,92 @@ export const scanService = {
       deleted,
       failed,
     };
+  },
+};
+
+// Redirect Service for handling post-auth redirects
+const REDIRECT_STORAGE_KEY = 'pending_redirect';
+
+export const RedirectService = {
+  // Store a redirect URL for later use
+  storeRedirect: async (url: string): Promise<void> => {
+    try {
+      await storage.setItem(REDIRECT_STORAGE_KEY, url);
+    } catch (error) {
+      console.error('Failed to store redirect:', error);
+    }
+  },
+
+  // Get stored redirect URL
+  getStoredRedirect: async (): Promise<string | null> => {
+    try {
+      return await storage.getItem<string>(REDIRECT_STORAGE_KEY);
+    } catch (error) {
+      console.error('Failed to get stored redirect:', error);
+      return null;
+    }
+  },
+
+  // Clear stored redirect
+  clearStoredRedirect: async (): Promise<void> => {
+    try {
+      await storage.removeItem(REDIRECT_STORAGE_KEY);
+    } catch (error) {
+      console.error('Failed to clear stored redirect:', error);
+    }
+  },
+
+  // Validate redirect URL to prevent open redirect attacks
+  validateRedirect: (url: string | undefined): string | null => {
+    if (!url) return null;
+
+    // Only allow relative paths (starting with /)
+    if (!url.startsWith('/')) {
+      console.warn('Invalid redirect URL (must be relative):', url);
+      return null;
+    }
+
+    // Block any protocol handlers
+    if (url.includes('://') || url.startsWith('//')) {
+      console.warn('Invalid redirect URL (no protocols allowed):', url);
+      return null;
+    }
+
+    // Allowed path prefixes (must include route group)
+    const allowedPrefixes = [
+      '/(tabs)',
+      '/(reports)',
+      '/(main)',
+      '/(profile)',
+      '/(settings)',
+      '/(support)',
+      '/(hireRequest)',
+      '/(general)',
+      '/(account)',
+      '/(socialShare)',
+    ];
+
+    const isAllowed = allowedPrefixes.some(prefix => url.startsWith(prefix));
+    if (!isAllowed) {
+      console.warn('Redirect URL not in allowed list:', url);
+      return null;
+    }
+
+    return url;
+  },
+
+  // Parse redirect URL into pathname and params
+  parseRedirectUrl: (url: string): { pathname: string; params: Record<string, string> } => {
+    const [pathname, queryString] = url.split('?');
+    const params: Record<string, string> = {};
+
+    if (queryString) {
+      const searchParams = new URLSearchParams(queryString);
+      searchParams.forEach((value, key) => {
+        params[key] = value;
+      });
+    }
+
+    return { pathname, params };
   },
 };
