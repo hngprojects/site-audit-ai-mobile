@@ -85,7 +85,10 @@ const Onboarding = () => {
 
       <View style={styles.privacyContainer}>
         <Text style={styles.privacyPolicy}>
-          {t("privacy.policy1")} <Link href={'../(profile)/privacy-policy'} style={styles.link}>{t("privacy.policy2")}</Link>
+          {t("privacy.policy1")} <Link href={'../(profile)/terms-conditions'} style={styles.link}>{t("privacy.policy2")}</Link>
+        </Text>
+        <Text style={styles.privacyPolicy}>
+          {t("privacy.policy3")} <Link href={'../(profile)/privacy-policy'} style={styles.link}>{t("privacy.policy4")}</Link>
         </Text>
       </View>
 

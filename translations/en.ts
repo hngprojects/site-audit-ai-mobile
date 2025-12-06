@@ -167,8 +167,8 @@ export const en = {
   'photoSheet.choosePhoto': 'Choose photo',
   'photoSheet.deletePhoto': 'Delete photo',
 
-  
-  
+
+
   // Auditing Screen
   'auditing.scanning': 'Scanning Website...',
   'auditing.analyzing': 'Evaluating website performance...',
@@ -428,11 +428,13 @@ export const en = {
 
 
   //onboarding
-  "onboarding.title" : "Turn Your Website Into a Sales Driving Machine",
-  "onboarding.subTitle" : "Trusted by businesses who want their\n websites to bring in more customers",
-  "button.getStarted" : "Get Started",
-  "privacy.policy1" : "By continuing you accept our",
-  "privacy.policy2" : "Privacy Policy",
-  
+  "onboarding.title": "Turn Your Website Into a Sales Driving Machine",
+  "onboarding.subTitle": "Trusted by businesses who want their\n websites to bring in more customers",
+  "button.getStarted": "Get Started",
+  "privacy.policy1": "By continuing you accept our",
+  "privacy.policy2": "Terms & Conditions",
+  "privacy.policy3": "and",
+  "privacy.policy4": "Privacy Policy",
+
 
 };
