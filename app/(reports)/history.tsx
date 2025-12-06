@@ -1,4 +1,5 @@
-import { getScanHistory, getScanSummary } from '@/actions/scan-actions';
+import { deleteMultipleScans, getScanHistory, getScanSummary } from '@/actions/scan-actions';
+import DeleteConfirmationSheet from '@/components/delete-confirmation-sheet';
 import styles from '@/stylesheets/history-stylesheet';
 import {
   getHistoryBySiteUrl,
@@ -11,6 +12,7 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
+  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   SectionList,
@@ -56,6 +58,8 @@ const HistoryScreen: React.FC = () => {
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState(true);
   const [historyItems, setHistoryItems] = useState<HistoryItemForUI[]>([]);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const formatMonthHeader = React.useCallback((date: Date) =>
     date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }), []);
@@ -203,10 +207,68 @@ const HistoryScreen: React.FC = () => {
 
   const handleDelete = () => {
     if (selectedItems.size === 0) return;
-    // TODO: Implement delete functionality
-    console.log('Deleting items:', Array.from(selectedItems));
-    setSelectedItems(new Set());
-    setIsSelectionMode(false);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (selectedItems.size === 0) return;
+
+    setShowDeleteModal(false);
+    setIsDeleting(true);
+
+    try {
+      // Get the job IDs for selected items
+      const selectedJobIds = historyItems
+        .filter(item => selectedItems.has(item.id))
+        .map(item => item.jobId);
+
+      const result = await deleteMultipleScans(selectedJobIds);
+
+      if (result.success) {
+        Toast.show({
+          type: 'success',
+          text1: t('common.success'),
+          text2: `${result.deleted.length} scan(s) deleted successfully`,
+        });
+
+        // Remove deleted items from local state
+        setHistoryItems(prev => prev.filter(item => !selectedItems.has(item.id)));
+      } else {
+        // Some deletions failed
+        if (result.deleted.length > 0) {
+          Toast.show({
+            type: 'info',
+            text1: 'Partial Success',
+            text2: `${result.deleted.length} deleted, ${result.failed.length} failed`,
+          });
+
+          // Remove successfully deleted items from local state
+          const deletedJobIdSet = new Set(result.deleted);
+          setHistoryItems(prev => prev.filter(item => !deletedJobIdSet.has(item.jobId)));
+        } else {
+          Toast.show({
+            type: 'error',
+            text1: t('common.error'),
+            text2: 'Failed to delete scans. Please try again.',
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Delete error:', error);
+      Toast.show({
+        type: 'error',
+        text1: t('common.error'),
+        text2: error instanceof Error ? error.message : 'Failed to delete scans',
+      });
+    } finally {
+      setIsDeleting(false);
+      setSelectedItems(new Set());
+      setIsSelectionMode(false);
+    }
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
   };
 
   const hasSelectedItems = selectedItems.size > 0;
@@ -367,17 +429,28 @@ const HistoryScreen: React.FC = () => {
           {isSelectionMode && (
             <View style={[styles.deleteButtonContainer, { paddingBottom: insets.bottom }]}>
               <TouchableOpacity
-                style={[styles.deleteButton, !hasSelectedItems && styles.deleteButtonDisabled]}
+                style={[styles.deleteButton, (!hasSelectedItems || isDeleting) && styles.deleteButtonDisabled]}
                 onPress={handleDelete}
-                disabled={!hasSelectedItems}
+                disabled={!hasSelectedItems || isDeleting}
                 activeOpacity={0.8}
               >
-                <Text style={[styles.deleteButtonText, !hasSelectedItems && styles.deleteButtonTextDisabled]}>
-                  {t('common.delete')}
-                </Text>
+                {isDeleting ? (
+                  <ActivityIndicator size="small" color="#FFFFFF" />
+                ) : (
+                  <Text style={[styles.deleteButtonText, !hasSelectedItems && styles.deleteButtonTextDisabled]}>
+                    {t('common.delete')} {hasSelectedItems && `(${selectedItems.size})`}
+                  </Text>
+                )}
               </TouchableOpacity>
             </View>
           )}
+
+          {/* Delete Confirmation Sheet */}
+          <DeleteConfirmationSheet
+            visible={showDeleteModal}
+            onClose={cancelDelete}
+            onConfirm={confirmDelete}
+          />
         </View>
       </KeyboardAvoidingView>
     </GestureHandlerRootView>

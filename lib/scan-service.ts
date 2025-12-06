@@ -1,4 +1,5 @@
 import { apiClient, formatErrorMessage, isAxiosError } from '@/lib/api-client';
+import { storage } from '@/lib/storage';
 import { useAuthStore } from '@/store/auth-store';
 
 export interface StartScanRequest {
@@ -261,45 +262,206 @@ export const scanService = {
       throw new Error('URL is required');
     }
 
-    const token = useAuthStore.getState().token;
-
-    const headers: any = {
-      'Content-Type': 'application/json',
-    };
-
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
-    }
+    const authState = useAuthStore.getState();
+    const isAuthenticated = authState.isAuthenticated;
+    const token = authState.token;
+    const userId = authState.user?.id;
 
     try {
-      const response = await apiClient.post<StartScanResponse>(
-        '/api/v1/scan/start-async',
-        { url, top_n: 10 },
-        { headers }
-      );
+      const queryParams = new URLSearchParams({
+        url: url,
+      });
 
-      const responseData = response.data;
+      if (isAuthenticated && userId) {
+        // Authenticated users: send user_id, no device_id
+        queryParams.append('user_id', userId);
+      } else {
+        // Anonymous users: send device_id
+        const deviceInfo = await getPersistentDeviceInfo();
+        queryParams.append('device_id', deviceInfo.deviceId);
+      }
 
-      if (responseData.status_code === 200) {
-        const jobId = responseData.data.job_id;
+      const baseUrl = process.env.EXPO_PUBLIC_BASE_URL || '';
+      const apiUrl = `${baseUrl}/api/v1/scan/start-scan-sse?${queryParams.toString()}`;
 
-        // Simulate events for UI feedback (since we don't have real SSE yet)
-        if (onEvent) {
-          onEvent('scan_started', { job_id: jobId, status: 'processing', message: 'Starting scan...' });
-          setTimeout(() => onEvent('loading_page', { job_id: jobId, progress_percent: 25, current_step: 'Discovering pages' }), 500);
-          setTimeout(() => onEvent('extracting_content', { job_id: jobId, progress_percent: 50, current_step: 'Analyzing content' }), 1000);
-          setTimeout(() => onEvent('performance_check', { job_id: jobId, progress_percent: 75, current_step: 'Checking performance' }), 1500);
-          setTimeout(() => onEvent('scan_complete', { job_id: jobId, status: 'completed', message: 'Scan completed successfully' }), 2000);
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        let lastProcessedIndex = 0;
+        let firstJobId: string | null = null;
+        let buffer = '';
+
+        xhr.open('POST', apiUrl);
+        xhr.setRequestHeader('Accept', 'text/event-stream');
+
+        if (isAuthenticated && token) {
+          xhr.setRequestHeader('Authorization', `Bearer ${token}`);
         }
 
-        return {
-          job_id: jobId,
-          status: responseData.data.status,
-          message: responseData.message,
+        const processedEvents = new Set<string>();
+
+        const processEventIfNew = (eventName: string, dataJson: string) => {
+          const eventKey = `${eventName}-${dataJson.substring(0, 50)}`;
+          if (!processedEvents.has(eventKey)) {
+            processedEvents.add(eventKey);
+            processEventImmediately(eventName, dataJson);
+          }
         };
-      } else {
-        throw new Error(responseData.message || 'Scan failed to start');
-      }
+
+        const parseAndProcessEvents = (lines: string[]) => {
+          let currentEvent: string | null = null;
+          let currentDataLines: string[] = [];
+          let processedUpTo = 0;
+
+          for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+
+            if (line.trim().startsWith(':')) {
+              processedUpTo = i + 1;
+              continue;
+            }
+
+            if (line.startsWith('event:')) {
+              if (currentEvent && currentDataLines.length > 0) {
+                processEventIfNew(currentEvent, currentDataLines.join('').trim());
+                processedUpTo = i;
+                currentDataLines = [];
+              }
+              currentEvent = line.replace('event:', '').trim();
+            } else if (line.startsWith('data:')) {
+              currentDataLines.push(line.replace('data:', '').trim());
+            } else if (line.trim() === '') {
+              if (currentEvent && currentDataLines.length > 0) {
+                processEventIfNew(currentEvent, currentDataLines.join('').trim());
+                processedUpTo = i + 1;
+                currentEvent = null;
+                currentDataLines = [];
+              } else {
+                processedUpTo = i + 1;
+              }
+            }
+          }
+
+          if (currentEvent && currentDataLines.length > 0) {
+            processEventIfNew(currentEvent, currentDataLines.join('').trim());
+            processedUpTo = lines.length;
+          }
+
+          return processedUpTo;
+        };
+
+        const processResponse = () => {
+          const responseText = xhr.responseText;
+          if (!responseText) return;
+
+          const newData = responseText.slice(lastProcessedIndex);
+          if (!newData) return;
+
+          lastProcessedIndex = responseText.length;
+          buffer += newData;
+
+          const lines = buffer.split('\n');
+          const processedUpTo = parseAndProcessEvents(lines);
+
+          if (processedUpTo > 0) {
+            buffer = lines.slice(processedUpTo).join('\n');
+          }
+        };
+
+        const processEventImmediately = (eventName: string, dataJson: string) => {
+          try {
+            const parsedData = JSON.parse(dataJson);
+            const finalEventName = eventName || parsedData.event_type || 'message';
+
+            if (!firstJobId && parsedData.job_id) {
+              firstJobId = parsedData.job_id;
+              resolve({
+                job_id: firstJobId!,
+                status: parsedData.status || parsedData.event_type || 'queued',
+                message: parsedData.message || 'Scan started',
+              });
+            }
+
+            // Forward to callback
+            if (onEvent && finalEventName) {
+              try {
+                onEvent(finalEventName, parsedData);
+              } catch (callbackError) {
+                console.error('[ScanService] Error in callback:', callbackError);
+              }
+            }
+          } catch (parseError) {
+            console.warn('[ScanService] Failed to parse SSE data:', parseError);
+          }
+        };
+
+        xhr.onreadystatechange = () => {
+          if (xhr.readyState === XMLHttpRequest.LOADING || xhr.readyState === XMLHttpRequest.DONE) {
+            processResponse();
+          }
+        };
+
+        xhr.onprogress = () => {
+          processResponse();
+        };
+
+        xhr.onload = () => {
+          // Check HTTP status first
+          if (xhr.status !== 200) {
+            console.error('[ScanService] HTTP error:', {
+              status: xhr.status,
+              statusText: xhr.statusText,
+              response: xhr.responseText?.substring(0, 500),
+            });
+
+            let errorMessage = `Scan request failed with status ${xhr.status}`;
+            try {
+              const errorData = JSON.parse(xhr.responseText);
+              errorMessage = errorData.message || errorData.detail || errorMessage;
+            } catch {
+              // Response is not JSON, use status-based message
+              if (xhr.status === 401) {
+                errorMessage = 'Authentication failed. Please sign in again.';
+              } else if (xhr.status === 403) {
+                errorMessage = 'Access denied. You do not have permission to perform this scan.';
+              } else if (xhr.status >= 500) {
+                errorMessage = 'Server error. Please try again later.';
+              }
+            }
+            reject(new Error(errorMessage));
+            return;
+          }
+
+          // Process any remaining buffer data
+          if (buffer) {
+            processResponse();
+          }
+
+          // Fallback: Process entire response to catch any missed events
+          if (xhr.responseText) {
+            const lines = xhr.responseText.split('\n');
+            parseAndProcessEvents(lines);
+          }
+
+          if (!firstJobId) {
+            console.error('[ScanService] No job_id found in response:', {
+              responseLength: xhr.responseText?.length,
+              responsePreview: xhr.responseText?.substring(0, 500),
+              processedEventsCount: processedEvents.size,
+            });
+            reject(new Error('No job_id received from scan'));
+          }
+        };
+
+        xhr.onerror = () => {
+          reject(new Error('Network error during scan'));
+        };
+
+        xhr.ontimeout = () => {
+          reject(new Error('Scan request timed out'));
+        };
+
+        xhr.send();
+      });
     } catch (error) {
       if (isAxiosError(error)) {
         const errorData = error.response?.data || {};
@@ -616,72 +778,33 @@ export const scanService = {
     }
   },
 
-  async startPageDiscovery(
-    url: string,
-    onEvent?: (eventName: string, data: any) => void
-  ): Promise<{ job_id: string; status: string; message: string }> {
-    if (!url) {
-      throw new Error('URL is required');
+  async deleteScan(jobId: string): Promise<{ success: boolean; message?: string }> {
+    if (!jobId) {
+      throw new Error('Job ID is required');
     }
 
-    const token = useAuthStore.getState().token;
+    const authState = useAuthStore.getState();
+    const token = authState.token;
+
+    if (!token) {
+      throw new Error('Authentication required. Please sign in.');
+    }
 
     const headers: any = {
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
     };
 
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
-    }
-
     try {
-      // Call the discovery API
-      const response = await apiClient.post<DiscoveryResponse>(
-        '/api/v1/scan/discovery/discover-urls',
-        { url },
+      const response = await apiClient.delete(
+        `/api/v1/scan/${jobId}`,
         { headers }
       );
 
-      const responseData = response.data;
-
-      if (responseData.status_code === 200) {
-        // Transform API response to PageDiscoveryResult format
-        const discoveryData = responseData.data;
-        lastDiscoveryResult = {
-          domain: discoveryData.base_url,
-          total_pages: discoveryData.discovered_count,
-          discovered_at: new Date().toISOString(),
-          pages: discoveryData.important_urls.map((url: any, index: number) => ({
-            id: `page-${index}`,
-            name: url.title,
-            url: url.url,
-            title: url.title,
-            status: 200, // Assume success
-            lastModified: new Date().toISOString(),
-            size: 0, // Not provided by API
-            priority: url.priority,
-            description: url.description,
-            category: 'Discovered Pages'
-          }))
-        };
-
-        // Simulate events for UI feedback
-        if (onEvent) {
-          onEvent('discovery_started', { job_id: 'discovery-' + Date.now(), message: 'Starting page discovery...' });
-          setTimeout(() => onEvent('crawling_pages', { progress: 25, message: 'Crawling website pages...' }), 500);
-          setTimeout(() => onEvent('analyzing_structure', { progress: 50, message: 'Analyzing site structure...' }), 1000);
-          setTimeout(() => onEvent('prioritizing_pages', { progress: 75, message: 'Prioritizing important pages...' }), 1500);
-          setTimeout(() => onEvent('discovery_complete', { message: 'Page discovery completed successfully' }), 2000);
-        }
-
-        return {
-          job_id: 'discovery-' + Date.now(),
-          status: 'completed',
-          message: responseData.message,
-        };
-      } else {
-        throw new Error(responseData.message || 'Discovery failed');
-      }
+      return {
+        success: true,
+        message: response.data?.message || 'Scan deleted successfully',
+      };
     } catch (error) {
       if (isAxiosError(error)) {
         const errorData = error.response?.data || {};
@@ -691,26 +814,134 @@ export const scanService = {
       if (error instanceof Error) {
         throw error;
       }
-      throw new Error('Failed to start page discovery. Please try again.');
+      throw new Error('Failed to delete scan. Please try again.');
     }
   },
 
-  async getDiscoveredPages(jobId: string): Promise<PageDiscoveryResult> {
-    if (!jobId) {
-      throw new Error('Job ID is required');
+  async deleteMultipleScans(jobIds: string[]): Promise<{
+    success: boolean;
+    deleted: string[];
+    failed: { jobId: string; error: string }[];
+  }> {
+    if (!jobIds || jobIds.length === 0) {
+      throw new Error('At least one Job ID is required');
     }
 
-    // Return the stored discovery result
-    if (lastDiscoveryResult) {
-      return lastDiscoveryResult;
+    const authState = useAuthStore.getState();
+    const token = authState.token;
+
+    if (!token) {
+      throw new Error('Authentication required. Please sign in.');
     }
 
-    // If no result is stored, return empty result
+    const deleted: string[] = [];
+    const failed: { jobId: string; error: string }[] = [];
+
+    await Promise.all(
+      jobIds.map(async (jobId) => {
+        try {
+          await this.deleteScan(jobId);
+          deleted.push(jobId);
+        } catch (error) {
+          failed.push({
+            jobId,
+            error: error instanceof Error ? error.message : 'Unknown error',
+          });
+        }
+      })
+    );
+
     return {
-      domain: '',
-      total_pages: 0,
-      pages: [],
-      discovered_at: new Date().toISOString()
+      success: failed.length === 0,
+      deleted,
+      failed,
     };
+  },
+};
+
+// Redirect Service for handling post-auth redirects
+const REDIRECT_STORAGE_KEY = 'pending_redirect';
+
+export const RedirectService = {
+  // Store a redirect URL for later use
+  storeRedirect: async (url: string): Promise<void> => {
+    try {
+      await storage.setItem(REDIRECT_STORAGE_KEY, url);
+    } catch (error) {
+      console.error('Failed to store redirect:', error);
+    }
+  },
+
+  // Get stored redirect URL
+  getStoredRedirect: async (): Promise<string | null> => {
+    try {
+      return await storage.getItem<string>(REDIRECT_STORAGE_KEY);
+    } catch (error) {
+      console.error('Failed to get stored redirect:', error);
+      return null;
+    }
+  },
+
+  // Clear stored redirect
+  clearStoredRedirect: async (): Promise<void> => {
+    try {
+      await storage.removeItem(REDIRECT_STORAGE_KEY);
+    } catch (error) {
+      console.error('Failed to clear stored redirect:', error);
+    }
+  },
+
+  // Validate redirect URL to prevent open redirect attacks
+  validateRedirect: (url: string | undefined): string | null => {
+    if (!url) return null;
+
+    // Only allow relative paths (starting with /)
+    if (!url.startsWith('/')) {
+      console.warn('Invalid redirect URL (must be relative):', url);
+      return null;
+    }
+
+    // Block any protocol handlers
+    if (url.includes('://') || url.startsWith('//')) {
+      console.warn('Invalid redirect URL (no protocols allowed):', url);
+      return null;
+    }
+
+    // Allowed path prefixes (must include route group)
+    const allowedPrefixes = [
+      '/(tabs)',
+      '/(reports)',
+      '/(main)',
+      '/(profile)',
+      '/(settings)',
+      '/(support)',
+      '/(hireRequest)',
+      '/(general)',
+      '/(account)',
+      '/(socialShare)',
+    ];
+
+    const isAllowed = allowedPrefixes.some(prefix => url.startsWith(prefix));
+    if (!isAllowed) {
+      console.warn('Redirect URL not in allowed list:', url);
+      return null;
+    }
+
+    return url;
+  },
+
+  // Parse redirect URL into pathname and params
+  parseRedirectUrl: (url: string): { pathname: string; params: Record<string, string> } => {
+    const [pathname, queryString] = url.split('?');
+    const params: Record<string, string> = {};
+
+    if (queryString) {
+      const searchParams = new URLSearchParams(queryString);
+      searchParams.forEach((value, key) => {
+        params[key] = value;
+      });
+    }
+
+    return { pathname, params };
   },
 };

@@ -1,6 +1,7 @@
 import AuthModal from '@/components/auth/auth-modal';
 import { useAuditInfoStore } from '@/store/audit-website-details-store';
 import { useAuthStore } from '@/store/auth-store';
+import { useScanStore } from '@/store/useScanStore';
 import styles from '@/stylesheets/hire-request-stylesheet';
 import { Feather } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -13,11 +14,12 @@ const HireRequest = () => {
   const params = useLocalSearchParams();
   const { isAuthenticated } = useAuthStore();
   const { auditInfo } = useAuditInfoStore();
+  const { jobId: storeJobId } = useScanStore();
   const [modalVisible, setModalVisible] = useState(false);
 
-  // Get job_id from route params if available
-  const jobId = Array.isArray(params.jobId) ? params.jobId[0] : params.jobId;
-
+  // Get job_id from route params, fallback to store
+  const paramsJobId = Array.isArray(params.jobId) ? params.jobId[0] : params.jobId;
+  const jobId = paramsJobId || storeJobId || undefined;
   const handleReviewPress = () => {
     if (isAuthenticated) {
       router.push({
@@ -73,7 +75,7 @@ const HireRequest = () => {
           </TouchableOpacity>
         </View>
       </View>
-      <AuthModal visible={modalVisible} onClose={() => setModalVisible(false)} redirect={jobId ? `/request-form?jobId=${jobId}` : "/request-form"} />
+      <AuthModal visible={modalVisible} onClose={() => setModalVisible(false)} redirect={jobId ? `/(hireRequest)/request-form?jobId=${jobId}` : "/(hireRequest)/request-form"} />
     </SafeAreaView>
   )
 }

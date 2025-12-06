@@ -1,8 +1,25 @@
 import * as AppleAuthentication from 'expo-apple-authentication';
 import Constants from 'expo-constants';
+import { Platform } from 'react-native';
+
+export interface AppleAuthCredential {
+  authorizationCode: string;
+  identityToken: string | null;
+  email: string | null;
+  fullName: {
+    givenName: string | null;
+    familyName: string | null;
+  } | null;
+  user: string; // Apple's unique user identifier
+}
 
 export class AppleAuthService {
   static isAvailable(): boolean {
+    // Apple Sign-In is only available on iOS
+    if (Platform.OS !== 'ios') {
+      return false;
+    }
+
     // Check if running in Expo Go (which doesn't support Apple Sign-In)
     const isExpoGo = Constants.executionEnvironment === 'storeClient';
     if (isExpoGo) {
@@ -18,7 +35,28 @@ export class AppleAuthService {
     }
   }
 
-  static async signIn(): Promise<string> {
+  static async checkAvailability(): Promise<boolean> {
+    if (Platform.OS !== 'ios') {
+      return false;
+    }
+
+    try {
+      return await AppleAuthentication.isAvailableAsync();
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Sign in with Apple and return the credential containing authorization code
+   * The authorization code is sent to the backend callback endpoint
+   */
+  static async signIn(): Promise<AppleAuthCredential> {
+    // Check platform
+    if (Platform.OS !== 'ios') {
+      throw new Error('Apple Sign-In is only available on iOS devices.');
+    }
+
     // Check if running in Expo Go
     const isExpoGo = Constants.executionEnvironment === 'storeClient';
     if (isExpoGo) {
@@ -40,21 +78,43 @@ export class AppleAuthService {
         ],
       });
 
-      if (credential.identityToken) {
-        return credential.identityToken;
-      } else {
-        throw new Error('No identity token received from Apple');
+      // The authorizationCode is required for the backend callback
+      if (!credential.authorizationCode) {
+        throw new Error('No authorization code received from Apple');
       }
-    } catch (error) {
+
+      console.log('✅ Apple Sign-In successful');
+      console.log('User:', credential.user);
+      console.log('Email:', credential.email || '(not provided - returning user)');
+      console.log('Name:', credential.fullName?.givenName || '(not provided - returning user)');
+
+      return {
+        authorizationCode: credential.authorizationCode,
+        identityToken: credential.identityToken,
+        email: credential.email,
+        fullName: credential.fullName ? {
+          givenName: credential.fullName.givenName,
+          familyName: credential.fullName.familyName,
+        } : null,
+        user: credential.user,
+      };
+    } catch (error: any) {
+      // Handle specific Apple authentication errors
+      if (error.code === 'ERR_REQUEST_CANCELED') {
+        throw new Error('Sign-in was cancelled by the user.');
+      }
+      if (error.code === 'ERR_INVALID_RESPONSE') {
+        throw new Error('Invalid response from Apple. Please try again.');
+      }
       if (error instanceof Error) {
         throw error;
       }
-      throw new Error('Apple sign-in failed');
+      throw new Error('Apple sign-in failed. Please try again.');
     }
   }
 
   static getPlatform(): string {
-    return 'ios'; // Apple Sign-In is primarily for iOS
+    return 'ios';
   }
 }
 

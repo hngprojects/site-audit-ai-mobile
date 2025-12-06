@@ -1,4 +1,5 @@
-import { scanService, type PageDiscoveryResult, type ScanHistoryItem, type ScanResult } from '@/lib/scan-service';
+import { apiClient } from '@/lib/api-client';
+import { scanService, type ScanHistoryItem, type ScanResult } from '@/lib/scan-service';
 import { useAuthStore } from '@/store/auth-store';
 
 export const startScan = async (
@@ -29,7 +30,6 @@ export const getScanStatus = async (jobId: string): Promise<{
   // }
 
   // Set the token in the apiClient headers
-  const { apiClient } = await import('@/lib/api-client');
   if (token) {
     apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
   } else {
@@ -46,7 +46,6 @@ export const getScanResult = async (jobId: string): Promise<ScanResult> => {
   // }
 
   // Set the token in the apiClient headers
-  const { apiClient } = await import('@/lib/api-client');
   if (token) {
     apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
   } else {
@@ -63,7 +62,6 @@ export const getScanSummary = async (jobId: string) => {
   // }
 
   // Set the token in the apiClient headers
-  const { apiClient } = await import('@/lib/api-client');
   if (token) {
     apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
   } else {
@@ -80,7 +78,6 @@ export const getScanIssues = async (jobId: string) => {
   // }
 
   // Set the token in the apiClient headers
-  const { apiClient } = await import('@/lib/api-client');
   if (token) {
     apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
   } else {
@@ -97,7 +94,6 @@ export const getScanHistory = async (): Promise<ScanHistoryItem[]> => {
   }
 
   // Set the token in the apiClient headers
-  const { apiClient } = await import('@/lib/api-client');
   apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
   return await scanService.getScanHistory();
@@ -107,7 +103,6 @@ export const stopScan = async (jobId: string): Promise<{ success: boolean; messa
   const token = useAuthStore.getState().token;
 
   // Set the token in the apiClient headers
-  const { apiClient } = await import('@/lib/api-client');
   if (token) {
     apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
   } else {
@@ -117,13 +112,30 @@ export const stopScan = async (jobId: string): Promise<{ success: boolean; messa
   return await scanService.stopScan(jobId);
 };
 
-export const startPageDiscovery = async (
-  url: string,
-  onEvent?: (eventName: string, data: any) => void
-): Promise<{ job_id: string; status: string; message: string }> => {
-  return await scanService.startPageDiscovery(url, onEvent);
+export const deleteScan = async (jobId: string): Promise<{ success: boolean; message?: string }> => {
+  const token = useAuthStore.getState().token;
+  if (!token) {
+    throw new Error('Authentication required. Please sign in.');
+  }
+
+  // Set the token in the apiClient headers
+  apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+  return await scanService.deleteScan(jobId);
 };
 
-export const getDiscoveredPages = async (jobId: string): Promise<PageDiscoveryResult> => {
-  return await scanService.getDiscoveredPages(jobId);
+export const deleteMultipleScans = async (jobIds: string[]): Promise<{
+  success: boolean;
+  deleted: string[];
+  failed: { jobId: string; error: string }[];
+}> => {
+  const token = useAuthStore.getState().token;
+  if (!token) {
+    throw new Error('Authentication required. Please sign in.');
+  }
+
+  // Set the token in the apiClient headers
+  apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+  return await scanService.deleteMultipleScans(jobIds);
 };
