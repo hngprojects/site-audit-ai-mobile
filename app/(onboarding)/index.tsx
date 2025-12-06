@@ -1,5 +1,6 @@
 import { storage, STORAGE_KEYS } from "@/lib/storage";
 import styles from "@/stylesheets/onboarding-stylesheet";
+import { useTranslation } from "@/utils/translations";
 import { Link, RelativePathString, useRouter } from "expo-router";
 import {
   Image,
@@ -14,6 +15,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 
 const Onboarding = () => {
+  const { t } = useTranslation();
   const router = useRouter();
   const inset = useSafeAreaInsets();
 
@@ -21,14 +23,14 @@ const Onboarding = () => {
 
   const handleNext = async () => {
     try {
-      console.log('📝 Onboarding - Setting completion status...');
+      console.log(' Onboarding - Setting completion status...');
       // Mark onboarding as completed and navigate to homepage
       await storage.setItem(STORAGE_KEYS.ONBOARDING_COMPLETED, true);
-      console.log('💾 Onboarding - Storage setItem completed');
+      console.log(' Onboarding - Storage setItem completed');
 
       // Verify the value was stored correctly
       const stored = await storage.getItem<boolean>(STORAGE_KEYS.ONBOARDING_COMPLETED);
-      console.log('🔍 Onboarding - Verification check:', {
+      console.log(' Onboarding - Verification check:', {
         key: STORAGE_KEYS.ONBOARDING_COMPLETED,
         stored: stored,
         type: typeof stored,
@@ -36,15 +38,15 @@ const Onboarding = () => {
       });
 
       if (stored === true) {
-        console.log('✅ Onboarding - Storage verified, navigating to tabs');
+        console.log(' Onboarding - Storage verified, navigating to tabs');
         router.replace('/(tabs)/' as RelativePathString);
       } else {
-        console.error('❌ Failed to persist onboarding completion status. Stored value:', stored);
+        console.error(' Failed to persist onboarding completion status. Stored value:', stored);
         // Still navigate even if storage fails
         router.replace('/(tabs)/' as RelativePathString);
       }
     } catch (error) {
-      console.error('❌ Error saving onboarding status:', error);
+      console.error(' Error saving onboarding status:', error);
       // Still navigate even if storage fails
       router.replace('/(tabs)/' as RelativePathString);
     }
@@ -62,10 +64,10 @@ const Onboarding = () => {
 
       <View style={styles.textContainer}>
         <Text style={styles.title}>
-          Turn Your Website Into a Sales Driving Machine
+          {t("onboarding.title")}
         </Text>
         <Text style={styles.subtitle}>
-          Trusted by businesses who want their websites to bring in more customers.
+          {t("onboarding.subTitle")}
         </Text>
       </View>
 
@@ -73,20 +75,17 @@ const Onboarding = () => {
 
       {Platform.OS === "ios" ? (
         <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-          <Text style={styles.nextText}>Get Started</Text>
+          <Text style={styles.nextText}>{t("button.getStarted")}</Text>
         </TouchableOpacity>
       ) : (
         <TouchableOpacity style={styles.androidNextButton} onPress={handleNext}>
-          <Text style={styles.nextText}>Get Started</Text>
+          <Text style={styles.nextText}>{t("button.getStarted")}</Text>
         </TouchableOpacity>
       )}
 
       <View style={styles.privacyContainer}>
         <Text style={styles.privacyPolicy}>
-          By continuing you accept our <Link href={'../(profile)/privacy-policy'} style={styles.link}>Terms & Conditions</Link>
-        </Text>
-        <Text style={styles.privacyPolicy}>
-          and <Link href={'../(profile)/privacy-policy'} style={styles.link}>Privacy Policy</Link>
+          {t("privacy.policy1")} <Link href={'../(profile)/privacy-policy'} style={styles.link}>{t("privacy.policy2")}</Link>
         </Text>
       </View>
 
